@@ -16,12 +16,25 @@
 
 ### 2. Configure the Web Service
 
-**Important**: When Render auto-detects Node.js, you need to manually change the settings:
+**If PHP is not showing as an option, try these steps:**
 
-1. **Environment**: Change from "Node" to **"PHP"**
+#### Option 1: Manual Configuration
+1. **Environment**: Look for "PHP" in the dropdown. If not visible, try scrolling or typing "php"
 2. **Build Command**: `composer install --no-dev --optimize-autoloader`
 3. **Start Command**: `vendor/bin/heroku-php-apache2 public/`
-4. **Root Directory**: Leave empty (or `/` if needed)
+4. **Root Directory**: Leave empty
+
+#### Option 2: Use Blueprint (Recommended)
+1. Instead of "Web Service", try "Blueprint"
+2. Connect your GitHub repository
+3. Render will use the `render.yaml` file automatically
+4. This should automatically detect PHP
+
+#### Option 3: Alternative Environment Selection
+If PHP still doesn't appear:
+1. Try selecting "Other" or "Custom"
+2. Then manually enter the build and start commands
+3. Or try "Static Site" and then change to "Web Service"
 
 ### 3. Environment Variables
 

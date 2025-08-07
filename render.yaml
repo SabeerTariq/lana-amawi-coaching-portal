@@ -2,6 +2,7 @@ services:
   - type: web
     name: lana-amawi-coaching-portal
     env: php
+    region: oregon
     buildCommand: |
       composer install --no-dev --optimize-autoloader
       php artisan key:generate --force
