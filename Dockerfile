@@ -22,20 +22,24 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy existing application directory contents
-COPY . /var/www
-
-# Copy existing application directory permissions
-COPY --chown=www-data:www-data . /var/www
+# Copy composer files first for better caching
+COPY composer.json composer.lock ./
 
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Generate key
-RUN php artisan key:generate --force
+# Copy the rest of the application
+COPY . .
 
-# Cache config
-RUN php artisan config:cache
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www
+
+# Create .env file if it doesn't exist
+RUN cp .env.example .env || echo "No .env.example found"
+
+# Copy startup script
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
 # Change current user to www
 USER www-data
@@ -44,4 +48,4 @@ USER www-data
 EXPOSE 8000
 
 # Start Laravel development server
-CMD php artisan serve --host=0.0.0.0 --port=$PORT 
+CMD ["/usr/local/bin/start.sh"] 
