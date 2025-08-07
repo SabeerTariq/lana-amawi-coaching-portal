@@ -1,40 +1,31 @@
 # Lana Amawi Coaching Portal
 
-A comprehensive coaching portal built with Laravel, Bootstrap, and MySQL for managing client appointments, messaging, and administrative tasks.
+A Laravel-based coaching management system with admin and client portals.
 
 ## Features
 
-### Public Features
-- **Booking Form**: Public booking form for new clients to schedule sessions
-- **Authentication**: Login and registration system
+- **Admin Portal**: Dashboard, client management, appointment scheduling, messaging
+- **Client Portal**: Personal dashboard, appointment viewing, messaging with admin
+- **Authentication**: User registration, login, password reset
+- **Appointment Management**: Booking, scheduling, status tracking
+- **Messaging System**: Real-time communication between admin and clients
+- **Email Notifications**: Automated email sending for credentials and notifications
 
-### Client Portal
-- **Dashboard**: Overview with next appointment, recent messages, and statistics
-- **Appointments**: View upcoming and past appointments with reschedule/cancel options
-- **Messages**: Secure 1-on-1 chat interface with Lana
-- **Profile**: Personal information and booking history
+## Local Development Setup
 
-### Admin Portal
-- **Dashboard**: Statistics, today's appointments, and quick actions
-- **Client Management**: View all clients and their profiles
-- **Messages**: Chat interface to communicate with clients
-- **Calendar**: Monthly calendar view of all appointments
-- **Settings**: Admin profile and system settings
+### Prerequisites
 
-## Technology Stack
+- PHP 8.2 or higher
+- Composer
+- MySQL/PostgreSQL
+- Node.js (for frontend assets)
 
-- **Backend**: Laravel 11
-- **Frontend**: HTML, Bootstrap 5, JavaScript
-- **Database**: MySQL
-- **Authentication**: Laravel's built-in authentication
-- **Styling**: Custom CSS with Bootstrap components
-
-## Installation
+### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd lana-amawi
+   git clone https://github.com/SabeerTariq/lana-amawi-coaching-portal.git
+   cd lana-amawi-coaching-portal
    ```
 
 2. **Install PHP dependencies**
@@ -56,115 +47,72 @@ A comprehensive coaching portal built with Laravel, Bootstrap, and MySQL for man
 5. **Configure database**
    - Update `.env` file with your database credentials
    - Run migrations: `php artisan migrate`
-   - Seed admin user: `php artisan db:seed --class=AdminUserSeeder`
+   - Seed the database: `php artisan db:seed`
 
-6. **Start development server**
+6. **Build frontend assets**
    ```bash
-   php artisan serve
    npm run dev
    ```
 
-## Default Admin Credentials
+7. **Start the development server**
+   ```bash
+   php artisan serve
+   ```
 
-- **Email**: admin@lana-amawi.com
-- **Password**: password123
+### Default Admin Account
+
+After running the seeders, you can login with:
+- **Email**: admin@lanaamawi.com
+- **Password**: password
+
+### Development Commands
+
+```bash
+# Start development server
+php artisan serve
+
+# Run migrations
+php artisan migrate
+
+# Seed database
+php artisan db:seed
+
+# Clear cache
+php artisan config:clear
+php artisan cache:clear
+
+# Run tests
+php artisan test
+
+# Build assets for production
+npm run build
+```
 
 ## Project Structure
 
 ```
-resources/
-├── views/
-│   ├── layouts/
-│   │   ├── app.blade.php          # Main layout
-│   │   ├── client.blade.php       # Client portal layout
-│   │   └── admin.blade.php        # Admin portal layout
-│   ├── auth/
-│   │   ├── login.blade.php        # Login page
-│   │   └── register.blade.php     # Registration page
-│   ├── client/
-│   │   ├── dashboard.blade.php    # Client dashboard
-│   │   ├── appointments.blade.php # Client appointments
-│   │   └── messages.blade.php     # Client messages
-│   ├── admin/
-│   │   ├── dashboard.blade.php    # Admin dashboard
-│   │   ├── clients.blade.php      # Client management
-│   │   ├── messages.blade.php     # Admin messages
-│   │   ├── calendar.blade.php     # Calendar view
-│   │   └── settings.blade.php     # Admin settings
-│   └── booking.blade.php          # Public booking form
-
-app/
-├── Http/Controllers/
-│   ├── BookingController.php      # Handle booking form
-│   ├── AuthController.php         # Authentication
-│   ├── ClientController.php       # Client portal logic
-│   └── AdminController.php        # Admin portal logic
-├── Models/
-│   ├── User.php                   # User model
-│   ├── Booking.php                # Booking model
-│   ├── Appointment.php            # Appointment model
-│   └── Message.php                # Message model
-└── Http/Middleware/
-    └── AdminMiddleware.php        # Admin route protection
+lana-amawi/
+├── app/
+│   ├── Http/Controllers/     # Application controllers
+│   ├── Models/              # Eloquent models
+│   └── Mail/                # Email classes
+├── database/
+│   ├── migrations/          # Database migrations
+│   └── seeders/            # Database seeders
+├── resources/
+│   └── views/              # Blade templates
+├── routes/
+│   └── web.php             # Web routes
+└── public/                 # Public assets
 ```
 
-## Database Schema
+## Technology Stack
 
-### Users Table
-- `id`, `name`, `email`, `password`, `is_admin`, `timestamps`
-
-### Bookings Table
-- `id`, `full_name`, `email`, `phone`, `program`, `preferred_date`, `preferred_time`, `message`, `status`, `timestamps`
-
-### Appointments Table
-- `id`, `user_id`, `program`, `appointment_date`, `appointment_time`, `message`, `status`, `timestamps`
-
-### Messages Table
-- `id`, `user_id`, `message`, `sender_type`, `is_read`, `timestamps`
-
-## Routes
-
-### Public Routes
-- `GET /` - Booking form
-- `GET /login` - Login page
-- `GET /register` - Registration page
-
-### Client Routes (Authenticated)
-- `GET /client/dashboard` - Client dashboard
-- `GET /client/appointments` - Client appointments
-- `GET /client/messages` - Client messages
-- `GET /client/profile` - Client profile
-
-### Admin Routes (Authenticated + Admin)
-- `GET /admin/dashboard` - Admin dashboard
-- `GET /admin/clients` - Client management
-- `GET /admin/messages` - Admin messages
-- `GET /admin/calendar` - Calendar view
-- `GET /admin/settings` - Admin settings
-
-## Features Implemented
-
-✅ **Booking Form**: Complete booking form with validation
-✅ **Authentication**: Login/register system with role-based access
-✅ **Client Dashboard**: Overview with statistics and next appointment
-✅ **Client Appointments**: View and manage appointments
-✅ **Client Messages**: Chat interface with Lana
-✅ **Admin Dashboard**: Statistics and quick actions
-✅ **Admin Client Management**: View and manage clients
-✅ **Admin Messages**: Chat interface for client communication
-✅ **Database**: Complete database schema with relationships
-✅ **Middleware**: Admin route protection
-✅ **Responsive Design**: Mobile-friendly Bootstrap layout
-
-## Next Steps
-
-1. **Email Notifications**: Implement email notifications for bookings and messages
-2. **Calendar Integration**: Add calendar integration for appointments
-3. **Payment Processing**: Integrate payment processing for sessions
-4. **File Uploads**: Add file sharing in messages
-5. **Advanced Analytics**: Add detailed reporting and analytics
-6. **Multi-admin Support**: Support for multiple admin users
-7. **API Development**: Create REST API for mobile app integration
+- **Backend**: Laravel 12, PHP 8.2
+- **Frontend**: Blade templates, Bootstrap, JavaScript
+- **Database**: MySQL/PostgreSQL
+- **Email**: Laravel Mail with SMTP
+- **Authentication**: Laravel's built-in auth system
 
 ## Contributing
 
