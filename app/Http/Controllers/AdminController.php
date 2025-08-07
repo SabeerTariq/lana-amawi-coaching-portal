@@ -178,10 +178,11 @@ class AdminController extends Controller
 
         $appointment = Appointment::create([
             'user_id' => $request->client_id,
+            'program' => null, // Program field is nullable
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
             'status' => $request->status,
-            'notes' => $request->notes,
+            'message' => $request->notes, // Use 'message' field instead of 'notes'
         ]);
 
         return response()->json([
