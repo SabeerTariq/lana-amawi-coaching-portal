@@ -35,6 +35,10 @@ class Appointment extends Model
      */
     public function getProgramNameAttribute()
     {
+        if (!$this->program) {
+            return 'General Coaching Session';
+        }
+        
         $programs = [
             'life_coaching' => 'Life Coaching Session',
             'career_coaching' => 'Career Coaching Session',

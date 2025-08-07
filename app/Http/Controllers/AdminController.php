@@ -293,7 +293,7 @@ class AdminController extends Controller
         // Create appointment from booking
         $appointment = Appointment::create([
             'user_id' => User::where('email', $booking->email)->first()->id,
-            'program' => $booking->program,
+            'program' => $booking->program ?? null, // Handle null program values
             'appointment_date' => $booking->preferred_date,
             'appointment_time' => $booking->preferred_time,
             'message' => $booking->message,

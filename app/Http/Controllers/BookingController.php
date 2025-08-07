@@ -24,7 +24,6 @@ class BookingController extends Controller
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
-            'program' => 'required|string|in:life_coaching,career_coaching,relationship_coaching,wellness_coaching',
             'preferred_date' => 'required|date|after_or_equal:today',
             'preferred_time' => 'required|string',
             'message' => 'nullable|string|max:1000',
@@ -68,7 +67,7 @@ class BookingController extends Controller
                 'full_name' => $request->full_name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'program' => $request->program,
+                'program' => null, // Program field removed from form
                 'preferred_date' => $request->preferred_date,
                 'preferred_time' => $request->preferred_time,
                 'message' => $request->message,
