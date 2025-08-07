@@ -16,9 +16,12 @@
 
 ### 2. Configure the Web Service
 
-**Environment**: PHP  
-**Build Command**: `composer install --no-dev --optimize-autoloader`  
-**Start Command**: `vendor/bin/heroku-php-apache2 public/`
+**Important**: When Render auto-detects Node.js, you need to manually change the settings:
+
+1. **Environment**: Change from "Node" to **"PHP"**
+2. **Build Command**: `composer install --no-dev --optimize-autoloader`
+3. **Start Command**: `vendor/bin/heroku-php-apache2 public/`
+4. **Root Directory**: Leave empty (or `/` if needed)
 
 ### 3. Environment Variables
 
