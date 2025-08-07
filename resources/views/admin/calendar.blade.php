@@ -398,6 +398,64 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         initializeCalendar();
     }, 1000);
+
+    // Navigation buttons
+    document.getElementById('prevMonth').addEventListener('click', function() {
+        if (!isLoading) {
+            calendar.prev();
+        }
+    });
+    
+    document.getElementById('nextMonth').addEventListener('click', function() {
+        if (!isLoading) {
+            calendar.next();
+        }
+    });
+
+    document.getElementById('todayBtn').addEventListener('click', function() {
+        if (!isLoading) {
+            calendar.today();
+        }
+    });
+
+    // Add appointment button
+    document.getElementById('addAppointmentBtn').addEventListener('click', function() {
+        if (!isLoading) {
+            showAddAppointmentModal();
+        }
+    });
+
+    // Appointment form submission
+    document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!isLoading) {
+            saveAppointment();
+        }
+    });
+
+    // Sidebar appointment clicks
+    document.querySelectorAll('.appointment-item').forEach(item => {
+        item.addEventListener('click', function() {
+            if (!isLoading) {
+                const appointmentId = this.dataset.appointmentId;
+                showAppointmentDetailsById(appointmentId);
+            }
+        });
+    });
+
+    // Edit appointment button
+    document.getElementById('editAppointmentBtn').addEventListener('click', function() {
+        if (currentAppointmentId) {
+            showEditAppointmentModal(currentAppointmentId);
+        }
+    });
+
+    // Cancel appointment button
+    document.getElementById('cancelAppointmentBtn').addEventListener('click', function() {
+        if (currentAppointmentId) {
+            cancelAppointment(currentAppointmentId);
+        }
+    });
 });
 
 function initializeCalendar() {
@@ -530,65 +588,6 @@ function showFallback() {
     document.getElementById('calendar').style.display = 'none';
     document.getElementById('calendar-fallback').style.display = 'block';
 }
-
-    // Navigation buttons
-    document.getElementById('prevMonth').addEventListener('click', function() {
-        if (!isLoading) {
-            calendar.prev();
-        }
-    });
-    
-    document.getElementById('nextMonth').addEventListener('click', function() {
-        if (!isLoading) {
-            calendar.next();
-        }
-    });
-
-    document.getElementById('todayBtn').addEventListener('click', function() {
-        if (!isLoading) {
-            calendar.today();
-        }
-    });
-
-    // Add appointment button
-    document.getElementById('addAppointmentBtn').addEventListener('click', function() {
-        if (!isLoading) {
-            showAddAppointmentModal();
-        }
-    });
-
-    // Appointment form submission
-    document.getElementById('appointmentForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (!isLoading) {
-            saveAppointment();
-        }
-    });
-
-    // Sidebar appointment clicks
-    document.querySelectorAll('.appointment-item').forEach(item => {
-        item.addEventListener('click', function() {
-            if (!isLoading) {
-                const appointmentId = this.dataset.appointmentId;
-                showAppointmentDetailsById(appointmentId);
-            }
-        });
-    });
-
-    // Edit appointment button
-    document.getElementById('editAppointmentBtn').addEventListener('click', function() {
-        if (currentAppointmentId) {
-            showEditAppointmentModal(currentAppointmentId);
-        }
-    });
-
-    // Cancel appointment button
-    document.getElementById('cancelAppointmentBtn').addEventListener('click', function() {
-        if (currentAppointmentId) {
-            cancelAppointment(currentAppointmentId);
-        }
-    });
-});
 
 function showLoadingState() {
     isLoading = true;
