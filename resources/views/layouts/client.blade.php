@@ -97,8 +97,8 @@
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
+                <div class="position-sticky pt-3 d-flex flex-column" style="height: calc(100vh - 80px);">
+                    <ul class="nav flex-column flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('client.dashboard') ? 'active' : '' }}" 
                                href="{{ route('client.dashboard') }}">
@@ -118,6 +118,22 @@
                             </a>
                         </li>
                     </ul>
+                    
+                    <!-- Logout at bottom -->
+                    <div class="mt-auto pb-3">
+                        @auth
+                            <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </button>
+                            </form>
+                        @else
+                            <a class="nav-link" href="{{ route('login') }}">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </a>
+                        @endauth
+                    </div>
                 </div>
             </div>
 

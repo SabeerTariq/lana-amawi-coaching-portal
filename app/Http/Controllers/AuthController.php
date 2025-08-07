@@ -90,7 +90,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('booking');
+        return redirect()->route('login');
     }
 
     // Password Reset Methods
