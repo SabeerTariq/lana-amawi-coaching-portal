@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->text('message');
-            $table->enum('sender_type', ['client', 'admin']);
+            $table->string('sender_type');
             $table->boolean('is_read')->default(false);
             $table->timestamps();
         });

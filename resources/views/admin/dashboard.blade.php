@@ -186,6 +186,10 @@
                 <div class="chart-container" style="position: relative; height: 300px;">
                     <canvas id="appointmentsChart"></canvas>
                 </div>
+                <div class="text-center mt-3">
+                    <h6 class="text-muted mb-1">Total Appointments This Week</h6>
+                    <h4 class="text-primary">{{ collect($weeklyAppointments)->sum('count') }}</h4>
+                </div>
             </div>
         </div>
     </div>
@@ -200,6 +204,30 @@
             <div class="card-body">
                 <div class="chart-container" style="position: relative; height: 300px;">
                     <canvas id="statusChart"></canvas>
+                </div>
+                <div class="row mt-3 text-center">
+                    <div class="col-3">
+                        <div class="border-end">
+                            <h6 class="text-success mb-1">{{ $appointmentStatusCounts['confirmed'] }}</h6>
+                            <small class="text-muted">Confirmed</small>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="border-end">
+                            <h6 class="text-warning mb-1">{{ $appointmentStatusCounts['pending'] }}</h6>
+                            <small class="text-muted">Pending</small>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="border-end">
+                            <h6 class="text-info mb-1">{{ $appointmentStatusCounts['completed'] }}</h6>
+                            <small class="text-muted">Completed</small>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <h6 class="text-danger mb-1">{{ $appointmentStatusCounts['cancelled'] }}</h6>
+                        <small class="text-muted">Cancelled</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -281,10 +309,10 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(appointmentsCtx, {
         type: 'line',
         data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            labels: @json(collect($weeklyAppointments)->pluck('date')),
             datasets: [{
                 label: 'Appointments',
-                data: [3, 5, 2, 8, 4, 1, 0],
+                data: @json(collect($weeklyAppointments)->pluck('count')),
                 borderColor: '#730623',
                 backgroundColor: 'rgba(115, 6, 35, 0.1)',
                 tension: 0.4,
@@ -321,7 +349,12 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: ['Confirmed', 'Pending', 'Completed', 'Cancelled'],
             datasets: [{
-                data: [12, 8, 15, 3],
+                data: [
+                    {{ $appointmentStatusCounts['confirmed'] }},
+                    {{ $appointmentStatusCounts['pending'] }},
+                    {{ $appointmentStatusCounts['completed'] }},
+                    {{ $appointmentStatusCounts['cancelled'] }}
+                ],
                 backgroundColor: [
                     '#28a745',
                     '#ffc107',

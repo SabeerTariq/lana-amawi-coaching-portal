@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Appointment;
 use App\Models\Message;
+use App\Models\Booking;
 
 class ClientController extends Controller
 {
@@ -14,8 +15,7 @@ class ClientController extends Controller
         $user = Auth::user();
         
         $nextAppointment = Appointment::where('user_id', $user->id)
-            ->where('appointment_date', '>=', now()->toDateString())
-            ->where('status', '!=', 'cancelled')
+            ->upcoming()
             ->orderBy('appointment_date')
             ->orderBy('appointment_time')
             ->first();
@@ -28,7 +28,7 @@ class ClientController extends Controller
         $totalAppointments = Appointment::where('user_id', $user->id)->count();
         $totalMessages = Message::where('user_id', $user->id)->count();
         $hoursCoached = Appointment::where('user_id', $user->id)
-            ->where('status', 'completed')
+            ->completed()
             ->count() * 1; // Assuming 1 hour per session
 
         return view('client.dashboard', compact(
@@ -44,20 +44,36 @@ class ClientController extends Controller
     {
         $user = Auth::user();
         
+        // Get pending bookings for this user
+        $pendingBookings = Booking::where('email', $user->email)
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Get suggested alternative time bookings
+        $suggestedBookings = Booking::where('email', $user->email)
+            ->where('status', 'suggested_alternative')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
         $upcomingAppointments = Appointment::where('user_id', $user->id)
-            ->where('appointment_date', '>=', now()->toDateString())
-            ->where('status', '!=', 'cancelled')
+            ->upcoming()
             ->orderBy('appointment_date')
             ->orderBy('appointment_time')
             ->get();
 
         $pastAppointments = Appointment::where('user_id', $user->id)
-            ->where('appointment_date', '<', now()->toDateString())
+            ->past()
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
             ->get();
 
-        return view('client.appointments', compact('upcomingAppointments', 'pastAppointments'));
+        return view('client.appointments', compact(
+            'pendingBookings', 
+            'suggestedBookings',
+            'upcomingAppointments', 
+            'pastAppointments'
+        ));
     }
 
     public function messages()
@@ -138,7 +154,8 @@ class ClientController extends Controller
         $user = Auth::user();
         
         $appointments = Appointment::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
             ->get();
 
         return view('client.profile', compact('user', 'appointments'));
@@ -175,5 +192,35 @@ class ClientController extends Controller
         $appointment->update(['status' => 'cancelled']);
 
         return redirect()->back()->with('success', 'Appointment cancelled successfully!');
+    }
+
+    public function bookNewSession(Request $request)
+    {
+        $request->validate([
+            'preferred_date' => 'required|date|after_or_equal:today',
+            'preferred_time' => 'required|string',
+            'message' => 'nullable|string|max:1000',
+        ]);
+
+        $user = Auth::user();
+
+        try {
+            // Create a new booking for the authenticated user
+            $booking = Booking::create([
+                'full_name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone ?? null,
+                'program' => null,
+                'preferred_date' => $request->preferred_date,
+                'preferred_time' => $request->preferred_time,
+                'message' => $request->message,
+                'status' => 'pending',
+            ]);
+
+            return redirect()->back()->with('success', 'Your new session has been booked successfully! We will review and confirm your appointment.');
+        } catch (\Exception $e) {
+            \Log::error('Client booking error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while booking your session. Please try again.');
+        }
     }
 } 

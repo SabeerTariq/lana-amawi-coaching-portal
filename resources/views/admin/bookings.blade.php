@@ -206,6 +206,7 @@ body.popup-open {
     <div class="card shadow">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Pending Bookings</h6>
+            <small class="text-muted">Confirm bookings to move them to appointments section</small>
         </div>
         <div class="card-body">
             @if($bookings->count() > 0)
@@ -216,7 +217,6 @@ body.popup-open {
                                 <th>Client</th>
                                 <th>Preferred Date/Time</th>
                                 <th>Contact Info</th>
-                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -245,35 +245,15 @@ body.popup-open {
                                         </div>
                                     </td>
                                     <td>
-                                        @if($booking->status === 'pending')
-                                            <span class="badge bg-warning">Pending Review</span>
-                                        @elseif($booking->status === 'suggested_alternative')
-                                            <span class="badge bg-info">Alternative Suggested</span>
-                                        @elseif($booking->status === 'confirmed')
-                                            <span class="badge bg-success">Confirmed</span>
-                                        @elseif($booking->status === 'cancelled')
-                                            <span class="badge bg-danger">Cancelled</span>
-                                        @else
-                                            <span class="badge bg-secondary">{{ ucfirst($booking->status) }}</span>
-                                        @endif
-                                    </td>
-                                    <td>
                                         <div class="btn-group" role="group">
-                                            @if($booking->status === 'pending')
-                                                <button type="button" class="btn btn-success btn-sm" 
-                                                        onclick="showPopup('convertPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-check me-1"></i>Confirm
-                                                </button>
-                                                <button type="button" class="btn btn-info btn-sm"
-                                                        onclick="showPopup('suggestPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-clock me-1"></i>Suggest Time
-                                                </button>
-                                            @elseif($booking->status === 'suggested_alternative')
-                                                <button type="button" class="btn btn-success btn-sm"
-                                                        onclick="showPopup('convertPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-check me-1"></i>Confirm
-                                                </button>
-                                            @endif
+                                            <button type="button" class="btn btn-success btn-sm" 
+                                                    onclick="showPopup('convertPopup{{ $booking->id }}')">
+                                                <i class="fas fa-check me-1"></i>Confirm
+                                            </button>
+                                            <button type="button" class="btn btn-info btn-sm"
+                                                    onclick="showPopup('suggestPopup{{ $booking->id }}')">
+                                                <i class="fas fa-clock me-1"></i>Suggest Time
+                                            </button>
                                             @php
                                                 $client = User::where('email', $booking->email)->first();
                                             @endphp
@@ -293,22 +273,26 @@ body.popup-open {
                                 <div class="popup-overlay" id="convertPopup{{ $booking->id }}">
                                     <div class="popup-container">
                                         <div class="popup-header">
-                                            <h5 class="popup-title">Confirm Appointment</h5>
+                                            <h5 class="popup-title">Confirm & Move to Appointments</h5>
                                             <button type="button" class="popup-close" onclick="hidePopup('convertPopup{{ $booking->id }}')">&times;</button>
                                         </div>
                                         <form action="{{ route('admin.bookings.convert', $booking) }}" method="POST">
                                             @csrf
                                             <div class="popup-body">
-                                                <p>Are you sure you want to convert this booking to a confirmed appointment?</p>
+                                                <p>Are you sure you want to confirm this booking and move it to appointments?</p>
                                                 <div class="alert alert-info">
                                                     <strong>Client:</strong> {{ $booking->full_name }}<br>
                                                     <strong>Date:</strong> {{ $booking->preferred_date->format('M d, Y') }}<br>
                                                     <strong>Time:</strong> {{ $booking->preferred_time }}
                                                 </div>
+                                                <div class="alert alert-warning">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <strong>Note:</strong> This booking will be moved to the appointments section where you can manage it (complete/cancel).
+                                                </div>
                                             </div>
                                             <div class="popup-footer">
                                                 <button type="button" class="btn btn-secondary" onclick="hidePopup('convertPopup{{ $booking->id }}')">Cancel</button>
-                                                <button type="submit" class="btn btn-success">Confirm Appointment</button>
+                                                <button type="submit" class="btn btn-success">Confirm & Move to Appointments</button>
                                             </div>
                                         </form>
                                     </div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 08, 2025 at 01:11 AM
+-- Generation Time: Aug 12, 2025 at 09:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,21 +44,7 @@ CREATE TABLE `appointments` (
 --
 
 INSERT INTO `appointments` (`id`, `user_id`, `program`, `appointment_date`, `appointment_time`, `message`, `status`, `created_at`, `updated_at`) VALUES
-(1, 15, 'Executive Coaching', '2025-08-30', '16:00', 'Career development discussion', 'completed', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(2, 15, 'Leadership Training', '2025-08-24', '11:00', 'Leadership skills development', 'pending', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(3, 16, 'Communication Skills', '2025-09-04', '15:00', 'Career development discussion', 'completed', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(4, 16, 'Communication Skills', '2025-08-11', '09:00', 'Communication skills training', 'completed', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(5, 15, 'Life Coaching', '2025-09-05', '16:00', 'Life coaching session', 'completed', '2025-08-07 15:03:41', '2025-08-07 16:41:46'),
-(6, 16, 'Life Coaching', '2025-08-19', '15:00', 'Leadership skills development', 'confirmed', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(7, 16, 'Communication Skills', '2025-08-31', '11:00', 'Progress review meeting', 'pending', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(8, 16, 'Stress Management', '2025-08-19', '09:00', 'Life coaching session', 'completed', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(9, 16, 'Communication Skills', '2025-08-10', '11:00', 'Progress review meeting', 'completed', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(10, 16, 'Communication Skills', '2025-09-05', '09:00', 'Communication skills training', 'pending', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(11, 16, 'Stress Management', '2025-08-29', '16:00', 'Leadership skills development', 'completed', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(12, 15, 'Communication Skills', '2025-08-10', '16:00', 'Goal setting and planning', 'pending', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(13, 16, 'Communication Skills', '2025-08-25', '11:00', 'Communication skills training', 'pending', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(14, 16, 'Career Development', '2025-08-10', '10:00', 'Career development discussion', 'confirmed', '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(15, 15, 'Career Development', '2025-08-18', '09:00', 'Communication skills training', 'pending', '2025-08-07 15:03:41', '2025-08-07 15:03:41');
+(22, 15, NULL, '2025-08-13', '09:00', NULL, 'completed', '2025-08-12 14:18:22', '2025-08-12 14:18:32');
 
 -- --------------------------------------------------------
 
@@ -79,14 +65,6 @@ CREATE TABLE `bookings` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `bookings`
---
-
-INSERT INTO `bookings` (`id`, `full_name`, `email`, `phone`, `program`, `preferred_date`, `preferred_time`, `message`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Thor Glass', 'papaj@mailinator.com', '+1 (227) 965-1079', NULL, '2025-08-09', '12:00', NULL, 'suggested_alternative', '2025-08-07 17:11:18', '2025-08-07 17:13:14'),
-(2, 'Griffin Webster', 'xepebekupe@mailinator.com', '+1 (814) 942-8158', NULL, '2025-08-07', '14:00', 'Magnam maiores qui i', 'pending', '2025-08-07 17:22:13', '2025-08-07 17:22:13');
 
 -- --------------------------------------------------------
 
@@ -183,17 +161,6 @@ CREATE TABLE `messages` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `messages`
---
-
-INSERT INTO `messages` (`id`, `user_id`, `message`, `attachment_path`, `attachment_name`, `attachment_type`, `attachment_size`, `sender_type`, `is_read`, `created_at`, `updated_at`) VALUES
-(1, 15, 'ho', NULL, NULL, NULL, NULL, 'admin', 1, '2025-08-07 15:16:19', '2025-08-07 16:41:27'),
-(2, 15, 'hi', NULL, NULL, NULL, NULL, 'client', 1, '2025-08-07 15:19:56', '2025-08-07 15:24:41'),
-(3, 15, 'hi', 'message-attachments/1754598163_logo-2.png', 'logo-2.png', 'image/png', 5090, 'admin', 1, '2025-08-07 15:22:43', '2025-08-07 16:41:27'),
-(4, 15, 'hi', NULL, NULL, NULL, NULL, 'admin', 1, '2025-08-07 15:29:20', '2025-08-07 16:41:27'),
-(5, 15, '', 'message-attachments/1754598568_Lana Amawmi Service agreement.docx', 'Lana Amawmi Service agreement.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 136002, 'admin', 1, '2025-08-07 15:29:28', '2025-08-07 16:41:27');
-
 -- --------------------------------------------------------
 
 --
@@ -221,7 +188,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (8, '2025_08_07_172645_add_suggested_alternative_to_bookings_status_enum', 1),
 (9, '2025_08_07_201515_add_attachments_to_messages_table', 2),
 (10, '2025_08_07_215137_make_program_nullable_in_bookings_table', 3),
-(11, '2025_08_07_215234_make_program_nullable_in_appointments_table', 4);
+(11, '2025_08_07_215234_make_program_nullable_in_appointments_table', 4),
+(12, '2025_08_12_191548_add_phone_to_users_table', 5);
 
 -- --------------------------------------------------------
 
@@ -255,11 +223,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('D4uXbdltSM5s5rZILtlbzhzAymcAerXjKUDpT1t6', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVFg5SnA5ODZQWlVaamlyeTdtS1FLU29vMXRMYkw3aEJMSXBRZ1huSSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9sb2dpbiI7fX0=', 1754605879),
-('ui8Mb3EEyy8OQjFHJftErKTka1E0IYS8K7Q6nPnN', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiY0NkSmdUT2x2aGQxRUgxb0xnVXY5UXpIRUtOQzZYWW44aElTSXZvayI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fX0=', 1754604114),
-('xE9W32J37Uelp9L1soFBFa0VNKEsFGmaLcwv7dU2', 15, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiWTZoRHlIU0VIUlVMN1lDeHJRcFBPRWhXSHJncWlnZzZoR3VFUlBMdiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTU7fQ==', 1754604150),
-('XnPCfgzi3mxtAQdkpcxPfJIxoQijNUv41DZ4CxnZ', 18, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoia3hmNkVSbnFPNkt1ZTJteVhBcHh6eEJaMkM3YXJEOHo5aDFFemtFNiI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozNzoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Rhc2hib2FyZCI7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjM4OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvY2xpZW50L2Rhc2hib2FyZCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE4O30=', 1754604838),
-('ztmvaMhR2tK3rw7cJoWN4IkpO3qorbRImkR1E0yo', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoidkpmaUx6YkdrbnB0MUtzS3ZRUWdVTjhIdUllN0JzcmxoR29iZ2VCbSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1754604658);
+('7nmv1wm0dO5oCEsHL9Zu9xbe0SZxiEDWgGNpMAAW', 15, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiS1pKWXNaUnRjVUl3SGFFMFpUaVNzN2xYV0JsSjRTaDhJUnMxUjl1cCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE1O30=', 1755026555),
+('XmFnGipLYHsSTPnD9pszm5oc8ESQdoIMnNymoFd4', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoielE0SUlCbEhyNGJ0Q2ZINVpHdk9hRHEyaXZIaEF4dTlHTzh4MFQyUyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9hcHBvaW50bWVudHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxNDt9', 1755026919);
 
 -- --------------------------------------------------------
 
@@ -271,6 +236,7 @@ CREATE TABLE `users` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `phone` varchar(255) DEFAULT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `is_admin` tinyint(1) NOT NULL DEFAULT 0,
@@ -283,12 +249,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `is_admin`, `remember_token`, `created_at`, `updated_at`) VALUES
-(14, 'Admin User', 'admin@example.com', '2025-08-07 15:03:40', '$2y$12$nV9CxLciXFYiNSIl9ehUGO5l8JcZ9Y/Ni.9bn9Ea3GLj0krv6qmn6', 1, NULL, '2025-08-07 15:03:40', '2025-08-07 15:03:40'),
-(15, 'Demo User', 'demo@example.com', '2025-08-07 15:03:40', '$2y$12$2xeDWAA2JBkMqBpbb47iF./aG2NhKqii/2LtskDP/fE1APX1511qa', 0, NULL, '2025-08-07 15:03:40', '2025-08-07 15:03:40'),
-(16, 'Test User', 'test@example.com', '2025-08-07 15:03:41', '$2y$12$YCLznGXTvzWku2zqROdwFexXTqztB83EioioIm9DqxVzekFRePLly', 0, NULL, '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
-(18, 'Thor Glass', 'papaj@mailinator.com', NULL, '$2y$12$qPNA1FSkZdOSLFAvD1/3H.334fTif6iTR5kgI6jAfuO7zDPV50L0W', 0, NULL, '2025-08-07 17:11:14', '2025-08-07 17:11:14'),
-(19, 'Griffin Webster', 'xepebekupe@mailinator.com', NULL, '$2y$12$rmhMvO5DjMpTEtLmhJsxWe.JYhBquusdiUq4XCHEulcr0xGzS7M8O', 0, NULL, '2025-08-07 17:22:09', '2025-08-07 17:22:09');
+INSERT INTO `users` (`id`, `name`, `email`, `phone`, `email_verified_at`, `password`, `is_admin`, `remember_token`, `created_at`, `updated_at`) VALUES
+(14, 'Admin User', 'admin@example.com', NULL, '2025-08-07 15:03:40', '$2y$12$nV9CxLciXFYiNSIl9ehUGO5l8JcZ9Y/Ni.9bn9Ea3GLj0krv6qmn6', 1, NULL, '2025-08-07 15:03:40', '2025-08-07 15:03:40'),
+(15, 'Demo User', 'demo@example.com', NULL, '2025-08-07 15:03:40', '$2y$12$2xeDWAA2JBkMqBpbb47iF./aG2NhKqii/2LtskDP/fE1APX1511qa', 0, NULL, '2025-08-07 15:03:40', '2025-08-07 15:03:40'),
+(16, 'Test User', 'test@example.com', NULL, '2025-08-07 15:03:41', '$2y$12$YCLznGXTvzWku2zqROdwFexXTqztB83EioioIm9DqxVzekFRePLly', 0, NULL, '2025-08-07 15:03:41', '2025-08-07 15:03:41');
 
 --
 -- Indexes for dumped tables
@@ -381,13 +345,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -411,13 +375,13 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Constraints for dumped tables

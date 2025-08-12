@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Appointment;
 use App\Models\Message;
@@ -25,6 +27,25 @@ class AdminController extends Controller
             ->orderBy('appointment_time')
             ->get();
 
+        // Get appointment status counts for the chart
+        $appointmentStatusCounts = [
+            'confirmed' => Appointment::where('status', 'confirmed')->count(),
+            'pending' => Appointment::where('status', 'pending')->count(),
+            'completed' => Appointment::where('status', 'completed')->count(),
+            'cancelled' => Appointment::where('status', 'cancelled')->count(),
+        ];
+
+        // Get weekly appointment data for the line chart
+        $weeklyAppointments = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $count = Appointment::where('appointment_date', $date->toDateString())->count();
+            $weeklyAppointments[] = [
+                'date' => $date->format('D'),
+                'count' => $count
+            ];
+        }
+
         $recentActivity = collect(); // You would implement activity logging here
 
         return view('admin.dashboard', compact(
@@ -33,6 +54,8 @@ class AdminController extends Controller
             'unreadMessages',
             'totalRevenue',
             'todayAppointments',
+            'appointmentStatusCounts',
+            'weeklyAppointments',
             'recentActivity'
         ));
     }
@@ -283,7 +306,8 @@ class AdminController extends Controller
 
     public function bookings()
     {
-        $bookings = Booking::orderBy('created_at', 'desc')
+        $bookings = Booking::where('status', 'pending')
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
         return view('admin.bookings', compact('bookings'));
@@ -291,23 +315,49 @@ class AdminController extends Controller
 
     public function convertBookingToAppointment(Booking $booking)
     {
-        // Create appointment from booking
-        $appointment = Appointment::create([
-            'user_id' => User::where('email', $booking->email)->first()->id,
-            'program' => $booking->program ?? null, // Handle null program values
-            'appointment_date' => $booking->preferred_date,
-            'appointment_time' => $booking->preferred_time,
-            'message' => $booking->message,
-            'status' => 'confirmed',
-        ]);
+        try {
+            // Find or create user based on email
+            $user = User::where('email', $booking->email)->first();
+            
+            if (!$user) {
+                // Create a new user account for the client
+                $user = User::create([
+                    'name' => $booking->full_name,
+                    'email' => $booking->email,
+                    'password' => Hash::make(Str::random(12)), // Generate random password
+                    'is_admin' => false,
+                ]);
+                
+                // Send credentials email to the new client
+                // You can implement email notification here
+            }
 
-        // Update booking status
-        $booking->update(['status' => 'confirmed']);
+            // Create appointment from booking
+            $appointment = Appointment::create([
+                'user_id' => $user->id,
+                'program' => $booking->program ?? null,
+                'appointment_date' => $booking->preferred_date,
+                'appointment_time' => $booking->preferred_time,
+                'message' => $booking->message,
+                'status' => 'confirmed',
+            ]);
 
-        // Send confirmation email to client
-        // You can implement email notification here
+            // Log the conversion for debugging
+            \Log::info('Booking converted to appointment', [
+                'booking_id' => $booking->id,
+                'appointment_id' => $appointment->id,
+                'user_id' => $user->id,
+                'email' => $booking->email
+            ]);
 
-        return redirect()->back()->with('success', 'Booking converted to appointment successfully!');
+            // Delete the booking after successful conversion
+            $booking->delete();
+
+            return redirect()->route('admin.appointments')->with('success', 'Booking converted to appointment successfully! The appointment is now available in the appointments section.');
+        } catch (\Exception $e) {
+            \Log::error('Error converting booking to appointment: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error converting booking to appointment: ' . $e->getMessage());
+        }
     }
 
     public function suggestAlternativeTime(Request $request, Booking $booking)

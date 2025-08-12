@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Since we're using string columns instead of enums, no changes needed
-        // The suggested_alternative status can be used directly
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('phone')->nullable()->after('email');
+        });
     }
 
     /**
@@ -20,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // No changes to reverse
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('phone');
+        });
     }
 };

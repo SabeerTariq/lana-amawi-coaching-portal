@@ -50,6 +50,9 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     // Appointment management
     Route::put('/appointments/{appointment}/reschedule', [ClientController::class, 'rescheduleAppointment'])->name('appointments.reschedule');
     Route::delete('/appointments/{appointment}/cancel', [ClientController::class, 'cancelAppointment'])->name('appointments.cancel');
+    
+    // Booking new sessions
+    Route::post('/book-session', [ClientController::class, 'bookNewSession'])->name('book-session');
 });
 
 // Admin routes (authenticated + admin middleware)
