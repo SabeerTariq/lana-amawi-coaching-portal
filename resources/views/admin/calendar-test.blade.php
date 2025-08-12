@@ -160,16 +160,16 @@ function initializeCalendar() {
                     id: 'test',
                     title: 'Test Appointment',
                     start: new Date().toISOString().split('T')[0] + 'T10:00:00',
-                    backgroundColor: '#007bff',
-                    borderColor: '#007bff',
+                            backgroundColor: '#730623',
+        borderColor: '#730623',
                     textColor: '#fff'
                 },
                 {
                     id: 'test2',
                     title: 'Another Test',
                     start: new Date().toISOString().split('T')[0] + 'T14:00:00',
-                    backgroundColor: '#28a745',
-                    borderColor: '#28a745',
+                            backgroundColor: '#032a57',
+        borderColor: '#032a57',
                     textColor: '#fff'
                 }
             ],

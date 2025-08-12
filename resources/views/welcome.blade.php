@@ -20,21 +20,21 @@
         
         .navbar-brand {
             font-weight: 600;
-            color: #8B4513 !important;
+            color: #730623 !important;
         }
         
         .btn-primary {
-            background-color: #D2691E;
-            border-color: #D2691E;
+            background-color: #730623;
+            border-color: #730623;
         }
         
         .btn-primary:hover {
-            background-color: #CD853F;
-            border-color: #CD853F;
+            background-color: #8a0a2a;
+            border-color: #8a0a2a;
         }
         
         .hero-section {
-            background: linear-gradient(135deg, #D2691E 0%, #CD853F 100%);
+            background: linear-gradient(135deg, #730623 0%, #8a0a2a 100%);
             color: white;
             padding: 100px 0;
         }
@@ -66,21 +66,49 @@
             height: 40px;
             width: auto;
         }
+        
+        .navbar {
+            position: relative;
+        }
+        
+        .navbar .logo-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .navbar .logo-center img {
+            height: 60px;
+            width: auto;
+        }
+        
+        .navbar .logo-center .brand-text {
+            margin-left: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #730623;
+        }
             </style>
     </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <img src="{{ asset('images/lana-amawi-logo.png') }}" alt="Lana Amawi Coaching" class="logo-navbar me-2">
-                Lana Amawi Coaching
-            </a>
-            
+            <!-- Left side - Navigation toggle -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
+            <!-- Center - Logo and Brand -->
+            <div class="logo-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching">
+                <span class="brand-text">Lana Amawi Coaching</span>
+            </div>
+            
+            <!-- Right side - Navigation menu -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     @auth
@@ -101,7 +129,7 @@
                         </li>
                     @else
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Login</a>
+                            <a class="nav-link" href="{{ route('client.login') }}">Login</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('booking') }}">Book Session</a>
@@ -118,7 +146,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <div class="text-center mb-4">
-                        <img src="{{ asset('images/lana-amawi-logo.png') }}" alt="Lana Amawi Coaching" class="logo-large mb-4">
+                        <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching" class="logo-large mb-4">
                     </div>
                     <h1 class="display-4 fw-bold mb-4">Transform Your Life with Professional Coaching</h1>
                     <p class="lead mb-4">Discover your potential and achieve your goals with personalized coaching sessions tailored to your unique journey.</p>
@@ -127,7 +155,7 @@
                             <i class="fas fa-calendar-plus me-2"></i>Book Your Session
                         </a>
                         @guest
-                            <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg">
+                            <a href="{{ route('client.login') }}" class="btn btn-outline-light btn-lg">
                                 <i class="fas fa-sign-in-alt me-2"></i>Client Login
                             </a>
                         @endguest

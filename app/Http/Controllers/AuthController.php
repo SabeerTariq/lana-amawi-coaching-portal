@@ -14,12 +14,17 @@ use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    public function showAdminLogin()
     {
-        return view('auth.login');
+        return view('auth.admin-login');
     }
 
-    public function login(Request $request)
+    public function showClientLogin()
+    {
+        return view('auth.client-login');
+    }
+
+    public function adminLogin(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -38,11 +43,14 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            // Redirect based on user role
+            // Check if user is admin
             if (Auth::user()->is_admin) {
                 return redirect()->route('admin.dashboard');
             } else {
-                return redirect()->route('client.dashboard');
+                Auth::logout();
+                return redirect()->back()
+                    ->withErrors(['email' => 'Access denied. Admin privileges required.'])
+                    ->withInput();
             }
         }
 
@@ -50,6 +58,43 @@ class AuthController extends Controller
             ->withErrors(['email' => 'The provided credentials do not match our records.'])
             ->withInput();
     }
+
+    public function clientLogin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $credentials = $request->only('email', 'password');
+        $remember = $request->has('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+
+            // Check if user is not admin (i.e., is a client)
+            if (!Auth::user()->is_admin) {
+                return redirect()->route('client.dashboard');
+            } else {
+                Auth::logout();
+                return redirect()->back()
+                    ->withErrors(['email' => 'This portal is for clients only. Please use admin login.'])
+                    ->withInput();
+            }
+        }
+
+        return redirect()->back()
+            ->withErrors(['email' => 'The provided credentials do not match our records.'])
+            ->withInput();
+    }
+
+
 
     public function showRegister()
     {
@@ -90,7 +135,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('home');
     }
 
     // Password Reset Methods
@@ -141,7 +186,7 @@ class AuthController extends Controller
         );
 
         return $status === Password::PASSWORD_RESET
-                    ? redirect()->route('login')->with('status', __($status))
+                    ? redirect()->route('home')->with('status', __($status))
                     : back()->withErrors(['email' => [__($status)]]);
     }
 } 

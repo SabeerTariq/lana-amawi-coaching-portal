@@ -56,7 +56,7 @@
 
                     <div class="text-center">
                         <p class="text-muted mb-0">
-                            <a href="{{ route('login') }}" class="text-decoration-none">Back to login</a>
+                            <a href="{{ route('client.login') }}" class="text-decoration-none">Back to login</a>
                         </p>
                     </div>
                 </div>

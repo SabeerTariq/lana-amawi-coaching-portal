@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
-@section('title', 'Login - Lana Amawi Coaching')
+@section('title', 'Admin Login - Lana Amawi Coaching')
 
 @section('content')
 <div class="container-fluid">
     <div class="row justify-content-center align-items-center min-vh-100">
         <div class="col-md-6 col-lg-4">
-            <div class="card">
+            <div class="card border-0 shadow-lg">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
-                        <img src="{{ asset('images/lana-amawi-logo.png') }}" alt="Lana Amawi Coaching" class="mb-3" style="max-width: 200px; height: auto;">
-                        <h2 class="fw-bold text-dark mb-2">Welcome Back</h2>
-                        <p class="text-muted">Sign in to your coaching portal</p>
+                        <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching" class="mb-3" style="max-width: 200px; height: auto;">
+                        <h2 class="fw-bold text-dark mb-2">Admin Access</h2>
+                        <p class="text-muted">Sign in to the administrative portal</p>
                     </div>
 
                     @if(session('error'))
@@ -32,7 +32,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('login') }}">
+                    <form method="POST" action="{{ route('admin.login') }}">
                         @csrf
                         
                         <div class="mb-3">
@@ -57,7 +57,7 @@
 
                         <div class="d-grid mb-3">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                                <i class="fas fa-user-shield me-2"></i>Admin Sign In
                             </button>
                         </div>
 
@@ -70,16 +70,11 @@
 
                     <hr class="my-4">
 
-                    <div class="text-center">
-                        <p class="text-muted mb-0">
-                            Don't have an account? 
-                            <a href="{{ route('register') }}" class="text-decoration-none">Sign up here</a>
-                        </p>
-                        <hr class="my-3">
-                        <a href="{{ route('booking') }}" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Form
-                        </a>
-                    </div>
+                                         <div class="text-center">
+                         <a href="{{ route('booking') }}" class="btn btn-outline-secondary btn-sm">
+                             <i class="fas fa-calendar-plus me-2"></i>Book Session
+                         </a>
+                     </div>
                 </div>
             </div>
         </div>

@@ -20,13 +20,13 @@
         }
         
         .btn-primary {
-            background-color: #D2691E;
-            border-color: #D2691E;
+            background-color: #730623;
+            border-color: #730623;
         }
         
         .btn-primary:hover {
-            background-color: #CD853F;
-            border-color: #CD853F;
+            background-color: #8a0a2a;
+            border-color: #8a0a2a;
         }
         
         .card {
@@ -36,13 +36,13 @@
         }
         
         .sidebar {
-            background: white;
+            background: #032a57;
             min-height: 100vh;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
         
         .sidebar .nav-link {
-            color: #6c757d;
+            color: white;
             padding: 12px 20px;
             border-radius: 8px;
             margin: 2px 10px;
@@ -50,7 +50,7 @@
         
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-            background-color: #D2691E;
+            background-color: #730623;
             color: white;
         }
         
@@ -60,7 +60,32 @@
         
         .navbar-brand {
             font-weight: 600;
-            color: #8B4513 !important;
+            color: #730623 !important;
+        }
+        
+        .navbar {
+            position: relative;
+        }
+        
+        .navbar .logo-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .navbar .logo-center img {
+            height: 60px;
+            width: auto;
+        }
+        
+        .navbar .logo-center .brand-text {
+            margin-left: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #730623;
         }
     </style>
 </head>
@@ -68,11 +93,21 @@
     <!-- Top Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('client.dashboard') }}">
-                <img src="{{ asset('images/lana-amawi-logo.png') }}" alt="Lana Amawi Coaching" height="40" class="me-2">
-                Lana Amawi Coaching
-            </a>
+            <!-- Left side - Portal Name -->
+            <div class="navbar-nav">
+                <div class="nav-item">
+                    <span class="nav-link fw-bold text-dark">
+                        Client Portal
+                    </span>
+                </div>
+            </div>
             
+            <!-- Center - Logo and Brand -->
+            <div class="logo-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching">
+            </div>
+            
+            <!-- Right side - User menu -->
             <div class="navbar-nav ms-auto">
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
@@ -129,7 +164,7 @@
                                 </button>
                             </form>
                         @else
-                            <a class="nav-link" href="{{ route('login') }}">
+                            <a class="nav-link" href="{{ route('client.login') }}">
                                 <i class="fas fa-sign-in-alt me-2"></i>Login
                             </a>
                         @endauth

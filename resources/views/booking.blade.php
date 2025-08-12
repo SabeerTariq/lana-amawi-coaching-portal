@@ -9,7 +9,7 @@
             <div class="card">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
-                        <img src="{{ asset('images/lana-amawi-logo.png') }}" alt="Lana Amawi Coaching" class="mb-3" style="max-width: 200px; height: auto;">
+                        <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching" class="mb-3" style="max-width: 200px; height: auto;">
                         <h2 class="fw-bold text-dark mb-2">Book Your Coaching Session</h2>
                         <p class="text-muted">Schedule your appointment with Lana Amawi</p>
                     </div>
@@ -105,7 +105,7 @@
                     <div class="text-center mt-4">
                         <p class="text-muted mb-0">
                             Already have an account? 
-                            <a href="{{ route('login') }}" class="text-decoration-none">Login here</a>
+                            <a href="{{ route('client.login') }}" class="text-decoration-none">Login here</a>
                         </p>
                     </div>
                 </div>

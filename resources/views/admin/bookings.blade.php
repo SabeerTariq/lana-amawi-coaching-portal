@@ -96,7 +96,7 @@ use App\Models\User;
     flex: 1;
     min-height: 0;
     scrollbar-width: thin;
-    scrollbar-color: #D2691E #f8f9fa;
+    scrollbar-color: #730623 #f8f9fa;
 }
 
 .popup-body::-webkit-scrollbar {
@@ -109,12 +109,12 @@ use App\Models\User;
 }
 
 .popup-body::-webkit-scrollbar-thumb {
-    background: #D2691E;
+    background: #730623;
     border-radius: 3px;
 }
 
 .popup-body::-webkit-scrollbar-thumb:hover {
-    background: #b85a1a;
+    background: #8a0a2a;
 }
 
 .popup-footer {

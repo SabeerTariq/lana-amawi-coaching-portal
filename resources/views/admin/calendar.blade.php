@@ -504,8 +504,8 @@ function initializeCalendar() {
                 id: 'test',
                 title: 'Test Appointment',
                 start: new Date().toISOString().split('T')[0] + 'T10:00:00',
-                backgroundColor: '#007bff',
-                borderColor: '#007bff',
+                        backgroundColor: '#730623',
+        borderColor: '#730623',
                 textColor: '#fff'
             },
             @foreach($appointments as $appointment)
@@ -514,8 +514,8 @@ function initializeCalendar() {
                 title: '{{ $appointment->user->name }}',
                 start: '{{ $appointment->appointment_date->format("Y-m-d") }}T{{ $appointment->appointment_time }}:00',
                 end: '{{ $appointment->appointment_date->format("Y-m-d") }}T{{ $appointment->appointment_time }}:00',
-                backgroundColor: '{{ $appointment->status === "confirmed" ? "#28a745" : ($appointment->status === "pending" ? "#ffc107" : ($appointment->status === "completed" ? "#17a2b8" : "#dc3545")) }}',
-                borderColor: '{{ $appointment->status === "confirmed" ? "#28a745" : ($appointment->status === "pending" ? "#ffc107" : ($appointment->status === "completed" ? "#17a2b8" : "#dc3545")) }}',
+                backgroundColor: '{{ $appointment->status === "confirmed" ? "#032a57" : ($appointment->status === "pending" ? "#730623" : ($appointment->status === "completed" ? "#032a57" : "#730623")) }}',
+        borderColor: '{{ $appointment->status === "confirmed" ? "#032a57" : ($appointment->status === "pending" ? "#730623" : ($appointment->status === "completed" ? "#032a57" : "#730623")) }}',
                 textColor: '{{ $appointment->status === "pending" ? "#000" : "#fff" }}',
                 className: 'bg-{{ $appointment->status }}',
                 extendedProps: {

@@ -23,13 +23,13 @@
         }
         
         .btn-primary {
-            background-color: #D2691E;
-            border-color: #D2691E;
+            background-color: #730623;
+            border-color: #730623;
         }
         
         .btn-primary:hover {
-            background-color: #CD853F;
-            border-color: #CD853F;
+            background-color: #8a0a2a;
+            border-color: #8a0a2a;
         }
         
         .card {
@@ -53,7 +53,7 @@
         
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-            background-color: #D2691E;
+            background-color: #730623;
             color: white;
         }
         
@@ -63,11 +63,11 @@
         
         .navbar-brand {
             font-weight: 600;
-            color: #8B4513 !important;
+            color: #730623 !important;
         }
         
         .stats-card {
-            background: linear-gradient(135deg, #D2691E 0%, #CD853F 100%);
+            background: linear-gradient(135deg, #730623 0%, #8a0a2a 100%);
             color: white;
         }
     </style>

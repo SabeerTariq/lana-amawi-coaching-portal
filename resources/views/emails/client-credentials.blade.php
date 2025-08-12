@@ -32,7 +32,7 @@
         }
         .login-button {
             display: inline-block;
-            background-color: #007bff;
+            background-color: #730623;
             color: white;
             padding: 12px 24px;
             text-decoration: none;
@@ -51,7 +51,7 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ asset('images/lana-amawi-logo.png') }}" alt="Lana Amawi Coaching" style="max-width: 200px; height: auto; margin-bottom: 20px;">
+        <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching" style="max-width: 200px; height: auto; margin-bottom: 20px;">
         <h1>Welcome to Lana Amawi Coaching Portal</h1>
     </div>
     

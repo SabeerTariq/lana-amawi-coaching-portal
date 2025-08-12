@@ -21,17 +21,17 @@
         
         .navbar-brand {
             font-weight: 600;
-            color: #8B4513 !important;
+            color: #730623 !important;
         }
         
         .btn-primary {
-            background-color: #D2691E;
-            border-color: #D2691E;
+            background-color: #730623;
+            border-color: #730623;
         }
         
         .btn-primary:hover {
-            background-color: #CD853F;
-            border-color: #CD853F;
+            background-color: #8a0a2a;
+            border-color: #8a0a2a;
         }
         
         .card {
@@ -41,8 +41,8 @@
         }
         
         .form-control:focus {
-            border-color: #D2691E;
-            box-shadow: 0 0 0 0.2rem rgba(210, 105, 30, 0.25);
+            border-color: #730623;
+            box-shadow: 0 0 0 0.2rem rgba(115, 6, 35, 0.25);
         }
         
         .sidebar {
@@ -60,7 +60,7 @@
         
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-            background-color: #D2691E;
+            background-color: #730623;
             color: white;
         }
     </style>

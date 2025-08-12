@@ -52,7 +52,7 @@
                     <div class="text-center">
                         <p class="text-muted mb-0">
                             Remember your password? 
-                            <a href="{{ route('login') }}" class="text-decoration-none">Sign in here</a>
+                            <a href="{{ route('client.login') }}" class="text-decoration-none">Sign in here</a>
                         </p>
                     </div>
                 </div>
