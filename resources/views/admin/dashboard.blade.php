@@ -14,82 +14,82 @@
 </div>
 
 <!-- Stats Cards -->
-<div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card stats-card">
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+        <div class="card stats-card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0">{{ $totalClients ?? 0 }}</h4>
-                        <p class="mb-0">Total Clients</p>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-0 fs-4">{{ $totalClients ?? 0 }}</h4>
+                        <p class="mb-0 small">Total Clients</p>
                     </div>
-                    <i class="fas fa-users fa-2x opacity-75"></i>
+                    <i class="fas fa-users fa-2x opacity-75 ms-2"></i>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="col-md-3 mb-3">
-        <div class="card stats-card">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+        <div class="card stats-card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0">{{ $appointmentsToday ?? 0 }}</h4>
-                        <p class="mb-0">Appointments Today</p>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-0 fs-4">{{ $appointmentsToday ?? 0 }}</h4>
+                        <p class="mb-0 small">Appointments Today</p>
                     </div>
-                    <i class="fas fa-calendar-check fa-2x opacity-75"></i>
+                    <i class="fas fa-calendar-check fa-2x opacity-75 ms-2"></i>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="col-md-3 mb-3">
-        <div class="card stats-card">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+        <div class="card stats-card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0">{{ $unreadMessages ?? 0 }}</h4>
-                        <p class="mb-0">Unread Messages</p>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-0 fs-4">{{ $unreadMessages ?? 0 }}</h4>
+                        <p class="mb-0 small">Unread Messages</p>
                     </div>
-                    <i class="fas fa-envelope fa-2x opacity-75"></i>
+                    <i class="fas fa-envelope fa-2x opacity-75 ms-2"></i>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="col-md-3 mb-3">
-        <div class="card stats-card">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+        <div class="card stats-card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0">{{ $totalRevenue ?? '$0' }}</h4>
-                        <p class="mb-0">Total Revenue</p>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-0 fs-4">{{ $totalRevenue ?? '$0' }}</h4>
+                        <p class="mb-0 small">Total Revenue</p>
                     </div>
-                    <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                    <i class="fas fa-dollar-sign fa-2x opacity-75 ms-2"></i>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="col-md-3 mb-3">
-        <div class="card stats-card">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+        <div class="card stats-card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0">{{ \App\Models\Booking::where('status', 'pending')->count() }}</h4>
-                        <p class="mb-0">Pending Bookings</p>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-0 fs-4">{{ \App\Models\Booking::where('status', 'pending')->count() }}</h4>
+                        <p class="mb-0 small">Pending Bookings</p>
                     </div>
-                    <i class="fas fa-calendar-plus fa-2x opacity-75"></i>
+                    <i class="fas fa-calendar-plus fa-2x opacity-75 ms-2"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
+<div class="row g-4">
     <!-- Recent Appointments -->
-    <div class="col-md-8 mb-4">
-        <div class="card">
+    <div class="col-12 col-lg-8">
+        <div class="card h-100">
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-calendar-alt me-2"></i>Today's Appointments
@@ -101,23 +101,28 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Time</th>
+                                    <th class="d-none d-md-table-cell">Time</th>
                                     <th>Client</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <th class="d-none d-lg-table-cell">Status</th>
+                                    <th class="d-none d-md-table-cell">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($todayAppointments as $appointment)
                                     <tr>
-                                        <td>{{ $appointment->appointment_time }}</td>
-                                        <td>{{ $appointment->client_name }}</td>
+                                        <td class="d-none d-md-table-cell">{{ $appointment->appointment_time }}</td>
                                         <td>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold">{{ $appointment->client_name }}</span>
+                                                <small class="text-muted d-md-none">{{ $appointment->appointment_time }}</small>
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-lg-table-cell">
                                             <span class="badge bg-{{ $appointment->status === 'confirmed' ? 'success' : ($appointment->status === 'pending' ? 'warning' : 'secondary') }}">
                                                 {{ ucfirst($appointment->status) }}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td class="d-none d-md-table-cell">
                                             <button class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-eye"></i>
                                             </button>
@@ -139,8 +144,8 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="col-md-4 mb-4">
-        <div class="card">
+    <div class="col-12 col-lg-4">
+        <div class="card h-100">
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-bolt me-2"></i>Quick Actions
@@ -164,48 +169,109 @@
             </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-history me-2"></i>Recent Activity
-                </h5>
-            </div>
-            <div class="card-body">
-                @if(isset($recentActivity) && count($recentActivity) > 0)
-                    @foreach($recentActivity->take(5) as $activity)
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="flex-grow-1">
-                                <p class="mb-1 small">{{ $activity->description }}</p>
-                                <small class="text-muted">{{ $activity->created_at->diffForHumans() }}</small>
-                            </div>
-                        </div>
-                    @endforeach
-                @else
-                    <p class="text-muted text-center">No recent activity</p>
-                @endif
-            </div>
-        </div>
+
     </div>
 </div>
 
 <!-- Charts Row -->
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card">
+<div class="row g-4 mt-4">
+    <div class="col-12 col-lg-6">
+        <div class="card h-100">
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-chart-line me-2"></i>Appointments This Week
                 </h5>
             </div>
             <div class="card-body">
-                <canvas id="appointmentsChart" width="400" height="200"></canvas>
+                <div class="chart-container" style="position: relative; height: 300px;">
+                    <canvas id="appointmentsChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
     
-
+    <div class="col-12 col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Appointment Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="position: relative; height: 300px;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stats-card .card-body {
+        padding: 1rem;
+    }
+    
+    .stats-card h4 {
+        font-size: 1.5rem !important;
+    }
+    
+    .stats-card i {
+        font-size: 1.5rem !important;
+    }
+    
+    .btn-toolbar {
+        margin-top: 1rem;
+    }
+    
+    .btn-toolbar .btn-group {
+        width: 100%;
+    }
+    
+    .btn-toolbar .btn {
+        flex: 1;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .stats-card h4 {
+        font-size: 1.25rem !important;
+    }
+    
+    .stats-card p {
+        font-size: 0.75rem !important;
+    }
+    
+    .stats-card i {
+        font-size: 1.25rem !important;
+    }
+}
+
+.chart-container {
+    min-height: 250px;
+}
+
+/* Ensure cards have consistent height */
+.card {
+    height: 100%;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .table td, .table th {
+        padding: 0.5rem;
+    }
+}
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -219,13 +285,15 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Appointments',
                 data: [3, 5, 2, 8, 4, 1, 0],
-                borderColor: '#D2691E',
-                backgroundColor: 'rgba(210, 105, 30, 0.1)',
-                tension: 0.4
+                borderColor: '#730623',
+                backgroundColor: 'rgba(115, 6, 35, 0.1)',
+                tension: 0.4,
+                fill: true
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: false
@@ -233,13 +301,51 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         }
     });
 
-
+    // Status Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Confirmed', 'Pending', 'Completed', 'Cancelled'],
+            datasets: [{
+                data: [12, 8, 15, 3],
+                backgroundColor: [
+                    '#28a745',
+                    '#ffc107',
+                    '#17a2b8',
+                    '#dc3545'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
 });
 </script>
 @endsection 

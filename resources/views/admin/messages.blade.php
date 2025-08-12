@@ -38,7 +38,7 @@
                         @foreach($clients as $client)
                             <a href="{{ route('admin.messages') }}?client_id={{ $client->id }}" 
                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {{ request('client_id') == $client->id ? 'active' : '' }}"
-                               style="{{ request('client_id') == $client->id ? 'background-color: #D2691E !important; border-color: #D2691E !important;' : '' }}">
+                               style="{{ request('client_id') == $client->id ? 'background-color: #730623 !important; border-color: #730623 !important;' : '' }}">
                                 <div>
                                     <div class="fw-bold">{{ $client->name }}</div>
                                     <small class="text-muted">{{ $client->email }}</small>
@@ -201,7 +201,7 @@
 }
 
 .message-outgoing .message-content {
-    background: #D2691E;
+    background: #730623;
     color: #fff;
     margin-left: auto;
 }
@@ -287,23 +287,23 @@
 
 /* Update button colors to match the new theme */
 .btn-primary {
-    background-color: #D2691E !important;
-    border-color: #D2691E !important;
+    background-color: #730623 !important;
+    border-color: #730623 !important;
 }
 
 .btn-primary:hover {
-    background-color: #B8860B !important;
-    border-color: #B8860B !important;
+    background-color: #8a0a2a !important;
+    border-color: #8a0a2a !important;
 }
 
 .btn-outline-primary {
-    color: #D2691E !important;
-    border-color: #D2691E !important;
+    color: #730623 !important;
+    border-color: #730623 !important;
 }
 
 .btn-outline-primary:hover {
-    background-color: #D2691E !important;
-    border-color: #D2691E !important;
+    background-color: #730623 !important;
+    border-color: #730623 !important;
 }
 </style>
 

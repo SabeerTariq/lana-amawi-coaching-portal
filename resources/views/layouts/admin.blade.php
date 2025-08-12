@@ -39,13 +39,13 @@
         }
         
         .sidebar {
-            background: white;
+            background: #032a57;
             min-height: 100vh;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
         
         .sidebar .nav-link {
-            color: #6c757d;
+            color: white;
             padding: 12px 20px;
             border-radius: 8px;
             margin: 2px 10px;
@@ -66,6 +66,31 @@
             color: #730623 !important;
         }
         
+        .navbar {
+            position: relative;
+        }
+        
+        .navbar .logo-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .navbar .logo-center img {
+            height: 60px;
+            width: auto;
+        }
+        
+        .navbar .logo-center .brand-text {
+            margin-left: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #730623;
+        }
+        
         .stats-card {
             background: linear-gradient(135deg, #730623 0%, #8a0a2a 100%);
             color: white;
@@ -76,11 +101,21 @@
     <!-- Top Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
-                <img src="{{ asset('images/lana-amawi-logo.png') }}" alt="Lana Amawi Coaching" height="40" class="me-2">
-                Admin Portal
-            </a>
+            <!-- Left side - Portal Name -->
+            <div class="navbar-nav">
+                <div class="nav-item">
+                    <span class="nav-link fw-bold text-dark">
+                        Admin Portal
+                    </span>
+                </div>
+            </div>
             
+            <!-- Center - Logo and Brand -->
+            <div class="logo-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching">
+            </div>
+            
+            <!-- Right side - User menu -->
             <div class="navbar-nav ms-auto">
                 @auth
                     <div class="nav-item dropdown">

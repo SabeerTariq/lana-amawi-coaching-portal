@@ -17,7 +17,7 @@
         </div>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.messages') }}?client_id={{ $client->id }}" 
-               class="btn btn-primary" style="background-color: #730623 !important; border-color: #730623 !important;">
+               class="btn btn-primary">
                 <i class="fas fa-comment me-2"></i>Send Message
             </a>
         </div>
@@ -28,7 +28,7 @@
         <div class="col-lg-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold" style="color: #730623 !important;">Client Information</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Client Information</h6>
                 </div>
                 <div class="card-body text-center">
                     <h5 class="card-title">{{ $client->name }}</h5>
@@ -36,11 +36,11 @@
                     <hr>
                     <div class="row text-center">
                         <div class="col-6">
-                            <h6 style="color: #730623 !important;">{{ $appointments->count() }}</h6>
+                            <h6 class="text-primary">{{ $appointments->count() }}</h6>
                             <small class="text-muted">Appointments</small>
                         </div>
                         <div class="col-6">
-                            <h6 style="color: #730623 !important;">{{ $messages->count() }}</h6>
+                            <h6 class="text-primary">{{ $messages->count() }}</h6>
                             <small class="text-muted">Messages</small>
                         </div>
                     </div>
@@ -57,7 +57,7 @@
         <div class="col-lg-8">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold" style="color: #730623 !important;">Appointment History</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Appointment History</h6>
                 </div>
                 <div class="card-body">
                     @if($appointments->count() > 0)
@@ -101,7 +101,7 @@
     <!-- Recent Messages -->
     <div class="card shadow">
         <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold" style="color: #730623 !important;">Recent Messages</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Recent Messages</h6>
         </div>
         <div class="card-body">
             @if($messages->count() > 0)
@@ -109,7 +109,7 @@
                     @foreach($messages->take(10) as $message)
                         <div class="timeline-item">
                             <div class="timeline-marker {{ $message->sender_type === 'admin' ? 'bg-primary' : 'bg-secondary' }}" 
-                                 style="{{ $message->sender_type === 'admin' ? 'background-color: #730623 !important;' : '' }}"></div>
+                                 ></div>
                             <div class="timeline-content">
                                 <div class="d-flex justify-content-between">
                                     <h6 class="timeline-title">{{ ucfirst($message->sender_type) }}</h6>
@@ -160,7 +160,7 @@
     background: #f8f9fa;
     padding: 15px;
     border-radius: 5px;
-                border-left: 3px solid #730623;
+                border-left: 3px solid var(--bs-primary);
 }
 
 .timeline-title {
@@ -171,15 +171,6 @@
     margin-bottom: 0;
 }
 
-/* Update button colors to match the new theme */
-.btn-primary {
-                background-color: #730623 !important;
-            border-color: #730623 !important;
-}
 
-.btn-primary:hover {
-                background-color: #8a0a2a !important;
-            border-color: #8a0a2a !important;
-}
 </style>
 @endsection 
