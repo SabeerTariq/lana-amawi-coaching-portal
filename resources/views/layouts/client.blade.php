@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Client Portal - Lana Amawi Coaching')</title>
+    <title>@yield('title', 'Client - Lana Amawi Coaching')</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     
     <!-- Bootstrap CSS -->
@@ -39,6 +39,26 @@
             background: #032a57;
             min-height: 100vh;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1030;
+            width: 16.666667%; /* col-md-2 equivalent */
+        }
+        
+        .sidebar .logo-section {
+            padding: 1.5rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .sidebar .logo-section img {
+            height: 127px;
+            width: auto;
         }
         
         .sidebar .nav-link {
@@ -56,6 +76,7 @@
         
         .main-content {
             padding: 2rem;
+            margin-left: 16.666667%; /* Offset for fixed sidebar */
         }
         
         .navbar-brand {
@@ -64,53 +85,70 @@
         }
         
         .navbar {
-            position: relative;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 16.666667%; /* Start after sidebar */
+            z-index: 1020;
+            background: white;
         }
         
-        .navbar .logo-center {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .content-wrapper {
+            margin-top: 80px; /* Space for fixed navbar */
         }
         
-        .navbar .logo-center img {
-            height: 60px;
-            width: auto;
+        /* Mobile responsive */
+        @media (max-width: 767.98px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                width: 250px;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .navbar {
+                left: 0;
+            }
+            
+            .sidebar-toggle {
+                display: block !important;
+            }
         }
         
-        .navbar .logo-center .brand-text {
-            margin-left: 15px;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #730623;
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1040;
+            background: #730623;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
     <!-- Top Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container-fluid">
-            <!-- Left side - Portal Name -->
-            <div class="navbar-nav">
-                <div class="nav-item">
-                    <span class="nav-link fw-bold text-dark">
-                        Client Portal
-                    </span>
-                </div>
-            </div>
-            
-            <!-- Center - Logo and Brand -->
-            <div class="logo-center">
-                <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching">
-            </div>
-            
             <!-- Right side - User menu -->
             <div class="navbar-nav ms-auto">
                 <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                    <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle me-2"></i>{{ Auth::user()->name }}
                     </a>
                     <ul class="dropdown-menu">
@@ -131,8 +169,11 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3 d-flex flex-column" style="height: calc(100vh - 80px);">
+            <div class="sidebar">
+                <div class="position-sticky d-flex flex-column" style="height: 100vh;">
+                    <div class="logo-section">
+                        <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching">
+                    </div>
                     <ul class="nav flex-column flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('client.dashboard') ? 'active' : '' }}" 
@@ -173,13 +214,36 @@
             </div>
 
             <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-                @yield('content')
-            </main>
+            <div class="content-wrapper">
+                <main class="main-content">
+                    @yield('content')
+                </main>
+            </div>
         </div>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
+                
+                // Close sidebar when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html> 

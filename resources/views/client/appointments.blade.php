@@ -1,6 +1,6 @@
 @extends('layouts.client')
 
-@section('title', 'Appointments - Client Portal')
+@section('title', 'Appointments - Client')
 
 @section('content')
 @if(session('success'))

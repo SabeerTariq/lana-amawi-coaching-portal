@@ -114,11 +114,11 @@
                     @auth
                         @if(Auth::user()->is_admin)
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Portal</a>
+                                <a class="nav-link" href="{{ route('admin.dashboard') }}">Admin</a>
                             </li>
                     @else
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('client.dashboard') }}">Client Portal</a>
+                                <a class="nav-link" href="{{ route('client.dashboard') }}">Client</a>
                             </li>
                         @endif
                         <li class="nav-item">

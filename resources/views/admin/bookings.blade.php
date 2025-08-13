@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Manage Bookings - Admin Portal')
+@section('title', 'Manage Bookings - Admin')
 
 @php
 use App\Models\User;
