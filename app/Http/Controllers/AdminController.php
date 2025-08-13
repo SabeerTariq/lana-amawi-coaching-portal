@@ -296,8 +296,48 @@ class AdminController extends Controller
 
     public function appointments()
     {
-        $appointments = Appointment::with('user')
-            ->orderBy('appointment_date', 'desc')
+        $query = Appointment::with('user');
+
+        // Store filter preferences in session
+        if (request('clear')) {
+            // Clear stored filters
+            session()->forget('appointment_filters');
+        } elseif (request()->hasAny(['search', 'status'])) {
+            session([
+                'appointment_filters' => request()->only(['search', 'status'])
+            ]);
+        } else {
+            // Use stored filters if no new filters are applied
+            $storedFilters = session('appointment_filters', []);
+            if (!empty($storedFilters)) {
+                request()->merge($storedFilters);
+            }
+        }
+
+        // Apply search filter
+        if (request('search')) {
+            $search = request('search');
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply status filter
+        if (request('status') && request('status') !== '') {
+            $query->where('status', request('status'));
+        }
+
+        // Handle export request
+        if (request('export')) {
+            $appointments = $query->orderBy('appointment_date', 'desc')
+                ->orderBy('appointment_time', 'desc')
+                ->get();
+
+            return $this->exportAppointments($appointments);
+        }
+
+        $appointments = $query->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
             ->paginate(20);
 
@@ -306,8 +346,8 @@ class AdminController extends Controller
 
     public function bookings()
     {
-        // Show all bookings except completed/cancelled ones
-        $bookings = Booking::whereNotIn('status', ['completed', 'cancelled'])
+        // Show all bookings except completed/cancelled/converted ones
+        $bookings = Booking::whereNotIn('status', ['completed', 'cancelled', 'converted'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
@@ -420,8 +460,8 @@ class AdminController extends Controller
                 'status' => 'confirmed',
             ]);
 
-            // Update booking status to converted
-            $booking->update(['status' => 'converted']);
+            // Delete the booking after successful conversion
+            $booking->delete();
 
             // Log the conversion for debugging
             \Log::info('Accepted booking converted to appointment', [
@@ -524,5 +564,52 @@ class AdminController extends Controller
         $appointment->update(['status' => 'cancelled']);
 
         return redirect()->back()->with('success', 'Appointment cancelled successfully!');
+    }
+
+    /**
+     * Export appointments to CSV
+     */
+    private function exportAppointments($appointments)
+    {
+        $filename = 'appointments_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($appointments) {
+            $file = fopen('php://output', 'w');
+            
+            // Add CSV headers
+            fputcsv($file, [
+                'Client Name',
+                'Email',
+                'Date',
+                'Time',
+                'Status',
+                'Program',
+                'Notes',
+                'Created At'
+            ]);
+
+            // Add data rows
+            foreach ($appointments as $appointment) {
+                fputcsv($file, [
+                    $appointment->user->name ?? 'N/A',
+                    $appointment->user->email ?? 'N/A',
+                    $appointment->appointment_date->format('Y-m-d'),
+                    $appointment->formatted_time,
+                    ucfirst($appointment->status),
+                    $appointment->program_name,
+                    $appointment->message ?? 'N/A',
+                    $appointment->created_at->format('Y-m-d H:i:s')
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 } 

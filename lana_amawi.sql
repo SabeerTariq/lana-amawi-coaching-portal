@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 12, 2025 at 09:29 PM
+-- Generation Time: Aug 13, 2025 at 08:47 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -34,17 +34,10 @@ CREATE TABLE `appointments` (
   `appointment_date` date NOT NULL,
   `appointment_time` varchar(255) NOT NULL,
   `message` text DEFAULT NULL,
-  `status` enum('pending','confirmed','completed','cancelled') NOT NULL DEFAULT 'pending',
+  `status` varchar(50) NOT NULL DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `appointments`
---
-
-INSERT INTO `appointments` (`id`, `user_id`, `program`, `appointment_date`, `appointment_time`, `message`, `status`, `created_at`, `updated_at`) VALUES
-(22, 15, NULL, '2025-08-13', '09:00', NULL, 'completed', '2025-08-12 14:18:22', '2025-08-12 14:18:32');
 
 -- --------------------------------------------------------
 
@@ -61,7 +54,10 @@ CREATE TABLE `bookings` (
   `preferred_date` date NOT NULL,
   `preferred_time` varchar(255) NOT NULL,
   `message` text DEFAULT NULL,
-  `status` enum('pending','confirmed','cancelled','suggested_alternative') DEFAULT 'pending',
+  `admin_suggestion` text DEFAULT NULL,
+  `client_response` text DEFAULT NULL,
+  `response_date` timestamp NULL DEFAULT NULL,
+  `status` varchar(50) NOT NULL DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -189,7 +185,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (9, '2025_08_07_201515_add_attachments_to_messages_table', 2),
 (10, '2025_08_07_215137_make_program_nullable_in_bookings_table', 3),
 (11, '2025_08_07_215234_make_program_nullable_in_appointments_table', 4),
-(12, '2025_08_12_191548_add_phone_to_users_table', 5);
+(12, '2025_08_12_191548_add_phone_to_users_table', 5),
+(13, '2025_08_13_175337_add_admin_suggestion_to_bookings_table', 6),
+(14, '2025_08_13_180954_add_client_response_fields_to_bookings_table', 7),
+(15, '2025_08_13_181631_fix_booking_status_column_length', 8),
+(16, '2025_08_13_181657_fix_appointment_status_column_length', 9);
 
 -- --------------------------------------------------------
 
@@ -223,8 +223,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('7nmv1wm0dO5oCEsHL9Zu9xbe0SZxiEDWgGNpMAAW', 15, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiS1pKWXNaUnRjVUl3SGFFMFpUaVNzN2xYV0JsSjRTaDhJUnMxUjl1cCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE1O30=', 1755026555),
-('XmFnGipLYHsSTPnD9pszm5oc8ESQdoIMnNymoFd4', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoielE0SUlCbEhyNGJ0Q2ZINVpHdk9hRHEyaXZIaEF4dTlHTzh4MFQyUyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9hcHBvaW50bWVudHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxNDt9', 1755026919);
+('L70aNsmrzkZ4fiHBNZmrarAmHF0i8s50ODkK7ZDo', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiMVdPVVVhcmZ2T2d3NDVCZ0pwYTVNQWRSMUJ5QTluSmJ1Y2VvOHdEaSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9hcHBvaW50bWVudHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxNDtzOjE5OiJhcHBvaW50bWVudF9maWx0ZXJzIjthOjQ6e3M6Njoic2VhcmNoIjtOO3M6Njoic3RhdHVzIjtOO3M6OToiZGF0ZV9mcm9tIjtzOjEwOiIyMDI1LTA4LTEzIjtzOjc6ImRhdGVfdG8iO3M6MTA6IjIwMjUtMDgtMjAiO319', 1755110796),
+('sB9G1xki6rtZIhjoM3Ij1TzL7cJiJAv02pThjPtX', 16, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiM09GNEFhMjE1VDQyVlYwZnR2RWhYN3Z1b0dOMEtpekdsb0xwZGdadyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvYXBwb2ludG1lbnRzIjt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTY7fQ==', 1755110791);
 
 -- --------------------------------------------------------
 
@@ -345,13 +345,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -375,7 +375,7 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `users`

@@ -389,7 +389,7 @@
                             <div class="card-footer bg-light">
                                 <div class="text-center">
                                     <small class="text-muted">
-                                        @if($appointment->is_completed)
+                                        @if($appointment->status === 'completed')
                                             <i class="fas fa-check-circle me-1"></i>
                                             Session completed
                                         @else

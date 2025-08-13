@@ -499,15 +499,6 @@ function initializeCalendar() {
         editable: true,
         selectable: true,
         events: [
-            // Test event
-            {
-                id: 'test',
-                title: 'Test Appointment',
-                start: new Date().toISOString().split('T')[0] + 'T10:00:00',
-                        backgroundColor: '#730623',
-        borderColor: '#730623',
-                textColor: '#fff'
-            },
             @foreach($appointments as $appointment)
             {
                 id: '{{ $appointment->id }}',
