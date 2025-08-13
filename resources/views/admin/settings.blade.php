@@ -3,6 +3,47 @@
 @section('title', 'Settings - Admin Dashboard')
 
 @section('content')
+<style>
+    .logo-upload-section {
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        transition: border-color 0.3s ease;
+    }
+    
+    .logo-upload-section:hover {
+        border-color: #730623;
+    }
+    
+    .current-logo-preview {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 10px;
+        background: #f8f9fa;
+    }
+    
+    .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+    
+    .file-input-wrapper input[type=file] {
+        font-size: 100px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .file-input-wrapper .btn {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">Admin Settings</h1>
@@ -27,6 +68,59 @@
     @endif
 
     <div class="row">
+        <!-- Logo Settings -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Logo Settings</h6>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('admin.settings.logo') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="logo" class="form-label">Upload New Logo</label>
+                                    <div class="logo-upload-section">
+                                        <div class="file-input-wrapper">
+                                            <input type="file" class="form-control" id="logo" name="logo" 
+                                                   accept="image/*" required>
+                                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('logo').click()">
+                                                <i class="fas fa-cloud-upload-alt me-2"></i>Choose File
+                                            </button>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Click the button above or drag & drop your logo here</small>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Recommended size: 200x200px or larger</small><br>
+                                            <small class="text-muted">Supported formats: PNG, JPG, JPEG, GIF (Max: 2MB)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Current Logo</label>
+                                    <div class="text-center">
+                                        <img src="{{ asset('images/logo.png') }}" alt="Current Logo" 
+                                             class="img-fluid current-logo-preview" style="max-height: 100px; max-width: 100%;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-2"></i>Upload Logo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Profile Settings -->
         <div class="col-lg-8">
             <div class="card shadow">
@@ -137,6 +231,94 @@
     document.getElementById('email_template').addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = this.scrollHeight + 'px';
+    });
+
+    // Logo preview functionality
+    document.getElementById('logo').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file size (2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('File size must be less than 2MB');
+                this.value = '';
+                return;
+            }
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Please select a valid image file (PNG, JPG, JPEG, or GIF)');
+                this.value = '';
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.querySelector('.current-logo-preview');
+                if (preview) {
+                    preview.src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Drag and drop functionality
+    const logoUploadSection = document.querySelector('.logo-upload-section');
+    
+    logoUploadSection.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#730623';
+        this.style.backgroundColor = '#f8f9fa';
+    });
+    
+    logoUploadSection.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#dee2e6';
+        this.style.backgroundColor = 'transparent';
+    });
+    
+    logoUploadSection.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#dee2e6';
+        this.style.backgroundColor = 'transparent';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            const logoInput = document.getElementById('logo');
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please drop an image file');
+                return;
+            }
+            
+            // Validate file size
+            if (file.size > 2 * 1024 * 1024) {
+                alert('File size must be less than 2MB');
+                return;
+            }
+            
+            // Set the file to the input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            logoInput.files = dataTransfer.files;
+            
+            // Trigger change event to show preview
+            logoInput.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // Form validation
+    document.querySelector('form[action*="logo"]').addEventListener('submit', function(e) {
+        const logoInput = document.getElementById('logo');
+        if (!logoInput.files[0]) {
+            e.preventDefault();
+            alert('Please select a logo file to upload');
+            return;
+        }
     });
 </script>
 @endpush

@@ -294,6 +294,51 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Settings updated successfully!');
     }
 
+    public function updateLogo(Request $request)
+    {
+        $request->validate([
+            'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
+        ]);
+
+        try {
+            if ($request->hasFile('logo')) {
+                $logo = $request->file('logo');
+                
+                // Generate unique filename
+                $filename = 'logo.' . $logo->getClientOriginalExtension();
+                
+                // Store the new logo in the public/images directory
+                $logo->move(public_path('images'), $filename);
+                
+                // If there's an old logo with different extension, remove it
+                $oldLogoPath = public_path('images/logo.png');
+                $oldLogoPathJpg = public_path('images/logo.jpg');
+                $oldLogoPathJpeg = public_path('images/logo.jpeg');
+                $oldLogoPathGif = public_path('images/logo.gif');
+                
+                if (file_exists($oldLogoPath) && $filename !== 'logo.png') {
+                    unlink($oldLogoPath);
+                }
+                if (file_exists($oldLogoPathJpg) && $filename !== 'logo.jpg') {
+                    unlink($oldLogoPathJpg);
+                }
+                if (file_exists($oldLogoPathJpeg) && $filename !== 'logo.jpeg') {
+                    unlink($oldLogoPathJpeg);
+                }
+                if (file_exists($oldLogoPathGif) && $filename !== 'logo.gif') {
+                    unlink($oldLogoPathGif);
+                }
+                
+                return redirect()->back()->with('success', 'Logo updated successfully!');
+            }
+            
+            return redirect()->back()->with('error', 'No logo file was uploaded.');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error uploading logo: ' . $e->getMessage());
+        }
+    }
+
     public function appointments()
     {
         $query = Appointment::with('user');

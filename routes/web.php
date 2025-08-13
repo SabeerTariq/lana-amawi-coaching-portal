@@ -100,6 +100,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/appointments/{appointment}/cancel', [AdminController::class, 'cancelAppointment'])->name('appointments.cancel');
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/settings/logo', [AdminController::class, 'updateLogo'])->name('settings.logo');
     
     // Appointment management
     Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
