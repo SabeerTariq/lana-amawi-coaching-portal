@@ -162,12 +162,128 @@
                                 @endif
                             </div>
                             <div class="card-footer bg-light">
-                                <div class="text-center">
-                                    <small class="text-muted">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        We've suggested an alternative time. Please review and let us know if this works for you.
-                                    </small>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#acceptModal{{ $booking->id }}">
+                                        <i class="fas fa-check me-1"></i>Accept Time
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $booking->id }}">
+                                        <i class="fas fa-times me-1"></i>Reject Time
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modifyModal{{ $booking->id }}">
+                                        <i class="fas fa-edit me-1"></i>Request Changes
+                                    </button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accept Modal -->
+                    <div class="modal fade" id="acceptModal{{ $booking->id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Accept Suggested Time</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="{{ route('client.bookings.accept', $booking) }}" method="POST">
+                                    @csrf
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to accept this suggested time?</p>
+                                        <div class="alert alert-info">
+                                            <strong>Date:</strong> {{ $booking->preferred_date->format('M d, Y') }}<br>
+                                            <strong>Time:</strong> {{ $booking->preferred_time }}
+                                        </div>
+                                        <p class="text-muted">Once accepted, we will convert this to a confirmed appointment.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-success">Accept Time</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reject Modal -->
+                    <div class="modal fade" id="rejectModal{{ $booking->id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Reject Suggested Time</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="{{ route('client.bookings.reject', $booking) }}" method="POST">
+                                    @csrf
+                                    <div class="modal-body">
+                                        <p>Please let us know why this time doesn't work for you:</p>
+                                        <div class="mb-3">
+                                            <label for="rejection_reason{{ $booking->id }}" class="form-label">Reason for Rejection *</label>
+                                            <textarea class="form-control" id="rejection_reason{{ $booking->id }}" 
+                                                      name="rejection_reason" rows="3" required
+                                                      placeholder="e.g., I have another commitment, I prefer morning sessions, etc."></textarea>
+                                        </div>
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            We'll use this feedback to suggest a better time for you.
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-danger">Reject Time</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modify Modal -->
+                    <div class="modal fade" id="modifyModal{{ $booking->id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Request Changes to Suggested Time</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="{{ route('client.bookings.modify', $booking) }}" method="POST">
+                                    @csrf
+                                    <div class="modal-body">
+                                        <p>Please suggest a different time that works better for you:</p>
+                                        <div class="mb-3">
+                                            <label for="new_date{{ $booking->id }}" class="form-label">Preferred Date *</label>
+                                            <input type="date" class="form-control" id="new_date{{ $booking->id }}" 
+                                                   name="new_date" required min="{{ date('Y-m-d') }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="new_time{{ $booking->id }}" class="form-label">Preferred Time *</label>
+                                            <select class="form-control" id="new_time{{ $booking->id }}" name="new_time" required>
+                                                <option value="">Select time</option>
+                                                <option value="09:00">9:00 AM</option>
+                                                <option value="10:00">10:00 AM</option>
+                                                <option value="11:00">11:00 AM</option>
+                                                <option value="12:00">12:00 PM</option>
+                                                <option value="13:00">1:00 PM</option>
+                                                <option value="14:00">2:00 PM</option>
+                                                <option value="15:00">3:00 PM</option>
+                                                <option value="16:00">4:00 PM</option>
+                                                <option value="17:00">5:00 PM</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="modification_reason{{ $booking->id }}" class="form-label">Reason for Change *</label>
+                                            <textarea class="form-control" id="modification_reason{{ $booking->id }}" 
+                                                      name="modification_reason" rows="3" required
+                                                      placeholder="e.g., I have a conflict, I prefer different hours, etc."></textarea>
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            We'll review your request and get back to you.
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Request Changes</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

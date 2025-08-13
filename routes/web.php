@@ -53,6 +53,11 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     
     // Booking new sessions
     Route::post('/book-session', [ClientController::class, 'bookNewSession'])->name('book-session');
+
+    // Respond to suggested alternative times
+    Route::post('/bookings/{booking}/accept', [ClientController::class, 'acceptSuggestedTime'])->name('bookings.accept');
+    Route::post('/bookings/{booking}/reject', [ClientController::class, 'rejectSuggestedTime'])->name('bookings.reject');
+    Route::post('/bookings/{booking}/modify', [ClientController::class, 'modifySuggestedTime'])->name('bookings.modify');
 });
 
 // Admin routes (authenticated + admin middleware)
@@ -105,6 +110,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
     Route::post('/bookings/{booking}/convert', [AdminController::class, 'convertBookingToAppointment'])->name('bookings.convert');
     Route::post('/bookings/{booking}/suggest-time', [AdminController::class, 'suggestAlternativeTime'])->name('bookings.suggest-time');
+    
+    // Handle client responses to suggested times
+    Route::post('/bookings/{booking}/convert-accepted', [AdminController::class, 'convertAcceptedBooking'])->name('bookings.convert-accepted');
+    Route::post('/bookings/{booking}/handle-rejection', [AdminController::class, 'handleRejectedBooking'])->name('bookings.handle-rejection');
+    Route::post('/bookings/{booking}/handle-modification', [AdminController::class, 'handleModifiedBooking'])->name('bookings.handle-modification');
 });
 
 // Test route for debugging booking

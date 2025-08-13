@@ -244,6 +244,21 @@ body.popup-open {
                                             @if($booking->admin_suggestion)
                                                 <br><small class="text-muted">{{ Str::limit($booking->admin_suggestion, 50) }}</small>
                                             @endif
+                                        @elseif($booking->status === 'accepted')
+                                            <span class="badge bg-success">Accepted by Client</span>
+                                            @if($booking->client_response)
+                                                <br><small class="text-muted">{{ Str::limit($booking->client_response, 50) }}</small>
+                                            @endif
+                                        @elseif($booking->status === 'rejected')
+                                            <span class="badge bg-danger">Rejected by Client</span>
+                                            @if($booking->client_response)
+                                                <br><small class="text-muted">{{ Str::limit($booking->client_response, 50) }}</small>
+                                            @endif
+                                        @elseif($booking->status === 'modified')
+                                            <span class="badge bg-primary">Modified by Client</span>
+                                            @if($booking->client_response)
+                                                <br><small class="text-muted">{{ Str::limit($booking->client_response, 50) }}</small>
+                                            @endif
                                         @else
                                             <span class="badge bg-secondary">{{ ucfirst(str_replace('_', ' ', $booking->status)) }}</span>
                                         @endif
@@ -259,14 +274,44 @@ body.popup-open {
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-success btn-sm" 
-                                                    onclick="showPopup('convertPopup{{ $booking->id }}')">
-                                                <i class="fas fa-check me-1"></i>Confirm
-                                            </button>
-                                            <button type="button" class="btn btn-info btn-sm"
-                                                    onclick="showPopup('suggestPopup{{ $booking->id }}')">
-                                                <i class="fas fa-clock me-1"></i>Suggest Time
-                                            </button>
+                                            @if($booking->status === 'pending')
+                                                <button type="button" class="btn btn-success btn-sm" 
+                                                        onclick="showPopup('convertPopup{{ $booking->id }}')">
+                                                    <i class="fas fa-check me-1"></i>Confirm
+                                                </button>
+                                                <button type="button" class="btn btn-info btn-sm"
+                                                        onclick="showPopup('suggestPopup{{ $booking->id }}')">
+                                                    <i class="fas fa-clock me-1"></i>Suggest Time
+                                                </button>
+                                            @elseif($booking->status === 'suggested_alternative')
+                                                <button type="button" class="btn btn-warning btn-sm" disabled>
+                                                    <i class="fas fa-clock me-1"></i>Waiting for Response
+                                                </button>
+                                            @elseif($booking->status === 'accepted')
+                                                <button type="button" class="btn btn-success btn-sm" 
+                                                        onclick="showPopup('convertAcceptedPopup{{ $booking->id }}')">
+                                                    <i class="fas fa-calendar-check me-1"></i>Convert to Appointment
+                                                </button>
+                                            @elseif($booking->status === 'rejected')
+                                                <button type="button" class="btn btn-info btn-sm"
+                                                        onclick="showPopup('handleRejectionPopup{{ $booking->id }}')">
+                                                    <i class="fas fa-clock me-1"></i>Suggest New Time
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                        onclick="showPopup('cancelRejectedPopup{{ $booking->id }}')">
+                                                    <i class="fas fa-times me-1"></i>Cancel
+                                                </button>
+                                            @elseif($booking->status === 'modified')
+                                                <button type="button" class="btn btn-success btn-sm"
+                                                        onclick="showPopup('acceptModificationPopup{{ $booking->id }}')">
+                                                    <i class="fas fa-check me-1"></i>Accept Changes
+                                                </button>
+                                                <button type="button" class="btn btn-info btn-sm"
+                                                        onclick="showPopup('suggestAlternativeToModificationPopup{{ $booking->id }}')">
+                                                    <i class="fas fa-clock me-1"></i>Suggest Alternative
+                                                </button>
+                                            @endif
+                                            
                                             @php
                                                 $client = User::where('email', $booking->email)->first();
                                             @endphp
@@ -354,6 +399,175 @@ body.popup-open {
                                         </form>
                                     </div>
                                 </div>
+
+                                <!-- Convert Accepted Booking to Appointment Popup -->
+                                <div class="popup-overlay" id="convertAcceptedPopup{{ $booking->id }}">
+                                    <div class="popup-container">
+                                        <div class="popup-header">
+                                            <h5 class="popup-title">Convert Accepted Booking to Appointment</h5>
+                                            <button type="button" class="popup-close" onclick="hidePopup('convertAcceptedPopup{{ $booking->id }}')">&times;</button>
+                                        </div>
+                                        <form action="{{ route('admin.bookings.convert-accepted', $booking) }}" method="POST">
+                                            @csrf
+                                            <div class="popup-body">
+                                                <p>This booking has been accepted by the client. Convert it to a confirmed appointment?</p>
+                                                <div class="alert alert-success">
+                                                    <strong>Client:</strong> {{ $booking->full_name }}<br>
+                                                    <strong>Date:</strong> {{ $booking->preferred_date->format('M d, Y') }}<br>
+                                                    <strong>Time:</strong> {{ $booking->preferred_time }}<br>
+                                                    <strong>Status:</strong> Accepted by Client
+                                                </div>
+                                                <div class="alert alert-info">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <strong>Note:</strong> This will create a confirmed appointment and move it to the appointments section.
+                                                </div>
+                                            </div>
+                                            <div class="popup-footer">
+                                                <button type="button" class="btn btn-secondary" onclick="hidePopup('convertAcceptedPopup{{ $booking->id }}')">Cancel</button>
+                                                <button type="submit" class="btn btn-success">Convert to Appointment</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Handle Rejection Popup -->
+                                <div class="popup-overlay" id="handleRejectionPopup{{ $booking->id }}">
+                                    <div class="popup-container">
+                                        <div class="popup-header">
+                                            <h5 class="popup-title">Handle Client Rejection</h5>
+                                            <button type="button" class="popup-close" onclick="hidePopup('handleRejectionPopup{{ $booking->id }}')">&times;</button>
+                                        </div>
+                                        <form action="{{ route('admin.bookings.handle-rejection', $booking) }}" method="POST">
+                                            @csrf
+                                            <div class="popup-body">
+                                                <p>The client rejected the suggested time. What would you like to do?</p>
+                                                <div class="alert alert-danger">
+                                                    <strong>Client:</strong> {{ $booking->full_name }}<br>
+                                                    <strong>Rejection Reason:</strong> {{ $booking->client_response }}
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Action:</label>
+                                                    <select class="form-control" name="action" id="rejectionAction{{ $booking->id }}" required>
+                                                        <option value="">Select action</option>
+                                                        <option value="suggest_new_time">Suggest New Alternative Time</option>
+                                                        <option value="cancel">Cancel the Booking</option>
+                                                    </select>
+                                                </div>
+                                                <div id="newTimeFields{{ $booking->id }}" style="display: none;">
+                                                    <div class="mb-3">
+                                                        <label for="new_suggested_date{{ $booking->id }}" class="form-label">New Suggested Date</label>
+                                                        <input type="date" class="form-control" id="new_suggested_date{{ $booking->id }}" 
+                                                               name="new_suggested_date" min="{{ date('Y-m-d') }}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="new_suggested_time{{ $booking->id }}" class="form-label">New Suggested Time</label>
+                                                        <select class="form-control" id="new_suggested_time{{ $booking->id }}" name="new_suggested_time">
+                                                            <option value="">Select time</option>
+                                                            <option value="09:00">9:00 AM</option>
+                                                            <option value="10:00">10:00 AM</option>
+                                                            <option value="11:00">11:00 AM</option>
+                                                            <option value="12:00">12:00 PM</option>
+                                                            <option value="13:00">1:00 PM</option>
+                                                            <option value="14:00">2:00 PM</option>
+                                                            <option value="15:00">3:00 PM</option>
+                                                            <option value="16:00">4:00 PM</option>
+                                                            <option value="17:00">5:00 PM</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="admin_message{{ $booking->id }}" class="form-label">Message to Client</label>
+                                                        <textarea class="form-control" id="admin_message{{ $booking->id }}" name="admin_message" rows="3" 
+                                                                  placeholder="Explain the new suggested time..."></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="popup-footer">
+                                                <button type="button" class="btn btn-secondary" onclick="hidePopup('handleRejectionPopup{{ $booking->id }}')">Cancel</button>
+                                                <button type="submit" class="btn btn-info">Submit</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Accept Modification Popup -->
+                                <div class="popup-overlay" id="acceptModificationPopup{{ $booking->id }}">
+                                    <div class="popup-container">
+                                        <div class="popup-header">
+                                            <h5 class="popup-title">Accept Client Modification</h5>
+                                            <button type="button" class="popup-close" onclick="hidePopup('acceptModificationPopup{{ $booking->id }}')">&times;</button>
+                                        </div>
+                                        <form action="{{ route('admin.bookings.handle-modification', $booking) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="action" value="accept_modification">
+                                            <div class="popup-body">
+                                                <p>The client has requested modifications to the suggested time. Accept their changes?</p>
+                                                <div class="alert alert-primary">
+                                                    <strong>Client:</strong> {{ $booking->full_name }}<br>
+                                                    <strong>New Preference:</strong> {{ $booking->preferred_date->format('M d, Y') }} at {{ $booking->preferred_time }}<br>
+                                                    <strong>Reason:</strong> {{ $booking->client_response }}
+                                                </div>
+                                                <div class="alert alert-success">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <strong>Note:</strong> This will mark the booking as accepted and ready for conversion to appointment.
+                                                </div>
+                                            </div>
+                                            <div class="popup-footer">
+                                                <button type="button" class="btn btn-secondary" onclick="hidePopup('acceptModificationPopup{{ $booking->id }}')">Cancel</button>
+                                                <button type="submit" class="btn btn-success">Accept Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Suggest Alternative to Modification Popup -->
+                                <div class="popup-overlay" id="suggestAlternativeToModificationPopup{{ $booking->id }}">
+                                    <div class="popup-container">
+                                        <div class="popup-header">
+                                            <h5 class="popup-title">Suggest Alternative to Client Modification</h5>
+                                            <button type="button" class="popup-close" onclick="hidePopup('suggestAlternativeToModificationPopup{{ $booking->id }}')">&times;</button>
+                                        </div>
+                                        <form action="{{ route('admin.bookings.handle-modification', $booking) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="action" value="suggest_alternative">
+                                            <div class="popup-body">
+                                                <p>The client requested modifications, but you'd like to suggest an alternative time instead.</p>
+                                                <div class="alert alert-primary">
+                                                    <strong>Client's Request:</strong> {{ $booking->preferred_date->format('M d, Y') }} at {{ $booking->preferred_time }}<br>
+                                                    <strong>Reason:</strong> {{ $booking->client_response }}
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="suggested_date_mod{{ $booking->id }}" class="form-label">Alternative Date</label>
+                                                    <input type="date" class="form-control" id="suggested_date_mod{{ $booking->id }}" 
+                                                           name="suggested_date" required min="{{ date('Y-m-d') }}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="suggested_time_mod{{ $booking->id }}" class="form-label">Alternative Time</label>
+                                                    <select class="form-control" id="suggested_time_mod{{ $booking->id }}" name="suggested_time" required>
+                                                        <option value="">Select time</option>
+                                                        <option value="09:00">9:00 AM</option>
+                                                        <option value="10:00">10:00 AM</option>
+                                                        <option value="11:00">11:00 AM</option>
+                                                        <option value="12:00">12:00 PM</option>
+                                                        <option value="13:00">1:00 PM</option>
+                                                        <option value="14:00">2:00 PM</option>
+                                                        <option value="15:00">3:00 PM</option>
+                                                        <option value="16:00">4:00 PM</option>
+                                                        <option value="17:00">5:00 PM</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="admin_message_mod{{ $booking->id }}" class="form-label">Message to Client</label>
+                                                    <textarea class="form-control" id="admin_message_mod{{ $booking->id }}" name="admin_message" rows="3" 
+                                                              placeholder="Explain why you're suggesting this alternative time..."></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="popup-footer">
+                                                <button type="button" class="btn btn-secondary" onclick="hidePopup('suggestAlternativeToModificationPopup{{ $booking->id }}')">Cancel</button>
+                                                <button type="submit" class="btn btn-info">Suggest Alternative</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             @endforeach
                         </tbody>
                     </table>
@@ -425,7 +639,7 @@ function hidePopup(popupId) {
 }
 
 function hideAllPopups() {
-    const popups = document.querySelectorAll('.popup-overlay');
+    const popups = document.querySelectorAll('.popup-overlay.active');
     popups.forEach(popup => {
         popup.classList.remove('active');
     });
@@ -438,28 +652,44 @@ function hideAllPopups() {
     document.body.style.height = '';
 }
 
-// Handle clicking outside popup to close
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('popup-overlay')) {
-        hidePopup(e.target.id);
-    }
-});
+// Handle rejection action change
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners for rejection action changes
+    const rejectionActions = document.querySelectorAll('[id^="rejectionAction"]');
+    rejectionActions.forEach(action => {
+        action.addEventListener('change', function() {
+            const bookingId = this.id.replace('rejectionAction', '');
+            const newTimeFields = document.getElementById('newTimeFields' + bookingId);
+            
+            if (this.value === 'suggest_new_time') {
+                newTimeFields.style.display = 'block';
+                // Make required fields actually required
+                newTimeFields.querySelectorAll('input, select').forEach(field => {
+                    field.required = true;
+                });
+            } else {
+                newTimeFields.style.display = 'none';
+                // Remove required from hidden fields
+                newTimeFields.querySelectorAll('input, select').forEach(field => {
+                    field.required = false;
+                });
+            }
+        });
+    });
 
-// Handle ESC key to close popup
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const activePopup = document.querySelector('.popup-overlay.active');
-        if (activePopup) {
-            hidePopup(activePopup.id);
+    // Close popups when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('popup-overlay')) {
+            hidePopup(e.target.id);
         }
-    }
-});
+    });
 
-// Prevent popup content clicks from closing the popup
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.popup-container')) {
-        e.stopPropagation();
-    }
+    // Close popups with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            hideAllPopups();
+        }
+    });
 });
 </script>
 @endsection 

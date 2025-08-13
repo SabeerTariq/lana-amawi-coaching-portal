@@ -383,6 +383,128 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Alternative time suggested to client! The booking is now marked as "Alternative Suggested" and will remain visible for further management.');
     }
 
+    /**
+     * Convert accepted booking to appointment
+     */
+    public function convertAcceptedBooking(Booking $booking)
+    {
+        // Verify the booking has been accepted by client
+        if ($booking->status !== 'accepted') {
+            return redirect()->back()->with('error', 'This booking has not been accepted by the client yet.');
+        }
+
+        try {
+            // Find or create user based on email
+            $user = User::where('email', $booking->email)->first();
+            
+            if (!$user) {
+                // Create a new user account for the client
+                $user = User::create([
+                    'name' => $booking->full_name,
+                    'email' => $booking->email,
+                    'password' => Hash::make(Str::random(12)), // Generate random password
+                    'is_admin' => false,
+                ]);
+                
+                // Send credentials email to the new client
+                // You can implement email notification here
+            }
+
+            // Create appointment from accepted booking
+            $appointment = Appointment::create([
+                'user_id' => $user->id,
+                'program' => $booking->program ?? null,
+                'appointment_date' => $booking->preferred_date,
+                'appointment_time' => $booking->preferred_time,
+                'message' => $booking->message,
+                'status' => 'confirmed',
+            ]);
+
+            // Update booking status to converted
+            $booking->update(['status' => 'converted']);
+
+            // Log the conversion for debugging
+            \Log::info('Accepted booking converted to appointment', [
+                'booking_id' => $booking->id,
+                'appointment_id' => $appointment->id,
+                'user_id' => $user->id,
+                'email' => $booking->email
+            ]);
+
+            return redirect()->route('admin.appointments')->with('success', 'Accepted booking converted to appointment successfully! The appointment is now available in the appointments section.');
+        } catch (\Exception $e) {
+            \Log::error('Error converting accepted booking to appointment: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error converting accepted booking to appointment: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle rejected booking (admin can suggest new time or cancel)
+     */
+    public function handleRejectedBooking(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'action' => 'required|in:suggest_new_time,cancel',
+            'new_suggested_date' => 'required_if:action,suggest_new_time|date|after:today',
+            'new_suggested_time' => 'required_if:action,suggest_new_time|string',
+            'admin_message' => 'nullable|string',
+        ]);
+
+        if ($request->action === 'suggest_new_time') {
+            // Suggest a new alternative time
+            $booking->update([
+                'preferred_date' => $request->new_suggested_date,
+                'preferred_time' => $request->new_suggested_time,
+                'admin_suggestion' => $request->admin_message ?? 'We have suggested a new alternative time based on your feedback.',
+                'status' => 'suggested_alternative',
+                'client_response' => null, // Reset client response
+                'response_date' => null,
+            ]);
+
+            return redirect()->back()->with('success', 'New alternative time suggested to client!');
+        } else {
+            // Cancel the booking
+            $booking->update(['status' => 'cancelled']);
+            return redirect()->back()->with('success', 'Booking cancelled due to client rejection.');
+        }
+    }
+
+    /**
+     * Handle modified booking (admin can accept modification or suggest alternative)
+     */
+    public function handleModifiedBooking(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'action' => 'required|in:accept_modification,suggest_alternative',
+            'suggested_date' => 'required_if:action,suggest_alternative|date|after:today',
+            'suggested_time' => 'required_if:action,suggest_alternative|string',
+            'admin_message' => 'nullable|string',
+        ]);
+
+        if ($request->action === 'accept_modification') {
+            // Accept the client's modification
+            $booking->update([
+                'status' => 'accepted',
+                'admin_suggestion' => 'We have accepted your requested modification.',
+                'client_response' => $booking->client_response . ' (Accepted by admin)',
+            ]);
+
+            return redirect()->back()->with('success', 'Client modification accepted! The booking is now ready for conversion to appointment.');
+        } else {
+            // Suggest an alternative to the client's modification
+            $booking->update([
+                'preferred_date' => $request->suggested_date,
+                'preferred_time' => $request->suggested_time,
+                'admin_suggestion' => $request->admin_message ?? 'We have suggested an alternative time based on your modification request.',
+                'status' => 'suggested_alternative',
+                'client_response' => null, // Reset client response
+                'response_date' => null,
+            ]);
+
+            return redirect()->back()->with('success', 'Alternative time suggested to client!');
+        }
+    }
+
     public function confirmAppointment(Appointment $appointment)
     {
         $appointment->update(['status' => 'confirmed']);

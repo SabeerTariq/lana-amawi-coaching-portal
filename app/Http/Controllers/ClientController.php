@@ -205,7 +205,6 @@ class ClientController extends Controller
         $user = Auth::user();
 
         try {
-            // Create a new booking for the authenticated user
             $booking = Booking::create([
                 'full_name' => $user->name,
                 'email' => $user->email,
@@ -216,11 +215,94 @@ class ClientController extends Controller
                 'message' => $request->message,
                 'status' => 'pending',
             ]);
-
             return redirect()->back()->with('success', 'Your new session has been booked successfully! We will review and confirm your appointment.');
         } catch (\Exception $e) {
             \Log::error('Client booking error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'An error occurred while booking your session. Please try again.');
         }
+    }
+
+    /**
+     * Client accepts suggested alternative time
+     */
+    public function acceptSuggestedTime(Request $request, Booking $booking)
+    {
+        // Verify the booking belongs to the authenticated user
+        if ($booking->email !== Auth::user()->email) {
+            abort(403, 'Access denied.');
+        }
+
+        // Verify the booking is in suggested_alternative status
+        if ($booking->status !== 'suggested_alternative') {
+            return redirect()->back()->with('error', 'This booking is not available for acceptance.');
+        }
+
+        $booking->update([
+            'status' => 'accepted',
+            'client_response' => 'Client accepted the suggested alternative time.',
+            'response_date' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'You have accepted the suggested alternative time. We will convert this to an appointment shortly.');
+    }
+
+    /**
+     * Client rejects suggested alternative time
+     */
+    public function rejectSuggestedTime(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500',
+        ]);
+
+        // Verify the booking belongs to the authenticated user
+        if ($booking->email !== Auth::user()->email) {
+            abort(403, 'Access denied.');
+        }
+
+        // Verify the booking is in suggested_alternative status
+        if ($booking->status !== 'suggested_alternative') {
+            return redirect()->back()->with('error', 'This booking is not available for rejection.');
+        }
+
+        $booking->update([
+            'status' => 'rejected',
+            'client_response' => 'Client rejected the suggested time. Reason: ' . $request->rejection_reason,
+            'response_date' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'You have rejected the suggested alternative time. We will contact you to arrange a different time.');
+    }
+
+    /**
+     * Client requests modification to suggested alternative time
+     */
+    public function modifySuggestedTime(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'new_date' => 'required|date|after:today',
+            'new_time' => 'required|string',
+            'modification_reason' => 'required|string|max:500',
+        ]);
+
+        // Verify the booking belongs to the authenticated user
+        if ($booking->email !== Auth::user()->email) {
+            abort(403, 'Access denied.');
+        }
+
+        // Verify the booking is in suggested_alternative status
+        if ($booking->status !== 'suggested_alternative') {
+            return redirect()->back()->with('error', 'This booking is not available for modification.');
+        }
+
+        $booking->update([
+            'status' => 'modified',
+            'preferred_date' => $request->new_date,
+            'preferred_time' => $request->new_time,
+            'client_response' => 'Client requested modification. New preference: ' . $request->new_date . ' at ' . $request->new_time . '. Reason: ' . $request->modification_reason,
+            'response_date' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'You have requested a modification to the suggested time. We will review your request and get back to you.');
     }
 } 
