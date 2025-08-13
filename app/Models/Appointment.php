@@ -135,6 +135,30 @@ class Appointment extends Model
     }
 
     /**
+     * Convert 24-hour time to AM/PM format for display
+     */
+    public function getFormattedTimeAttribute()
+    {
+        if (!$this->appointment_time) {
+            return '';
+        }
+        
+        return date('g:i A', strtotime($this->appointment_time));
+    }
+
+    /**
+     * Static method to convert any time string to AM/PM format
+     */
+    public static function formatTime($time)
+    {
+        if (!$time) {
+            return '';
+        }
+        
+        return date('g:i A', strtotime($time));
+    }
+
+    /**
      * Boot method to add model events
      */
     protected static function boot()

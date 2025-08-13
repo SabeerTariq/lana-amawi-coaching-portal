@@ -110,11 +110,11 @@
                             <tbody>
                                 @foreach($todayAppointments as $appointment)
                                     <tr>
-                                        <td class="d-none d-md-table-cell">{{ $appointment->appointment_time }}</td>
+                                        <td class="d-none d-md-table-cell">{{ $appointment->formatted_time }}</td>
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <span class="fw-bold">{{ $appointment->client_name }}</span>
-                                                <small class="text-muted d-md-none">{{ $appointment->appointment_time }}</small>
+                                                <small class="text-muted d-md-none">{{ $appointment->formatted_time }}</small>
                                             </div>
                                         </td>
                                         <td class="d-none d-lg-table-cell">

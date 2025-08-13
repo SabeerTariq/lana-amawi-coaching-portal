@@ -36,7 +36,7 @@
                         <h6 class="mb-1">Coaching Session</h6>
                         <p class="text-muted mb-0">
                             {{ $nextAppointment->appointment_date->format('l, F j, Y') }} at 
-                            {{ $nextAppointment->appointment_time }}
+                            {{ $nextAppointment->formatted_time }}
                         </p>
                     </div>
                     <div class="d-flex gap-2">

@@ -109,4 +109,28 @@ class Booking extends Model
             default => ucfirst($this->status)
         };
     }
+
+    /**
+     * Convert 24-hour time to AM/PM format for display
+     */
+    public function getFormattedTimeAttribute()
+    {
+        if (!$this->preferred_time) {
+            return '';
+        }
+        
+        return date('g:i A', strtotime($this->preferred_time));
+    }
+
+    /**
+     * Static method to convert any time string to AM/PM format
+     */
+    public static function formatTime($time)
+    {
+        if (!$time) {
+            return '';
+        }
+        
+        return date('g:i A', strtotime($time));
+    }
 } 

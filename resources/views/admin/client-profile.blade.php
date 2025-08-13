@@ -75,7 +75,7 @@
                                     @foreach($appointments as $appointment)
                                         <tr>
                                             <td>{{ $appointment->appointment_date->format('M d, Y') }}</td>
-                                            <td>{{ $appointment->appointment_time }}</td>
+                                            <td>{{ $appointment->formatted_time }}</td>
                                                                                          <td>
                                                  <span class="badge bg-{{ $appointment->status === 'confirmed' ? 'success' : ($appointment->status === 'pending' ? 'warning' : ($appointment->status === 'completed' ? 'info' : 'danger')) }}">
                                                      {{ ucfirst($appointment->status) }}

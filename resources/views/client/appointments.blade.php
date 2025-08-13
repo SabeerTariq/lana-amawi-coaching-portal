@@ -85,7 +85,7 @@
                                 <div class="mb-3">
                                     <i class="fas fa-clock text-muted me-2"></i>
                                     <span class="text-muted">
-                                        {{ $booking->preferred_time }}
+                                        {{ $booking->formatted_time }}
                                     </span>
                                 </div>
                                 @if($booking->program)
@@ -143,7 +143,7 @@
                                 <div class="mb-3">
                                     <i class="fas fa-clock text-muted me-2"></i>
                                     <span class="text-muted">
-                                        {{ $booking->preferred_time }}
+                                        {{ $booking->formatted_time }}
                                     </span>
                                 </div>
                                 @if($booking->program)
@@ -319,7 +319,7 @@
                                 <div class="mb-3">
                                     <i class="fas fa-clock text-muted me-2"></i>
                                     <span class="text-muted">
-                                        {{ $appointment->appointment_time }}
+                                        {{ $appointment->formatted_time }}
                                     </span>
                                 </div>
                                 @if($appointment->message)
@@ -376,7 +376,7 @@
                                 <div class="mb-3">
                                     <i class="fas fa-clock text-muted me-2"></i>
                                     <span class="text-muted">
-                                        {{ $appointment->appointment_time }}
+                                        {{ $appointment->formatted_time }}
                                     </span>
                                 </div>
                                 @if($appointment->message)
@@ -473,7 +473,7 @@
                         <p>Are you sure you want to cancel this appointment?</p>
                         <div class="alert alert-warning">
                             <strong>Date:</strong> {{ $appointment->appointment_date->format('M d, Y') }}<br>
-                            <strong>Time:</strong> {{ $appointment->appointment_time }}
+                                                                    <strong>Time:</strong> {{ $appointment->formatted_time }}
                         </div>
                     </div>
                     <div class="modal-footer">

@@ -234,7 +234,7 @@ body.popup-open {
                                     <td>
                                         <strong>{{ $booking->preferred_date->format('M d, Y') }}</strong>
                                         <br>
-                                        <small class="text-muted">{{ $booking->preferred_time }}</small>
+                                        <small class="text-muted">{{ $booking->formatted_time }}</small>
                                     </td>
                                     <td>
                                         @if($booking->status === 'pending')
@@ -341,7 +341,7 @@ body.popup-open {
                                                 <div class="alert alert-info">
                                                     <strong>Client:</strong> {{ $booking->full_name }}<br>
                                                     <strong>Date:</strong> {{ $booking->preferred_date->format('M d, Y') }}<br>
-                                                    <strong>Time:</strong> {{ $booking->preferred_time }}
+                                                    <strong>Time:</strong> {{ $booking->formatted_time }}
                                                 </div>
                                                 <div class="alert alert-warning">
                                                     <i class="fas fa-info-circle me-2"></i>
@@ -414,7 +414,7 @@ body.popup-open {
                                                 <div class="alert alert-success">
                                                     <strong>Client:</strong> {{ $booking->full_name }}<br>
                                                     <strong>Date:</strong> {{ $booking->preferred_date->format('M d, Y') }}<br>
-                                                    <strong>Time:</strong> {{ $booking->preferred_time }}<br>
+                                                    <strong>Time:</strong> {{ $booking->formatted_time }}<br>
                                                     <strong>Status:</strong> Accepted by Client
                                                 </div>
                                                 <div class="alert alert-info">
@@ -503,7 +503,7 @@ body.popup-open {
                                                 <p>The client has requested modifications to the suggested time. Accept their changes?</p>
                                                 <div class="alert alert-primary">
                                                     <strong>Client:</strong> {{ $booking->full_name }}<br>
-                                                    <strong>New Preference:</strong> {{ $booking->preferred_date->format('M d, Y') }} at {{ $booking->preferred_time }}<br>
+                                                    <strong>New Preference:</strong> {{ $booking->preferred_date->format('M d, Y') }} at {{ $booking->formatted_time }}<br>
                                                     <strong>Reason:</strong> {{ $booking->client_response }}
                                                 </div>
                                                 <div class="alert alert-success">
@@ -532,7 +532,7 @@ body.popup-open {
                                             <div class="popup-body">
                                                 <p>The client requested modifications, but you'd like to suggest an alternative time instead.</p>
                                                 <div class="alert alert-primary">
-                                                    <strong>Client's Request:</strong> {{ $booking->preferred_date->format('M d, Y') }} at {{ $booking->preferred_time }}<br>
+                                                    <strong>Client's Request:</strong> {{ $booking->preferred_date->format('M d, Y') }} at {{ $booking->formatted_time }}<br>
                                                     <strong>Reason:</strong> {{ $booking->client_response }}
                                                 </div>
                                                 <div class="mb-3">

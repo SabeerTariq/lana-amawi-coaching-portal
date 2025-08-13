@@ -87,7 +87,7 @@
                                 </td>
                                 <td>
                                     <div class="fw-bold">{{ $appointment->appointment_date->format('M d, Y') }}</div>
-                                    <small class="text-muted">{{ $appointment->appointment_time }}</small>
+                                                                            <small class="text-muted">{{ $appointment->formatted_time }}</small>
                                 </td>
                                 <td>
                                     <span class="badge bg-{{ $appointment->status === 'confirmed' ? 'success' : ($appointment->status === 'pending' ? 'warning' : ($appointment->status === 'completed' ? 'info' : 'danger')) }}">

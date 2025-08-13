@@ -55,7 +55,7 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
                                                 <h6 class="mb-1">{{ $appointment->user->name }}</h6>
-                                                <p class="mb-1">{{ $appointment->appointment_date->format('M d, Y') }} at {{ $appointment->appointment_time }}</p>
+                                                <p class="mb-1">{{ $appointment->appointment_date->format('M d, Y') }} at {{ $appointment->formatted_time }}</p>
                                             </div>
                                             <span class="badge bg-{{ $appointment->status === 'confirmed' ? 'success' : ($appointment->status === 'pending' ? 'warning' : ($appointment->status === 'completed' ? 'info' : 'danger')) }}">
                                                 {{ ucfirst($appointment->status) }}
@@ -111,7 +111,7 @@
                                             <h6 class="mb-1">{{ $appointment->user->name }}</h6>
                                             <p class="mb-1 text-muted">
                                                 {{ $appointment->appointment_date->format('M d, Y') }} at 
-                                                {{ $appointment->appointment_time }}
+                                                {{ $appointment->formatted_time }}
                                             </p>
                                             <small class="text-muted">{{ Str::limit($appointment->message ?? 'No notes', 50) }}</small>
                                         </div>
