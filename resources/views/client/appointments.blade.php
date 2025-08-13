@@ -37,6 +37,14 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
+        <button class="nav-link" id="suggested-tab" data-bs-toggle="tab" data-bs-target="#suggested" type="button" role="tab">
+            <i class="fas fa-lightbulb me-2"></i>Alternative Times
+            @if(count($suggestedBookings) > 0)
+                <span class="badge bg-info ms-1">{{ count($suggestedBookings) }}</span>
+            @endif
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
         <button class="nav-link" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">
             <i class="fas fa-calendar-check me-2"></i>Upcoming
             @if(count($upcomingAppointments) > 0)
@@ -110,6 +118,66 @@
                 <i class="fas fa-calendar-check text-muted mb-3" style="font-size: 4rem;"></i>
                 <h4 class="text-muted">No pending bookings</h4>
                 <p class="text-muted">All your bookings have been processed.</p>
+            </div>
+        @endif
+    </div>
+
+    <!-- Suggested Alternative Times -->
+    <div class="tab-pane fade" id="suggested" role="tabpanel">
+        @if(isset($suggestedBookings) && count($suggestedBookings) > 0)
+            <div class="row">
+                @foreach($suggestedBookings as $booking)
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 border-info">
+                            <div class="card-header d-flex justify-content-between align-items-center bg-info text-white">
+                                <h6 class="mb-0">Alternative Time Suggested</h6>
+                                <span class="badge bg-info text-white">Alternative Suggested</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <i class="fas fa-calendar text-muted me-2"></i>
+                                    <span class="text-muted">
+                                        {{ $booking->preferred_date->format('l, F j, Y') }}
+                                    </span>
+                                </div>
+                                <div class="mb-3">
+                                    <i class="fas fa-clock text-muted me-2"></i>
+                                    <span class="text-muted">
+                                        {{ $booking->preferred_time }}
+                                    </span>
+                                </div>
+                                @if($booking->program)
+                                    <div class="mb-3">
+                                        <i class="fas fa-tag text-muted me-2"></i>
+                                        <span class="text-muted">{{ ucfirst(str_replace('_', ' ', $booking->program)) }}</span>
+                                    </div>
+                                @endif
+                                @if($booking->admin_suggestion)
+                                    <div class="mb-3">
+                                        <i class="fas fa-comment-dots text-info me-2"></i>
+                                        <span class="text-info fw-bold">Admin Message:</span>
+                                        <br>
+                                        <span class="text-muted">{{ $booking->admin_suggestion }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="card-footer bg-light">
+                                <div class="text-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        We've suggested an alternative time. Please review and let us know if this works for you.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="text-center py-5">
+                <i class="fas fa-lightbulb text-muted mb-3" style="font-size: 4rem;"></i>
+                <h4 class="text-muted">No alternative times suggested</h4>
+                <p class="text-muted">All your bookings are proceeding as originally scheduled.</p>
             </div>
         @endif
     </div>

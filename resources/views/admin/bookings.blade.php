@@ -205,8 +205,8 @@ body.popup-open {
 
     <div class="card shadow">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Pending Bookings</h6>
-            <small class="text-muted">Confirm bookings to move them to appointments section</small>
+            <h6 class="m-0 font-weight-bold text-primary">Active Bookings</h6>
+            <small class="text-muted">Manage all active bookings - confirm, suggest alternatives, or view details</small>
         </div>
         <div class="card-body">
             @if($bookings->count() > 0)
@@ -216,6 +216,7 @@ body.popup-open {
                             <tr>
                                 <th>Client</th>
                                 <th>Preferred Date/Time</th>
+                                <th>Status</th>
                                 <th>Contact Info</th>
                                 <th>Actions</th>
                             </tr>
@@ -234,6 +235,18 @@ body.popup-open {
                                         <strong>{{ $booking->preferred_date->format('M d, Y') }}</strong>
                                         <br>
                                         <small class="text-muted">{{ $booking->preferred_time }}</small>
+                                    </td>
+                                    <td>
+                                        @if($booking->status === 'pending')
+                                            <span class="badge bg-warning">Pending</span>
+                                        @elseif($booking->status === 'suggested_alternative')
+                                            <span class="badge bg-info">Alternative Suggested</span>
+                                            @if($booking->admin_suggestion)
+                                                <br><small class="text-muted">{{ Str::limit($booking->admin_suggestion, 50) }}</small>
+                                            @endif
+                                        @else
+                                            <span class="badge bg-secondary">{{ ucfirst(str_replace('_', ' ', $booking->status)) }}</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <div>
@@ -352,8 +365,8 @@ body.popup-open {
             @else
                 <div class="text-center py-4">
                     <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">No pending bookings</h5>
-                    <p class="text-muted">All bookings have been processed.</p>
+                    <h5 class="text-muted">No active bookings</h5>
+                    <p class="text-muted">All bookings have been processed or converted to appointments.</p>
                 </div>
             @endif
         </div>

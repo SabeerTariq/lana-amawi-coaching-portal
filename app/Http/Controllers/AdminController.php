@@ -306,7 +306,8 @@ class AdminController extends Controller
 
     public function bookings()
     {
-        $bookings = Booking::where('status', 'pending')
+        // Show all bookings except completed/cancelled ones
+        $bookings = Booking::whereNotIn('status', ['completed', 'cancelled'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
@@ -372,14 +373,14 @@ class AdminController extends Controller
         $booking->update([
             'preferred_date' => $request->suggested_date,
             'preferred_time' => $request->suggested_time,
-            'message' => $request->message,
+            'admin_suggestion' => $request->message,
             'status' => 'suggested_alternative',
         ]);
 
         // Send email to client with suggested time
         // You can implement email notification here
 
-        return redirect()->back()->with('success', 'Alternative time suggested to client!');
+        return redirect()->back()->with('success', 'Alternative time suggested to client! The booking is now marked as "Alternative Suggested" and will remain visible for further management.');
     }
 
     public function confirmAppointment(Appointment $appointment)

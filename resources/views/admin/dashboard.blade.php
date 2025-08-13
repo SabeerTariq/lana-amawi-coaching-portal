@@ -76,8 +76,8 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="flex-grow-1">
-                        <h4 class="mb-0 fs-4">{{ \App\Models\Booking::where('status', 'pending')->count() }}</h4>
-                        <p class="mb-0 small">Pending Bookings</p>
+                        <h4 class="mb-0 fs-4">{{ \App\Models\Booking::whereNotIn('status', ['completed', 'cancelled'])->count() }}</h4>
+                        <p class="mb-0 small">Active Bookings</p>
                     </div>
                     <i class="fas fa-calendar-plus fa-2x opacity-75 ms-2"></i>
                 </div>

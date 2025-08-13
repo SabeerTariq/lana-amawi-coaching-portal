@@ -135,7 +135,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        return redirect()->route('booking');
     }
 
     // Password Reset Methods
@@ -186,7 +186,7 @@ class AuthController extends Controller
         );
 
         return $status === Password::PASSWORD_RESET
-                    ? redirect()->route('home')->with('status', __($status))
+                    ? redirect()->route('booking')->with('status', __($status))
                     : back()->withErrors(['email' => [__($status)]]);
     }
 } 
