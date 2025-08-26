@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 13, 2025 at 08:47 PM
+-- Generation Time: Aug 26, 2025 at 06:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -39,6 +39,15 @@ CREATE TABLE `appointments` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `appointments`
+--
+
+INSERT INTO `appointments` (`id`, `user_id`, `program`, `appointment_date`, `appointment_time`, `message`, `status`, `created_at`, `updated_at`) VALUES
+(25, 24, NULL, '2025-08-30', '13:00', NULL, 'confirmed', '2025-08-22 19:16:31', '2025-08-22 19:16:31'),
+(26, 25, NULL, '2025-08-26', '14:00', 'Ratione ad adipisici', 'confirmed', '2025-08-25 23:20:03', '2025-08-25 23:20:03'),
+(27, 26, NULL, '2025-08-26', '16:00', 'Quae non quos molest', 'confirmed', '2025-08-25 23:29:29', '2025-08-25 23:29:29');
+
 -- --------------------------------------------------------
 
 --
@@ -58,6 +67,9 @@ CREATE TABLE `bookings` (
   `client_response` text DEFAULT NULL,
   `response_date` timestamp NULL DEFAULT NULL,
   `status` varchar(50) NOT NULL DEFAULT 'pending',
+  `signed_agreement_path` varchar(255) DEFAULT NULL,
+  `signed_agreement_name` varchar(255) DEFAULT NULL,
+  `agreement_uploaded_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -85,6 +97,29 @@ CREATE TABLE `cache_locks` (
   `owner` varchar(255) NOT NULL,
   `expiration` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `client_notes`
+--
+
+CREATE TABLE `client_notes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `admin_id` bigint(20) UNSIGNED NOT NULL,
+  `note` text NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `client_notes`
+--
+
+INSERT INTO `client_notes` (`id`, `user_id`, `admin_id`, `note`, `created_at`, `updated_at`) VALUES
+(1, 26, 14, 'Testing note', '2025-08-25 23:28:34', '2025-08-25 23:28:34'),
+(2, 26, 14, 'Another session', '2025-08-25 23:28:47', '2025-08-25 23:28:47');
 
 -- --------------------------------------------------------
 
@@ -189,7 +224,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (13, '2025_08_13_175337_add_admin_suggestion_to_bookings_table', 6),
 (14, '2025_08_13_180954_add_client_response_fields_to_bookings_table', 7),
 (15, '2025_08_13_181631_fix_booking_status_column_length', 8),
-(16, '2025_08_13_181657_fix_appointment_status_column_length', 9);
+(16, '2025_08_13_181657_fix_appointment_status_column_length', 9),
+(17, '2025_08_13_200000_add_agreement_fields_to_bookings_table', 10),
+(18, '2025_08_23_002943_add_agreement_fields_to_users_table', 11),
+(19, '2025_08_26_042306_create_client_notes_table', 12);
 
 -- --------------------------------------------------------
 
@@ -223,8 +261,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('L70aNsmrzkZ4fiHBNZmrarAmHF0i8s50ODkK7ZDo', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiMVdPVVVhcmZ2T2d3NDVCZ0pwYTVNQWRSMUJ5QTluSmJ1Y2VvOHdEaSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9hcHBvaW50bWVudHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxNDtzOjE5OiJhcHBvaW50bWVudF9maWx0ZXJzIjthOjQ6e3M6Njoic2VhcmNoIjtOO3M6Njoic3RhdHVzIjtOO3M6OToiZGF0ZV9mcm9tIjtzOjEwOiIyMDI1LTA4LTEzIjtzOjc6ImRhdGVfdG8iO3M6MTA6IjIwMjUtMDgtMjAiO319', 1755110796),
-('sB9G1xki6rtZIhjoM3Ij1TzL7cJiJAv02pThjPtX', 16, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiM09GNEFhMjE1VDQyVlYwZnR2RWhYN3Z1b0dOMEtpekdsb0xwZGdadyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvYXBwb2ludG1lbnRzIjt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTY7fQ==', 1755110791);
+('qcW3NdqVHe3tVJzoyoT9LUyADUeMa288eQqrnwr2', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiZHFLT3FhRkFwWTFtRUFUcnZJd1pybEs2eGtuYXVEZHBiTXdmWjdNUyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fX0=', 1756182068),
+('WeBBWX8VYRLaLyI8LP3rpTGGIDW989UKUG1HOO6c', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoib2x0emNlQ3lYVDFRaVFtWFlDaGZlcHY0TzhiZ3VZMHk5a1pmMnhhbyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9hcHBvaW50bWVudHMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxNDt9', 1756182583);
 
 -- --------------------------------------------------------
 
@@ -240,6 +278,9 @@ CREATE TABLE `users` (
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `is_admin` tinyint(1) NOT NULL DEFAULT 0,
+  `signed_agreement_path` varchar(255) DEFAULT NULL,
+  `signed_agreement_name` varchar(255) DEFAULT NULL,
+  `agreement_uploaded_at` timestamp NULL DEFAULT NULL,
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -249,10 +290,13 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `phone`, `email_verified_at`, `password`, `is_admin`, `remember_token`, `created_at`, `updated_at`) VALUES
-(14, 'Admin User', 'admin@example.com', NULL, '2025-08-07 15:03:40', '$2y$12$nV9CxLciXFYiNSIl9ehUGO5l8JcZ9Y/Ni.9bn9Ea3GLj0krv6qmn6', 1, NULL, '2025-08-07 15:03:40', '2025-08-07 15:03:40'),
-(15, 'Demo User', 'demo@example.com', NULL, '2025-08-07 15:03:40', '$2y$12$2xeDWAA2JBkMqBpbb47iF./aG2NhKqii/2LtskDP/fE1APX1511qa', 0, NULL, '2025-08-07 15:03:40', '2025-08-07 15:03:40'),
-(16, 'Test User', 'test@example.com', NULL, '2025-08-07 15:03:41', '$2y$12$YCLznGXTvzWku2zqROdwFexXTqztB83EioioIm9DqxVzekFRePLly', 0, NULL, '2025-08-07 15:03:41', '2025-08-07 15:03:41');
+INSERT INTO `users` (`id`, `name`, `email`, `phone`, `email_verified_at`, `password`, `is_admin`, `signed_agreement_path`, `signed_agreement_name`, `agreement_uploaded_at`, `remember_token`, `created_at`, `updated_at`) VALUES
+(14, 'Admin User', 'admin@example.com', NULL, '2025-08-07 15:03:40', '$2y$12$nV9CxLciXFYiNSIl9ehUGO5l8JcZ9Y/Ni.9bn9Ea3GLj0krv6qmn6', 1, NULL, NULL, NULL, NULL, '2025-08-07 15:03:40', '2025-08-07 15:03:40'),
+(15, 'Demo User', 'demo@example.com', NULL, '2025-08-07 15:03:40', '$2y$12$2xeDWAA2JBkMqBpbb47iF./aG2NhKqii/2LtskDP/fE1APX1511qa', 0, NULL, NULL, NULL, NULL, '2025-08-07 15:03:40', '2025-08-07 15:03:40'),
+(16, 'Test User', 'test@example.com', NULL, '2025-08-07 15:03:41', '$2y$12$YCLznGXTvzWku2zqROdwFexXTqztB83EioioIm9DqxVzekFRePLly', 0, NULL, NULL, NULL, NULL, '2025-08-07 15:03:41', '2025-08-07 15:03:41'),
+(24, 'Te', 'testing1@gmail.com', NULL, NULL, '$2y$12$YKyp/OHId29xMU3Ay.MHSOEyQKip28Zy/vAgsv0T6fr.x1BpyjPY6', 0, NULL, NULL, NULL, NULL, '2025-08-22 19:07:54', '2025-08-22 19:07:54'),
+(25, 'Cheryl Henson', 'wapeny@mailinator.com', NULL, NULL, '$2y$12$ppitOHOpeGmCWenWnSkAEudlNuK4ooDr5nKO9jdWnkK.F2Pns.SZi', 0, 'agreements/signed/bvS7FTqhQeyFYoLr6Il49OVT9fEKqzwBm8omahZW.pdf', 'coaching_agreement (1).pdf', '2025-08-25 23:17:45', NULL, '2025-08-25 23:17:45', '2025-08-25 23:17:45'),
+(26, 'Yoko Booth', 'mupec@mailinator.com', NULL, NULL, '$2y$12$PZPd/iDWb0CjmXerSX8Q9OWHU6AWlSH9FOjDB4EZEBDsepToVhu6.', 0, 'agreements/signed/V1z0gVpUhSz4Nd77X63HjM0Hz737a7BTFBVc8E3C.pdf', 'coaching_agreement (1).pdf', '2025-08-25 23:21:02', NULL, '2025-08-25 23:21:02', '2025-08-25 23:21:02');
 
 --
 -- Indexes for dumped tables
@@ -282,6 +326,14 @@ ALTER TABLE `cache`
 --
 ALTER TABLE `cache_locks`
   ADD PRIMARY KEY (`key`);
+
+--
+-- Indexes for table `client_notes`
+--
+ALTER TABLE `client_notes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `client_notes_admin_id_foreign` (`admin_id`),
+  ADD KEY `client_notes_user_id_created_at_index` (`user_id`,`created_at`);
 
 --
 -- Indexes for table `failed_jobs`
@@ -345,13 +397,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `client_notes`
+--
+ALTER TABLE `client_notes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -375,13 +433,13 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Constraints for dumped tables
@@ -392,6 +450,13 @@ ALTER TABLE `users`
 --
 ALTER TABLE `appointments`
   ADD CONSTRAINT `appointments_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `client_notes`
+--
+ALTER TABLE `client_notes`
+  ADD CONSTRAINT `client_notes_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `client_notes_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `messages`

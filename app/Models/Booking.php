@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Booking extends Model
 {
@@ -21,11 +22,15 @@ class Booking extends Model
         'admin_suggestion',
         'client_response',
         'response_date',
+        'signed_agreement_path',
+        'signed_agreement_name',
+        'agreement_uploaded_at',
     ];
 
     protected $casts = [
         'preferred_date' => 'date',
         'response_date' => 'datetime',
+        'agreement_uploaded_at' => 'datetime',
     ];
 
     // Status constants for better tracking
@@ -132,5 +137,51 @@ class Booking extends Model
         }
         
         return date('g:i A', strtotime($time));
+    }
+
+    /**
+     * Check if the booking has a signed agreement uploaded
+     */
+    public function hasSignedAgreement()
+    {
+        return !empty($this->signed_agreement_path);
+    }
+
+    /**
+     * Get the agreement upload status for display
+     */
+    public function getAgreementStatusAttribute()
+    {
+        if ($this->hasSignedAgreement()) {
+            return 'uploaded';
+        }
+        return 'pending';
+    }
+
+    /**
+     * Get the agreement status badge color
+     */
+    public function getAgreementStatusBadgeColorAttribute()
+    {
+        return $this->hasSignedAgreement() ? 'success' : 'warning';
+    }
+
+    /**
+     * Get the agreement status display text
+     */
+    public function getAgreementStatusTextAttribute()
+    {
+        return $this->hasSignedAgreement() ? 'Agreement Uploaded' : 'Agreement Pending';
+    }
+
+    /**
+     * Get the agreement file URL
+     */
+    public function getAgreementUrlAttribute()
+    {
+        if ($this->hasSignedAgreement()) {
+            return Storage::url($this->signed_agreement_path);
+        }
+        return null;
     }
 } 

@@ -9,13 +9,50 @@ use App\Mail\ClientCredentials;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BookingController extends Controller
 {
     public function index()
     {
         return view('booking');
+    }
+
+    public function downloadAgreement(Request $request)
+    {
+        // Validate the booking data
+        $validator = Validator::make($request->all(), [
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'preferred_date' => 'required|date|after_or_equal:today',
+            'preferred_time' => 'required|string',
+            'message' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Store booking data in session for later use
+        session([
+            'pending_booking' => $request->all()
+        ]);
+
+        // Generate agreement PDF
+        $pdf = PDF::loadView('agreements.coaching_agreement', [
+            'client_name' => $request->full_name,
+            'client_email' => $request->email,
+            'client_phone' => $request->phone,
+            'preferred_date' => $request->preferred_date,
+            'preferred_time' => $request->preferred_time,
+            'message' => $request->message,
+            'agreement_date' => now()->format('F j, Y'),
+        ]);
+
+        return $pdf->download('coaching_agreement_' . Str::slug($request->full_name) . '.pdf');
     }
 
     public function store(Request $request)
@@ -28,6 +65,7 @@ class BookingController extends Controller
             'preferred_time' => 'required|string',
             'message' => 'nullable|string|max:1000',
             'terms' => 'required|accepted',
+            'signed_agreement' => 'required|file|mimes:pdf|max:10240', // 10MB max
         ]);
 
         if ($validator->fails()) {
@@ -37,7 +75,11 @@ class BookingController extends Controller
         }
 
         try {
-            \Log::info('Starting booking process for email: ' . $request->email);
+            \Log::info('Starting booking process with signed agreement for email: ' . $request->email);
+            
+            // Handle file upload
+            $signedAgreementPath = $request->file('signed_agreement')->store('agreements/signed', 'public');
+            $signedAgreementName = $request->file('signed_agreement')->getClientOriginalName();
             
             // Check if user already exists
             $user = User::where('email', $request->email)->first();
@@ -46,12 +88,15 @@ class BookingController extends Controller
                 // Generate a random password
                 $password = Str::random(8);
                 
-                // Create new user
+                // Create new user with agreement
                 $user = User::create([
                     'name' => $request->full_name,
                     'email' => $request->email,
                     'password' => Hash::make($password),
                     'is_admin' => false,
+                    'signed_agreement_path' => $signedAgreementPath,
+                    'signed_agreement_name' => $signedAgreementName,
+                    'agreement_uploaded_at' => now(),
                 ]);
                 
                 // Send credentials email
@@ -59,6 +104,27 @@ class BookingController extends Controller
                     Mail::to($user->email)->send(new ClientCredentials($user, $password));
                 } catch (\Exception $mailException) {
                     \Log::error('Mail sending failed: ' . $mailException->getMessage());
+                    // Continue with booking even if email fails
+                }
+            } else {
+                // User already exists, update their agreement
+                $user->update([
+                    'signed_agreement_path' => $signedAgreementPath,
+                    'signed_agreement_name' => $signedAgreementName,
+                    'agreement_uploaded_at' => now(),
+                ]);
+                
+                // Generate a new password and update their account
+                $newPassword = Str::random(8);
+                $user->update([
+                    'password' => Hash::make($newPassword)
+                ]);
+                
+                // Send new credentials email
+                try {
+                    Mail::to($user->email)->send(new ClientCredentials($user, $newPassword));
+                } catch (\Exception $mailException) {
+                    \Log::error('Mail sending failed for existing user: ' . $mailException->getMessage());
                     // Continue with booking even if email fails
                 }
             }
@@ -74,26 +140,10 @@ class BookingController extends Controller
                 'status' => 'pending',
             ]);
 
-            // Send credentials email if user was just created
-            if ($user->wasRecentlyCreated) {
-                // User was just created, credentials email already sent above
-            } else {
-                // User already exists, generate a new password and update their account
-                $newPassword = Str::random(8);
-                $user->update([
-                    'password' => Hash::make($newPassword)
-                ]);
-                
-                // Send new credentials email
-                try {
-                    Mail::to($user->email)->send(new ClientCredentials($user, $newPassword));
-                } catch (\Exception $mailException) {
-                    \Log::error('Mail sending failed for existing user: ' . $mailException->getMessage());
-                    // Continue with booking even if email fails
-                }
-            }
+            // Clear the pending booking session data
+            session()->forget('pending_booking');
 
-            \Log::info('Booking completed successfully for user: ' . $user->email);
+            \Log::info('Booking with signed agreement completed successfully for user: ' . $user->email);
             return redirect()->back()->with('success', 'Your booking has been submitted successfully! Please check your email for portal login credentials.');
         } catch (\Exception $e) {
             // Log the error for debugging

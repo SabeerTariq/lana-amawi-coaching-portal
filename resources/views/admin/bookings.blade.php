@@ -207,6 +207,10 @@ body.popup-open {
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Active Bookings</h6>
             <small class="text-muted">Manage all active bookings - confirm, suggest alternatives, or view details</small>
+            <div class="alert alert-info mt-2 mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Note:</strong> Bookings can only be converted to appointments after the client has uploaded their signed agreement (stored in their user profile).
+            </div>
         </div>
         <div class="card-body">
             @if($bookings->count() > 0)

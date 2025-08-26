@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Appointment;
 use App\Models\Message;
 use App\Models\Booking;
+use App\Models\ClientNote; // Added this import
 
 class AdminController extends Controller
 {
@@ -64,6 +65,9 @@ class AdminController extends Controller
     {
         $clients = User::where('is_admin', false)
             ->withCount(['appointments', 'messages'])
+            ->with(['bookings' => function($query) {
+                $query->orderBy('created_at', 'desc');
+            }])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
@@ -297,46 +301,52 @@ class AdminController extends Controller
     public function updateLogo(Request $request)
     {
         $request->validate([
-            'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
+            'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        try {
-            if ($request->hasFile('logo')) {
-                $logo = $request->file('logo');
-                
-                // Generate unique filename
-                $filename = 'logo.' . $logo->getClientOriginalExtension();
-                
-                // Store the new logo in the public/images directory
-                $logo->move(public_path('images'), $filename);
-                
-                // If there's an old logo with different extension, remove it
-                $oldLogoPath = public_path('images/logo.png');
-                $oldLogoPathJpg = public_path('images/logo.jpg');
-                $oldLogoPathJpeg = public_path('images/logo.jpeg');
-                $oldLogoPathGif = public_path('images/logo.gif');
-                
-                if (file_exists($oldLogoPath) && $filename !== 'logo.png') {
-                    unlink($oldLogoPath);
-                }
-                if (file_exists($oldLogoPathJpg) && $filename !== 'logo.jpg') {
-                    unlink($oldLogoPathJpg);
-                }
-                if (file_exists($oldLogoPathJpeg) && $filename !== 'logo.jpeg') {
-                    unlink($oldLogoPathJpeg);
-                }
-                if (file_exists($oldLogoPathGif) && $filename !== 'logo.gif') {
-                    unlink($oldLogoPathGif);
-                }
-                
-                return redirect()->back()->with('success', 'Logo updated successfully!');
-            }
+        if ($request->hasFile('logo')) {
+            $logo = $request->file('logo');
+            $logoName = 'logo.' . $logo->getClientOriginalExtension();
+            $logoPath = $logo->storeAs('public', $logoName);
             
-            return redirect()->back()->with('error', 'No logo file was uploaded.');
+            // Update logo path in config or database
+            // You might want to store this in a settings table
             
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error uploading logo: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Logo updated successfully!');
         }
+
+        return redirect()->back()->with('error', 'No logo file uploaded.');
+    }
+
+    /**
+     * Add a note for a client
+     */
+    public function addClientNote(Request $request, User $client)
+    {
+        $request->validate([
+            'note' => 'required|string|max:1000',
+        ]);
+
+        $client->notes()->create([
+            'admin_id' => Auth::id(),
+            'note' => $request->note,
+        ]);
+
+        return redirect()->back()->with('success', 'Note added successfully!');
+    }
+
+    /**
+     * Delete a client note
+     */
+    public function deleteClientNote(ClientNote $note)
+    {
+        // Check if the current user is the admin who created the note or a super admin
+        if (Auth::id() !== $note->admin_id && !Auth::user()->is_admin) {
+            abort(403, 'Access denied.');
+        }
+
+        $note->delete();
+        return redirect()->back()->with('success', 'Note deleted successfully!');
     }
 
     public function appointments()
@@ -401,23 +411,15 @@ class AdminController extends Controller
 
     public function convertBookingToAppointment(Booking $booking)
     {
-        try {
-            // Find or create user based on email
-            $user = User::where('email', $booking->email)->first();
-            
-            if (!$user) {
-                // Create a new user account for the client
-                $user = User::create([
-                    'name' => $booking->full_name,
-                    'email' => $booking->email,
-                    'password' => Hash::make(Str::random(12)), // Generate random password
-                    'is_admin' => false,
-                ]);
-                
-                // Send credentials email to the new client
-                // You can implement email notification here
-            }
+        // Find user based on email
+        $user = User::where('email', $booking->email)->first();
+        
+        // Check if signed agreement is uploaded for the user
+        if (!$user || !$user->hasSignedAgreement()) {
+            return redirect()->back()->with('error', 'Cannot convert booking to appointment. The signed agreement has not been uploaded yet.');
+        }
 
+        try {
             // Create appointment from booking
             $appointment = Appointment::create([
                 'user_id' => $user->id,
@@ -478,23 +480,13 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'This booking has not been accepted by the client yet.');
         }
 
-        try {
-            // Find or create user based on email
-            $user = User::where('email', $booking->email)->first();
-            
-            if (!$user) {
-                // Create a new user account for the client
-                $user = User::create([
-                    'name' => $booking->full_name,
-                    'email' => $booking->email,
-                    'password' => Hash::make(Str::random(12)), // Generate random password
-                    'is_admin' => false,
-                ]);
-                
-                // Send credentials email to the new client
-                // You can implement email notification here
-            }
+        // Check if signed agreement is uploaded for the user
+        $user = User::where('email', $booking->email)->first();
+        if (!$user || !$user->hasSignedAgreement()) {
+            return redirect()->back()->with('error', 'Cannot convert booking to appointment. The signed agreement has not been uploaded yet.');
+        }
 
+        try {
             // Create appointment from accepted booking
             $appointment = Appointment::create([
                 'user_id' => $user->id,

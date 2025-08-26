@@ -98,6 +98,56 @@
         </div>
     </div>
 
+    <!-- Admin Notes -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-sticky-note me-2"></i>Admin Notes
+            </h6>
+            <button type="button" 
+                    class="btn btn-primary btn-sm" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#addNoteModal">
+                <i class="fas fa-plus me-2"></i>Add Note
+            </button>
+        </div>
+        <div class="card-body">
+            @if($client->notes->count() > 0)
+                <div class="notes-list">
+                    @foreach($client->notes()->orderBy('created_at', 'desc')->get() as $note)
+                        <div class="note-item border rounded p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <strong class="text-primary">{{ $note->admin->name }}</strong>
+                                    <small class="text-muted ms-2">{{ $note->created_at->format('M d, Y g:i A') }}</small>
+                                </div>
+                                @if(Auth::id() === $note->admin_id || Auth::user()->is_admin)
+                                    <form action="{{ route('admin.clients.notes.delete', $note) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                onclick="return confirm('Are you sure you want to delete this note?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                            <div class="note-content">
+                                {{ $note->note }}
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-4">
+                    <i class="fas fa-sticky-note fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No admin notes yet for this client</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
     <!-- Recent Messages -->
     <div class="card shadow">
         <div class="card-header py-3">
@@ -132,6 +182,40 @@
                     <p class="text-muted">No messages found</p>
                 </div>
             @endif
+        </div>
+    </div>
+</div>
+
+<!-- Add Note Modal -->
+<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addNoteModalLabel">
+                    <i class="fas fa-sticky-note me-2"></i>Add Note for {{ $client->name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.clients.notes.add', $client) }}" method="POST">
+                <div class="modal-body">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Note Content</label>
+                        <textarea class="form-control" 
+                                  id="note" 
+                                  name="note" 
+                                  rows="4" 
+                                  placeholder="Enter your note about this client..." 
+                                  required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Note
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

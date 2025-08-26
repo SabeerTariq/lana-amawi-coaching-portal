@@ -19,6 +19,7 @@ use App\Http\Controllers\AuthController;
 
 // Public routes
 Route::get('/', [BookingController::class, 'index'])->name('booking');
+Route::post('/booking/agreement/download', [BookingController::class, 'downloadAgreement'])->name('booking.agreement.download');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
 
 // Authentication routes
@@ -116,6 +117,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/bookings/{booking}/convert-accepted', [AdminController::class, 'convertAcceptedBooking'])->name('bookings.convert-accepted');
     Route::post('/bookings/{booking}/handle-rejection', [AdminController::class, 'handleRejectedBooking'])->name('bookings.handle-rejection');
     Route::post('/bookings/{booking}/handle-modification', [AdminController::class, 'handleModifiedBooking'])->name('bookings.handle-modification');
+
+    // Client notes management
+    Route::post('/clients/{client}/notes', [AdminController::class, 'addClientNote'])->name('clients.notes.add');
+    Route::delete('/clients/notes/{note}', [AdminController::class, 'deleteClientNote'])->name('clients.notes.delete');
+    
+    // Client profile
 });
 
 // Test route for debugging booking
