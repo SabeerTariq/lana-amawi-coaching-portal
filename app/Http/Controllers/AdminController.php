@@ -304,17 +304,17 @@ class AdminController extends Controller
             'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        if ($request->hasFile('logo')) {
-            $logo = $request->file('logo');
+            if ($request->hasFile('logo')) {
+                $logo = $request->file('logo');
             $logoName = 'logo.' . $logo->getClientOriginalExtension();
             $logoPath = $logo->storeAs('public', $logoName);
             
             // Update logo path in config or database
             // You might want to store this in a settings table
+                
+                return redirect()->back()->with('success', 'Logo updated successfully!');
+            }
             
-            return redirect()->back()->with('success', 'Logo updated successfully!');
-        }
-
         return redirect()->back()->with('error', 'No logo file uploaded.');
     }
 
@@ -412,8 +412,8 @@ class AdminController extends Controller
     public function convertBookingToAppointment(Booking $booking)
     {
         // Find user based on email
-        $user = User::where('email', $booking->email)->first();
-        
+            $user = User::where('email', $booking->email)->first();
+            
         // Check if signed agreement is uploaded for the user
         if (!$user || !$user->hasSignedAgreement()) {
             return redirect()->back()->with('error', 'Cannot convert booking to appointment. The signed agreement has not been uploaded yet.');
@@ -481,7 +481,7 @@ class AdminController extends Controller
         }
 
         // Check if signed agreement is uploaded for the user
-        $user = User::where('email', $booking->email)->first();
+            $user = User::where('email', $booking->email)->first();
         if (!$user || !$user->hasSignedAgreement()) {
             return redirect()->back()->with('error', 'Cannot convert booking to appointment. The signed agreement has not been uploaded yet.');
         }
