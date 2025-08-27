@@ -22,6 +22,29 @@
 .text-gray-800 {
     color: #5a5c69 !important;
 }
+
+/* Agreement File Link Styling */
+.agreement-link {
+    color: #0d6efd;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.agreement-link:hover {
+    color: #0a58ca;
+    text-decoration: underline !important;
+    transform: translateY(-1px);
+}
+
+.agreement-link:active {
+    transform: translateY(0);
+}
+
+.agreement-link.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
 </style>
 
 <div class="container-fluid">
@@ -44,87 +67,6 @@
         </div>
     @endif
 
-    <!-- Agreement Statistics -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Clients
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $clients->total() }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Agreements Uploaded
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $clients->getCollection()->filter(function($client) { return $client->hasSignedAgreement(); })->count() }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-file-pdf fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                No Agreements
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $clients->getCollection()->filter(function($client) { return !$client->hasSignedAgreement(); })->count() }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                No Bookings
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $clients->getCollection()->filter(function($client) { return $client->bookings->isEmpty(); })->count() }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-calendar-times fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="card shadow">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">All Clients</h6>
@@ -146,7 +88,7 @@
                             <th>Joined</th>
                             <th>Appointments</th>
                             <th>Messages</th>
-                            <th data-bs-toggle="tooltip" data-bs-placement="top" title="Agreement file uploaded by the client during signup">Agreement</th>
+                            <th data-bs-toggle="tooltip" data-bs-placement="top" title="Click 'Agreement File' to view the uploaded agreement">Agreement</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -167,31 +109,21 @@
                                 </td>
                                 <td>
                                     @if($client->hasSignedAgreement())
-                                        <div class="text-center">
-                                            <i class="fas fa-file-pdf text-success me-2"></i>
+                                        <a href="{{ $client->agreement_url }}" 
+                                           target="_blank" 
+                                           class="text-decoration-none agreement-link"
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="Click to view agreement (opens in new tab)"
+                                           aria-label="View agreement file for {{ $client->name }}">
+                                            <i class="fas fa-file-pdf text-success me-1"></i>
                                             <strong>Agreement File</strong>
-                                            <br>
-                                            <small class="text-muted">
-                                                {{ $client->signed_agreement_name ?? 'Agreement.pdf' }}
-                                            </small>
-                                            <br>
-                                            <small class="text-muted">
-                                                Uploaded: {{ $client->agreement_uploaded_at ? $client->agreement_uploaded_at->format('M d, Y g:i A') : 'N/A' }}
-                                            </small>
-                                            <br>
-                                            <a href="{{ $client->agreement_url }}" 
-                                               target="_blank" 
-                                               class="btn btn-sm btn-outline-primary mt-1">
-                                                <i class="fas fa-eye me-1"></i>View Agreement
-                                            </a>
-                                        </div>
+                                        </a>
                                     @else
-                                        <div class="text-center text-muted">
-                                            <i class="fas fa-times-circle text-secondary me-2"></i>
-                                            <strong>No Agreement</strong>
-                                            <br>
-                                            <small>No agreement uploaded</small>
-                                        </div>
+                                        <span class="text-muted">
+                                            <i class="fas fa-times-circle me-1"></i>
+                                            No Agreement
+                                        </span>
                                     @endif
                                 </td>
                                 <td>
@@ -377,6 +309,22 @@
             
             // Remove the filter function after drawing
             $.fn.dataTable.ext.search.pop();
+        });
+
+        // Agreement link click handling
+        $(document).on('click', '.agreement-link', function(e) {
+            var $link = $(this);
+            var originalText = $link.html();
+            
+            // Show loading state
+            $link.html('<i class="fas fa-spinner fa-spin text-success me-1"></i><strong>Loading...</strong>');
+            $link.addClass('disabled');
+            
+            // Reset after a short delay (allows the new tab to open)
+            setTimeout(function() {
+                $link.html(originalText);
+                $link.removeClass('disabled');
+            }, 1000);
         });
     });
 </script>

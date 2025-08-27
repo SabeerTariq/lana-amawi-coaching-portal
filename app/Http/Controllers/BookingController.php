@@ -144,7 +144,14 @@ class BookingController extends Controller
             session()->forget('pending_booking');
 
             \Log::info('Booking with signed agreement completed successfully for user: ' . $user->email);
-            return redirect()->back()->with('success', 'Your booking has been submitted successfully! Please check your email for portal login credentials.');
+            
+            // Store email in session for pre-filling login form
+            session(['booking_email' => $user->email]);
+            
+            // Redirect to client login with success messages
+            return redirect()->route('client.login')
+                ->with('success', 'Your booking has been submitted successfully!')
+                ->with('email_check', 'Please check your email for your portal login credentials (email and password).');
         } catch (\Exception $e) {
             // Log the error for debugging
             \Log::error('Booking submission error: ' . $e->getMessage());

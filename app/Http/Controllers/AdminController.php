@@ -84,7 +84,12 @@ class AdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('admin.client-profile', compact('client', 'appointments', 'messages'));
+        // Get client's booking information including notes
+        $bookings = Booking::where('email', $client->email)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin.client-profile', compact('client', 'appointments', 'messages', 'bookings'));
     }
 
     public function messages()
@@ -179,12 +184,20 @@ class AdminController extends Controller
             ->orderBy('appointment_time')
             ->get();
 
+        // Get bookings for the calendar
+        $bookings = Booking::where('preferred_date', '>=', now()->subDays(7))
+            ->where('preferred_date', '<=', now()->addDays(30))
+            ->orderBy('preferred_date')
+            ->orderBy('preferred_time')
+            ->get();
+
         $clients = User::where('is_admin', false)->orderBy('name')->get();
         
         $todayAppointments = Appointment::where('appointment_date', today())->count();
         $pendingAppointments = Appointment::where('status', 'pending')->count();
+        $todayBookings = Booking::where('preferred_date', today())->count();
 
-        return view('admin.calendar', compact('appointments', 'clients', 'todayAppointments', 'pendingAppointments'));
+        return view('admin.calendar', compact('appointments', 'bookings', 'clients', 'todayAppointments', 'pendingAppointments', 'todayBookings'));
     }
 
     public function getAppointment($id)

@@ -53,8 +53,83 @@
             </div>
         </div>
 
-        <!-- Appointments -->
+        <!-- Client Bookings & Notes -->
         <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-file-alt me-2"></i>Booking Information & Client Notes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @if($bookings->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Booking Date</th>
+                                        <th>Preferred Date/Time</th>
+                                        <th>Status</th>
+                                        <th>Client Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($bookings as $booking)
+                                        <tr>
+                                            <td>{{ $booking->created_at->format('M d, Y g:i A') }}</td>
+                                            <td>
+                                                <strong>{{ $booking->preferred_date->format('M d, Y') }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ $booking->formatted_time }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-{{ $booking->getStatusBadgeColorAttribute() }}">
+                                                    {{ ucfirst(str_replace('_', ' ', $booking->status)) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if($booking->message)
+                                                    <div class="client-notes">
+                                                        <div class="text-truncate" 
+                                                             data-bs-toggle="tooltip" 
+                                                             data-bs-placement="top" 
+                                                             title="{{ $booking->message }}">
+                                                            <i class="fas fa-sticky-note text-info me-2"></i>
+                                                            {{ Str::limit($booking->message, 60) }}
+                                                        </div>
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-info mt-2"
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#viewNotesModal{{ $booking->id }}">
+                                                            <i class="fas fa-eye me-1"></i>View Full Notes
+                                                        </button>
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">
+                                                        <i class="fas fa-times-circle me-2"></i>
+                                                        No notes provided
+                                                    </span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No booking information found</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Appointments -->
+        <div class="col-lg-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Appointment History</h6>
@@ -186,6 +261,62 @@
     </div>
 </div>
 
+<!-- View Client Notes Modals -->
+@foreach($bookings as $booking)
+    @if($booking->message)
+        <div class="modal fade" id="viewNotesModal{{ $booking->id }}" tabindex="-1" aria-labelledby="viewNotesModalLabel{{ $booking->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewNotesModalLabel{{ $booking->id }}">
+                            <i class="fas fa-sticky-note me-2"></i>Client Notes - {{ $client->name }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Booking Details</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>Booking Date:</strong> {{ $booking->created_at->format('M d, Y g:i A') }}</li>
+                                    <li><strong>Preferred Date:</strong> {{ $booking->preferred_date->format('M d, Y') }}</li>
+                                    <li><strong>Preferred Time:</strong> {{ $booking->formatted_time }}</li>
+                                    <li><strong>Status:</strong> 
+                                        <span class="badge bg-{{ $booking->getStatusBadgeColorAttribute() }}">
+                                            {{ ucfirst(str_replace('_', ' ', $booking->status)) }}
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Client Contact</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>Email:</strong> {{ $booking->email }}</li>
+                                    @if($booking->phone)
+                                        <li><strong>Phone:</strong> {{ $booking->phone }}</li>
+                                    @endif
+                                </ul>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="mt-3">
+                            <h6 class="text-primary">Client Notes</h6>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <p class="mb-0">{{ $booking->message }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+@endforeach
+
 <!-- Add Note Modal -->
 <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -244,7 +375,7 @@
     background: #f8f9fa;
     padding: 15px;
     border-radius: 5px;
-                border-left: 3px solid var(--bs-primary);
+    border-left: 3px solid var(--bs-primary);
 }
 
 .timeline-title {
@@ -255,6 +386,51 @@
     margin-bottom: 0;
 }
 
+/* Client Notes Styling */
+.client-notes .text-truncate {
+    cursor: help;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+}
 
+.client-notes .btn-outline-info {
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+
+.client-notes .btn-outline-info:hover {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: white;
+}
+
+/* Booking table styling */
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Status badges */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips for client notes
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
 @endsection 

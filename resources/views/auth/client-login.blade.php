@@ -10,9 +10,36 @@
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
                         <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching" class="mb-3" style="max-width: 200px; height: auto;">
-                        <h2 class="fw-bold text-dark mb-2">Welcome Back</h2>
-                        <p class="text-muted">Sign in to your coaching portal</p>
+                        @if(session('success'))
+                            <h2 class="fw-bold text-success mb-2">🎉 Booking Complete!</h2>
+                            <p class="text-success mb-2">Your coaching session has been scheduled successfully</p>
+                        @else
+                            <h2 class="fw-bold text-dark mb-2">Welcome Back</h2>
+                            <p class="text-muted">Sign in to your coaching portal</p>
+                        @endif
                     </div>
+
+                    @if(session('success') && session('email_check'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @elseif(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if(session('email_check'))
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <i class="fas fa-envelope me-2"></i>
+                            {{ session('email_check') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
 
                     @if(session('error'))
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -38,7 +65,13 @@
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="email" name="email" 
-                                   value="{{ old('email') }}" required autofocus>
+                                   value="{{ $email ?? old('email') }}" required autofocus>
+                            @if($email)
+                                <div class="form-text text-success">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    Welcome back! Your email has been pre-filled from your recent booking
+                                </div>
+                            @endif
                         </div>
 
                         <div class="mb-3">

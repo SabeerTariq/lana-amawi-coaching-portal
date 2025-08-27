@@ -99,6 +99,403 @@ use App\Models\User;
     scrollbar-color: #730623 #f8f9fa;
 }
 
+/* Notes and Agreement Column Styling */
+.notes-cell {
+    max-width: 200px;
+    word-wrap: break-word;
+}
+
+.notes-cell .text-truncate {
+    cursor: help;
+}
+
+.agreement-cell a {
+    color: #0d6efd;
+    transition: all 0.2s ease;
+}
+
+.agreement-cell a:hover {
+    color: #0a58ca;
+    text-decoration: underline !important;
+}
+
+.agreement-cell .text-muted {
+    font-style: italic;
+}
+
+/* Table column widths */
+.table th:nth-child(1), /* Client column */
+.table td:nth-child(1) {
+    width: 15%;
+    min-width: 120px;
+}
+
+.table th:nth-child(2), /* Date/Time column */
+.table td:nth-child(2) {
+    width: 14%;
+    min-width: 100px;
+}
+
+.table th:nth-child(3), /* Status column */
+.table td:nth-child(3) {
+    width: 12%;
+    min-width: 90px;
+}
+
+.table th:nth-child(4), /* Contact Info column */
+.table td:nth-child(4) {
+    width: 19%;
+    min-width: 120px;
+}
+
+.table th:nth-child(5), /* Notes column */
+.table td:nth-child(5) {
+    width: 14%;
+    min-width: 110px;
+}
+
+.table th:nth-child(6), /* Agreement column */
+.table td:nth-child(6) {
+    width: 12%;
+    min-width: 90px;
+}
+
+.table th:nth-child(7), /* Actions column */
+.table td:nth-child(7) {
+    width: 14%;
+    min-width: 140px;
+}
+
+/* Responsive Table Styling */
+@media (max-width: 1400px) {
+    .table th:nth-child(5),
+    .table td:nth-child(5) {
+        width: 13%;
+        min-width: 100px;
+    }
+    
+    .table th:nth-child(6),
+    .table td:nth-child(6) {
+        width: 12%;
+        min-width: 90px;
+    }
+    
+    .table th:nth-child(7),
+    .table td:nth-child(7) {
+        width: 13%;
+        min-width: 130px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .table th:nth-child(1),
+    .table td:nth-child(1) {
+        width: 16%;
+        min-width: 110px;
+    }
+    
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        width: 14%;
+        min-width: 90px;
+    }
+    
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        width: 12%;
+        min-width: 90px;
+    }
+    
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        width: 20%;
+        min-width: 110px;
+    }
+    
+    .table th:nth-child(5),
+    .table td:nth-child(5) {
+        width: 15%;
+        min-width: 100px;
+    }
+    
+    .table th:nth-child(6),
+    .table td:nth-child(6) {
+        width: 12%;
+        min-width: 80px;
+    }
+    
+    .table th:nth-child(7),
+    .table td:nth-child(7) {
+        width: 11%;
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 992px) {
+    .table th:nth-child(1),
+    .table td:nth-child(1) {
+        width: 17%;
+        min-width: 100px;
+    }
+    
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        width: 15%;
+        min-width: 80px;
+    }
+    
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        width: 12%;
+        min-width: 80px;
+    }
+    
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        width: 21%;
+        min-width: 100px;
+    }
+    
+    .table th:nth-child(5),
+    .table td:nth-child(5) {
+        width: 15%;
+        min-width: 90px;
+    }
+    
+    .table th:nth-child(6),
+    .table td:nth-child(6) {
+        width: 9%;
+        min-width: 70px;
+    }
+    
+    .table th:nth-child(7),
+    .table td:nth-child(7) {
+        width: 11%;
+        min-width: 90px;
+    }
+}
+
+/* Ensure table fits screen width */
+.table-responsive {
+    overflow-x: hidden;
+}
+
+.table {
+    width: 100%;
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+
+.table th,
+.table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Compact text for better fit */
+.table th {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.table td {
+    font-size: 0.875rem;
+}
+
+/* Compact badges and buttons */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* Compact icons */
+.fas {
+    font-size: 0.875rem;
+}
+
+/* Ensure content fits in cells */
+.notes-cell .text-truncate {
+    max-width: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.agreement-cell a {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* Action buttons styling */
+.btn-group {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.btn-group .btn {
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.btn-group .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-group .btn:active {
+    transform: translateY(0);
+}
+
+/* Ensure action column has enough space */
+.table th:nth-child(7),
+.table td:nth-child(7) {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    text-align: center;
+}
+
+/* Button colors and states */
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.btn-info {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+@media (max-width: 768px) {
+    /* Stack table on mobile */
+    .table-responsive {
+        border: 0;
+    }
+    
+    .table {
+        border: 0;
+    }
+    
+    .table thead {
+        display: none;
+    }
+    
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+    }
+    
+    .table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .table td {
+        border: none;
+        padding: 0.5rem 0;
+        text-align: left;
+        position: relative;
+        padding-left: 50%;
+    }
+    
+    .table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 45%;
+        padding-right: 10px;
+        font-weight: bold;
+        color: #495057;
+        font-size: 0.875rem;
+    }
+    
+    /* Mobile-specific styling */
+    .notes-cell,
+    .agreement-cell {
+        max-width: none;
+        width: 100%;
+    }
+    
+    .notes-cell .text-truncate {
+        max-width: none;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .table td {
+        padding-left: 0;
+        padding-top: 2rem;
+    }
+    
+    .table td:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-header {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
 .popup-body::-webkit-scrollbar {
     width: 6px;
 }
@@ -185,6 +582,26 @@ body.popup-open {
         max-height: 75vh;
     }
 }
+
+@media (max-width: 576px) {
+    .popup-container {
+        width: 95%;
+        margin: 10px;
+        max-height: 90vh;
+    }
+    
+    .popup-header {
+        padding: 15px;
+    }
+    
+    .popup-body {
+        padding: 15px;
+    }
+    
+    .popup-footer {
+        padding: 15px;
+    }
+}
 </style>
 
 @section('content')
@@ -206,7 +623,7 @@ body.popup-open {
     <div class="card shadow">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Active Bookings</h6>
-            <small class="text-muted">Manage all active bookings - confirm, suggest alternatives, or view details</small>
+            <small class="text-muted d-none d-md-block">Manage all active bookings - confirm, suggest alternatives, or view details</small>
             <div class="alert alert-info mt-2 mb-0">
                 <i class="fas fa-info-circle me-2"></i>
                 <strong>Note:</strong> Bookings can only be converted to appointments after the client has uploaded their signed agreement (stored in their user profile).
@@ -222,97 +639,145 @@ body.popup-open {
                                 <th>Preferred Date/Time</th>
                                 <th>Status</th>
                                 <th>Contact Info</th>
+                                <th>Notes</th>
+                                <th>Agreement</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($bookings as $booking)
                                 <tr>
-                                    <td>
+                                    <td data-label="Client">
                                         <div>
-                                            <strong>{{ $booking->full_name }}</strong>
+                                            <strong>{{ Str::limit($booking->full_name, 15) }}</strong>
                                             <br>
-                                            <small class="text-muted">{{ $booking->email }}</small>
+                                            <small class="text-muted">{{ Str::limit($booking->email, 20) }}</small>
                                         </div>
                                     </td>
-                                    <td>
-                                        <strong>{{ $booking->preferred_date->format('M d, Y') }}</strong>
+                                    <td data-label="Preferred Date/Time">
+                                        <strong>{{ $booking->preferred_date->format('M d') }}</strong>
                                         <br>
                                         <small class="text-muted">{{ $booking->formatted_time }}</small>
                                     </td>
-                                    <td>
+                                    <td data-label="Status">
                                         @if($booking->status === 'pending')
                                             <span class="badge bg-warning">Pending</span>
                                         @elseif($booking->status === 'suggested_alternative')
-                                            <span class="badge bg-info">Alternative Suggested</span>
+                                            <span class="badge bg-info">Alt. Time</span>
                                             @if($booking->admin_suggestion)
-                                                <br><small class="text-muted">{{ Str::limit($booking->admin_suggestion, 50) }}</small>
+                                                <br><small class="text-muted">{{ Str::limit($booking->admin_suggestion, 30) }}</small>
                                             @endif
                                         @elseif($booking->status === 'accepted')
-                                            <span class="badge bg-success">Accepted by Client</span>
+                                            <span class="badge bg-success">Accepted</span>
                                             @if($booking->client_response)
-                                                <br><small class="text-muted">{{ Str::limit($booking->client_response, 50) }}</small>
+                                                <br><small class="text-muted">{{ Str::limit($booking->client_response, 30) }}</small>
                                             @endif
                                         @elseif($booking->status === 'rejected')
-                                            <span class="badge bg-danger">Rejected by Client</span>
+                                            <span class="badge bg-danger">Rejected</span>
                                             @if($booking->client_response)
-                                                <br><small class="text-muted">{{ Str::limit($booking->client_response, 50) }}</small>
+                                                <br><small class="text-muted">{{ Str::limit($booking->client_response, 30) }}</small>
                                             @endif
                                         @elseif($booking->status === 'modified')
-                                            <span class="badge bg-primary">Modified by Client</span>
+                                            <span class="badge bg-primary">Modified</span>
                                             @if($booking->client_response)
-                                                <br><small class="text-muted">{{ Str::limit($booking->client_response, 50) }}</small>
+                                                <br><small class="text-muted">{{ Str::limit($booking->client_response, 30) }}</small>
                                             @endif
                                         @else
                                             <span class="badge bg-secondary">{{ ucfirst(str_replace('_', ' ', $booking->status)) }}</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    <td data-label="Contact Info">
                                         <div>
-                                            <i class="fas fa-envelope me-2"></i>{{ $booking->email }}
+                                            <i class="fas fa-envelope me-1"></i>{{ Str::limit($booking->email, 18) }}
                                             @if($booking->phone)
                                                 <br>
-                                                <i class="fas fa-phone me-2"></i>{{ $booking->phone }}
+                                                <i class="fas fa-phone me-1"></i>{{ Str::limit($booking->phone, 12) }}
                                             @endif
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
+                                    <td class="notes-cell" data-label="Notes">
+                                        @if($booking->message)
+                                            <div class="text-truncate" 
+                                                 data-bs-toggle="tooltip" 
+                                                 data-bs-placement="top" 
+                                                 title="{{ $booking->message }}">
+                                                <i class="fas fa-sticky-note text-info me-1"></i>
+                                                {{ Str::limit($booking->message, 25) }}
+                                            </div>
+                                        @else
+                                            <span class="text-muted">
+                                                <i class="fas fa-times-circle me-1"></i>
+                                                <span class="d-none d-lg-inline">No notes</span>
+                                                <span class="d-lg-none">None</span>
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="agreement-cell" data-label="Agreement">
+                                        @php
+                                            $user = \App\Models\User::where('email', $booking->email)->first();
+                                        @endphp
+                                        @if($user && $user->hasSignedAgreement())
+                                            <a href="{{ $user->agreement_url }}" 
+                                               target="_blank" 
+                                               class="text-decoration-none"
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="top" 
+                                               title="Click to view agreement (opens in new tab)">
+                                                <i class="fas fa-file-pdf text-success me-1"></i>
+                                                <strong>View</strong>
+                                            </a>
+                                        @else
+                                            <span class="text-muted">
+                                                <i class="fas fa-times-circle me-1"></i>
+                                                None
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td data-label="Actions">
+                                        <div class="btn-group d-flex flex-column flex-md-row" role="group">
                                             @if($booking->status === 'pending')
-                                                <button type="button" class="btn btn-success btn-sm" 
-                                                        onclick="showPopup('convertPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-check me-1"></i>Confirm
+                                                <button type="button" class="btn btn-success btn-sm mb-1 mb-md-0" 
+                                                        onclick="showPopup('convertPopup{{ $booking->id }}')"
+                                                        title="Confirm booking">
+                                                    <i class="fas fa-check"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-info btn-sm"
-                                                        onclick="showPopup('suggestPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-clock me-1"></i>Suggest Time
+                                                <button type="button" class="btn btn-info btn-sm mb-1 mb-md-0"
+                                                        onclick="showPopup('suggestPopup{{ $booking->id }}')"
+                                                        title="Suggest alternative time">
+                                                    <i class="fas fa-clock"></i>
                                                 </button>
                                             @elseif($booking->status === 'suggested_alternative')
-                                                <button type="button" class="btn btn-warning btn-sm" disabled>
-                                                    <i class="fas fa-clock me-1"></i>Waiting for Response
+                                                <button type="button" class="btn btn-warning btn-sm mb-1 mb-md-0" disabled
+                                                        title="Waiting for client response">
+                                                    <i class="fas fa-clock"></i>
                                                 </button>
                                             @elseif($booking->status === 'accepted')
-                                                <button type="button" class="btn btn-success btn-sm" 
-                                                        onclick="showPopup('convertAcceptedPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-calendar-check me-1"></i>Convert to Appointment
+                                                <button type="button" class="btn btn-success btn-sm mb-1 mb-md-0" 
+                                                        onclick="showPopup('convertAcceptedPopup{{ $booking->id }}')"
+                                                        title="Convert to appointment">
+                                                    <i class="fas fa-calendar-check"></i>
                                                 </button>
                                             @elseif($booking->status === 'rejected')
-                                                <button type="button" class="btn btn-info btn-sm"
-                                                        onclick="showPopup('handleRejectionPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-clock me-1"></i>Suggest New Time
+                                                <button type="button" class="btn btn-info btn-sm mb-1 mb-md-0"
+                                                        onclick="showPopup('handleRejectionPopup{{ $booking->id }}')"
+                                                        title="Suggest new time">
+                                                    <i class="fas fa-clock"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                        onclick="showPopup('cancelRejectedPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-times me-1"></i>Cancel
+                                                <button type="button" class="btn btn-danger btn-sm mb-1 mb-md-0"
+                                                        onclick="showPopup('cancelRejectedPopup{{ $booking->id }}')"
+                                                        title="Cancel booking">
+                                                    <i class="fas fa-times"></i>
                                                 </button>
                                             @elseif($booking->status === 'modified')
-                                                <button type="button" class="btn btn-success btn-sm"
-                                                        onclick="showPopup('acceptModificationPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-check me-1"></i>Accept Changes
+                                                <button type="button" class="btn btn-success btn-sm mb-1 mb-md-0"
+                                                        onclick="showPopup('acceptModificationPopup{{ $booking->id }}')"
+                                                        title="Accept changes">
+                                                    <i class="fas fa-check"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-info btn-sm"
-                                                        onclick="showPopup('suggestAlternativeToModificationPopup{{ $booking->id }}')">
-                                                    <i class="fas fa-clock me-1"></i>Suggest Alternative
+                                                <button type="button" class="btn btn-info btn-sm mb-1 mb-md-0"
+                                                        onclick="showPopup('suggestAlternativeToModificationPopup{{ $booking->id }}')"
+                                                        title="Suggest alternative">
+                                                    <i class="fas fa-clock"></i>
                                                 </button>
                                             @endif
                                             
@@ -321,11 +786,12 @@ body.popup-open {
                                             @endphp
                                             @if($client)
                                                 <a href="{{ route('admin.clients.profile', $client) }}" 
-                                                   class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-user me-1"></i>View Client
+                                                   class="btn btn-outline-primary btn-sm mb-1 mb-md-0"
+                                                   title="View client profile">
+                                                    <i class="fas fa-user"></i>
                                                 </a>
                                             @else
-                                                <span class="text-muted">No client account</span>
+                                                <span class="text-muted small">No client</span>
                                             @endif
                                         </div>
                                     </td>
@@ -581,10 +1047,12 @@ body.popup-open {
                     {{ $bookings->links() }}
                 </div>
             @else
-                <div class="text-center py-4">
-                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">No active bookings</h5>
-                    <p class="text-muted">All bookings have been processed or converted to appointments.</p>
+                <div class="text-center py-5">
+                    <div class="text-muted">
+                        <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                        <p class="h5">No bookings found</p>
+                        <p>There are currently no active bookings in the system.</p>
+                    </div>
                 </div>
             @endif
         </div>
@@ -658,6 +1126,12 @@ function hideAllPopups() {
 
 // Handle rejection action change
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
     // Add event listeners for rejection action changes
     const rejectionActions = document.querySelectorAll('[id^="rejectionAction"]');
     rejectionActions.forEach(action => {

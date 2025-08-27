@@ -21,7 +21,10 @@ class AuthController extends Controller
 
     public function showClientLogin()
     {
-        return view('auth.client-login');
+        // Check if user is coming from a successful booking
+        $email = session('booking_email');
+        
+        return view('auth.client-login', compact('email'));
     }
 
     public function adminLogin(Request $request)
@@ -80,6 +83,9 @@ class AuthController extends Controller
 
             // Check if user is not admin (i.e., is a client)
             if (!Auth::user()->is_admin) {
+                // Clear booking email session if it exists
+                $request->session()->forget('booking_email');
+                
                 return redirect()->route('client.dashboard');
             } else {
                 Auth::logout();
