@@ -30,28 +30,198 @@
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Client Information</h6>
                 </div>
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ $client->name }}</h5>
-                    <p class="text-muted">{{ $client->email }}</p>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <h5 class="card-title">{{ $client->name }}</h5>
+                        <p class="text-muted">{{ $client->email }}</p>
+                        @if($client->phone)
+                            <p class="text-muted">
+                                <i class="fas fa-phone me-2"></i>{{ $client->phone }}
+                            </p>
+                        @endif
+                    </div>
                     <hr>
-                    <div class="row text-center">
+                    <div class="row text-center mb-3">
                         <div class="col-6">
                             <h6 class="text-primary">{{ $appointments->count() }}</h6>
-                            <small class="text-muted">Appointments</small>
+                            <small class="text-muted">Total Appointments</small>
                         </div>
                         <div class="col-6">
-                            <h6 class="text-primary">{{ $messages->count() }}</h6>
+                            <h6 class="text-success">{{ $appointments->where('status', 'completed')->count() }}</h6>
+                            <small class="text-muted">Completed</small>
+                        </div>
+                    </div>
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <h6 class="text-warning">{{ $appointments->where('status', 'pending')->count() }}</h6>
+                            <small class="text-muted">Pending</small>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-info">{{ $messages->count() }}</h6>
                             <small class="text-muted">Messages</small>
                         </div>
                     </div>
+                    <div class="text-center">
+                        <h6 class="text-primary">{{ $appointments->where('status', 'completed')->count() * 1 }}</h6>
+                        <small class="text-muted">Hours Coached</small>
+                    </div>
                     <hr>
                     <div class="text-start">
-                        <p><strong>Member since:</strong> {{ $client->created_at->format('M d, Y') }}</p>
-                        <p><strong>Last activity:</strong> {{ $client->updated_at->format('M d, Y') }}</p>
+                        <div class="mb-2">
+                            <strong>Member since:</strong> {{ $client->created_at->format('M d, Y') }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Last activity:</strong> {{ $client->updated_at->format('M d, Y') }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Agreement Status:</strong> 
+                            @if($client->hasSignedAgreement())
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Signed
+                                </span>
+                                @if($client->agreement_uploaded_at)
+                                    <br><small class="text-muted">
+                                        Uploaded: {{ $client->agreement_uploaded_at->format('M j, Y') }}
+                                    </small>
+                                @endif
+                            @else
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Not Uploaded
+                                </span>
+                            @endif
+                        </div>
+                        @if($client->hasSignedAgreement() && $client->agreement_url)
+                        <div class="mb-2">
+                            <a href="{{ $client->agreement_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-download me-1"></i>View Agreement
+                            </a>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Personal Information -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-user me-2"></i>Personal Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Full Name</label>
+                            <p class="form-control-plaintext">{{ $client->name }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Email Address</label>
+                            <p class="form-control-plaintext">{{ $client->email }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Phone Number</label>
+                            <p class="form-control-plaintext">{{ $client->phone ?? 'Not provided' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Date of Birth</label>
+                            <p class="form-control-plaintext">{{ $client->date_of_birth ? $client->date_of_birth->format('M d, Y') : 'Not provided' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Age</label>
+                            <p class="form-control-plaintext">{{ $client->age ?? 'Not provided' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Gender</label>
+                            <p class="form-control-plaintext">
+                                @if($client->gender)
+                                    {{ ucfirst(str_replace('_', ' ', $client->gender)) }}
+                                @else
+                                    Not provided
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold text-muted">Address</label>
+                            <p class="form-control-plaintext">{{ $client->address ?? 'Not provided' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold text-muted">Languages Spoken</label>
+                            <p class="form-control-plaintext">
+                                @if($client->languages_spoken && is_array($client->languages_spoken))
+                                    {{ implode(', ', $client->languages_spoken) }}
+                                @else
+                                    Not provided
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Professional Information -->
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-briefcase me-2"></i>Professional Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Institution/Hospital</label>
+                            <p class="form-control-plaintext">{{ $client->institution_hospital ?? 'Not provided' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Position</label>
+                            <p class="form-control-plaintext">{{ $client->position ?? 'Not provided' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Position as of Date</label>
+                            <p class="form-control-plaintext">{{ $client->position_as_of_date ? $client->position_as_of_date->format('M d, Y') : 'Not provided' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Specialty</label>
+                            <p class="form-control-plaintext">{{ $client->specialty ?? 'Not provided' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Graduation Date</label>
+                            <p class="form-control-plaintext">{{ $client->graduation_date ? $client->graduation_date->format('M d, Y') : 'Not provided' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-muted">Member Since</label>
+                            <p class="form-control-plaintext">{{ $client->created_at->format('M d, Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
 
         <!-- Client Bookings & Notes -->
         <div class="col-lg-8">

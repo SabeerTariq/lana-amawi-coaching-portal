@@ -60,12 +60,22 @@ class BookingController extends Controller
         $validator = Validator::make($request->all(), [
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
+            'address' => 'required|string|max:500',
+            'date_of_birth' => 'required|date|before:today',
+            'gender' => 'required|in:male,female,other,prefer_not_to_say',
+            'age' => 'required|integer|min:18|max:100',
+            'languages_spoken' => 'required|array|min:1',
+            'languages_spoken.*' => 'string|in:English,Arabic,French,Spanish,Other',
+            'institution_hospital' => 'required|string|max:255',
+            'position' => 'required|string|max:255',
+            'position_as_of_date' => 'required|date|before_or_equal:today',
+            'specialty' => 'required|string|max:255',
+            'graduation_date' => 'nullable|date|before_or_equal:today',
             'phone' => 'nullable|string|max:20',
             'preferred_date' => 'required|date|after_or_equal:today',
             'preferred_time' => 'required|string',
             'message' => 'nullable|string|max:1000',
             'terms' => 'required|accepted',
-            'signed_agreement' => 'required|file|mimes:pdf|max:10240', // 10MB max
         ]);
 
         if ($validator->fails()) {
@@ -75,11 +85,7 @@ class BookingController extends Controller
         }
 
         try {
-            \Log::info('Starting booking process with signed agreement for email: ' . $request->email);
-            
-            // Handle file upload
-            $signedAgreementPath = $request->file('signed_agreement')->store('agreements/signed', 'public');
-            $signedAgreementName = $request->file('signed_agreement')->getClientOriginalName();
+            \Log::info('Starting booking process for email: ' . $request->email);
             
             // Check if user already exists
             $user = User::where('email', $request->email)->first();
@@ -88,15 +94,22 @@ class BookingController extends Controller
                 // Generate a random password
                 $password = Str::random(8);
                 
-                // Create new user with agreement
+                // Create new user with professional information
                 $user = User::create([
                     'name' => $request->full_name,
                     'email' => $request->email,
+                    'address' => $request->address,
+                    'date_of_birth' => $request->date_of_birth,
+                    'gender' => $request->gender,
+                    'age' => $request->age,
+                    'languages_spoken' => $request->languages_spoken,
+                    'institution_hospital' => $request->institution_hospital,
+                    'position' => $request->position,
+                    'position_as_of_date' => $request->position_as_of_date,
+                    'specialty' => $request->specialty,
+                    'graduation_date' => $request->graduation_date,
                     'password' => Hash::make($password),
                     'is_admin' => false,
-                    'signed_agreement_path' => $signedAgreementPath,
-                    'signed_agreement_name' => $signedAgreementName,
-                    'agreement_uploaded_at' => now(),
                 ]);
                 
                 // Send credentials email
@@ -107,16 +120,20 @@ class BookingController extends Controller
                     // Continue with booking even if email fails
                 }
             } else {
-                // User already exists, update their agreement
-                $user->update([
-                    'signed_agreement_path' => $signedAgreementPath,
-                    'signed_agreement_name' => $signedAgreementName,
-                    'agreement_uploaded_at' => now(),
-                ]);
-                
-                // Generate a new password and update their account
+                // User already exists, update their professional information and generate new password
                 $newPassword = Str::random(8);
                 $user->update([
+                    'name' => $request->full_name,
+                    'address' => $request->address,
+                    'date_of_birth' => $request->date_of_birth,
+                    'gender' => $request->gender,
+                    'age' => $request->age,
+                    'languages_spoken' => $request->languages_spoken,
+                    'institution_hospital' => $request->institution_hospital,
+                    'position' => $request->position,
+                    'position_as_of_date' => $request->position_as_of_date,
+                    'specialty' => $request->specialty,
+                    'graduation_date' => $request->graduation_date,
                     'password' => Hash::make($newPassword)
                 ]);
                 
@@ -150,8 +167,8 @@ class BookingController extends Controller
             
             // Redirect to client login with success messages
             return redirect()->route('client.login')
-                ->with('success', 'Your booking has been submitted successfully!')
-                ->with('email_check', 'Please check your email for your portal login credentials (email and password).');
+                ->with('success', 'Your professional registration and booking have been submitted successfully!')
+                ->with('email_check', 'Please check your email for your portal login credentials.');
         } catch (\Exception $e) {
             // Log the error for debugging
             \Log::error('Booking submission error: ' . $e->getMessage());

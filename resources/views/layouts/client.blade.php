@@ -193,6 +193,12 @@
                                 <i class="fas fa-comments me-2"></i>Messages
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('client.profile') ? 'active' : '' }}" 
+                               href="{{ route('client.profile') }}">
+                                <i class="fas fa-user-circle me-2"></i>Profile
+                            </a>
+                        </li>
                     </ul>
                     
                     <!-- Logout at bottom -->

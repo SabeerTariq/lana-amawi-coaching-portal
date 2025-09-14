@@ -13,8 +13,8 @@
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
                         <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching" class="mb-3" style="max-width: 200px; height: auto;">
-                        <h2 class="fw-bold text-dark mb-2">Book Your Coaching Session</h2>
-                        <p class="text-muted">Schedule your appointment with Lana Amawi</p>
+                        <h2 class="fw-bold text-dark mb-2">Professional Registration & Booking</h2>
+                        <p class="text-muted">Join Lana Amawi's coaching portal for healthcare professionals</p>
                     </div>
 
                     @if(session('success'))
@@ -35,44 +35,135 @@
                         </div>
                     @endif
 
-                    <!-- Step Indicator -->
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="step-indicator active" id="step-1">
-                                <div class="step-number">1</div>
-                                <div class="step-label">Fill Form</div>
-                            </div>
-                            <div class="step-line"></div>
-                            <div class="step-indicator" id="step-2">
-                                <div class="step-number">2</div>
-                                <div class="step-label">Download & Sign</div>
-                            </div>
-                            <div class="step-line"></div>
-                            <div class="step-indicator" id="step-3">
-                                <div class="step-number">3</div>
-                                <div class="step-label">Upload & Submit</div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Step 1: Booking Form -->
-                    <div id="step-1-content">
-                        <form id="booking-form" method="POST">
-                            @csrf
+                    <!-- Professional Registration & Booking Form -->
+                    <form method="POST" action="{{ route('booking.store') }}">
+                        @csrf
+                        
+                        <!-- Personal Information -->
+                    <div class="mb-4">
+                            <h5 class="text-primary mb-3">Personal Information</h5>
                             
+                            <div class="mb-3">
+                                <label for="full_name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" 
+                                       value="{{ old('full_name') }}" required autofocus>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ old('email') }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Address *</label>
+                                <textarea class="form-control" id="address" name="address" rows="2" 
+                                          placeholder="Enter your full address" required>{{ old('address') }}</textarea>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="full_name" class="form-label">Full Name *</label>
-                                    <input type="text" class="form-control" id="full_name" name="full_name" 
-                                           value="{{ old('full_name') }}" required>
+                                    <label for="date_of_birth" class="form-label">Date of Birth *</label>
+                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
+                                           value="{{ old('date_of_birth') }}" required>
                                 </div>
                                 
                                 <div class="col-md-6 mb-3">
-                                    <label for="email" class="form-label">Email Address *</label>
-                                    <input type="email" class="form-control" id="email" name="email" 
-                                           value="{{ old('email') }}" required>
+                                    <label for="gender" class="form-label">Gender *</label>
+                                    <select class="form-select" id="gender" name="gender" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
+                                        <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
+                                        <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
+                                        <option value="prefer_not_to_say" {{ old('gender') == 'prefer_not_to_say' ? 'selected' : '' }}>Prefer not to say</option>
+                                    </select>
                                 </div>
                             </div>
+
+                            <div class="mb-3">
+                                <label for="age" class="form-label">Age *</label>
+                                <input type="number" class="form-control" id="age" name="age" 
+                                       value="{{ old('age') }}" min="18" max="100" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="languages_spoken" class="form-label">Languages Spoken *</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="lang_english" name="languages_spoken[]" value="English" 
+                                                   {{ in_array('English', old('languages_spoken', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="lang_english">English</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="lang_arabic" name="languages_spoken[]" value="Arabic" 
+                                                   {{ in_array('Arabic', old('languages_spoken', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="lang_arabic">Arabic</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="lang_french" name="languages_spoken[]" value="French" 
+                                                   {{ in_array('French', old('languages_spoken', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="lang_french">French</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="lang_spanish" name="languages_spoken[]" value="Spanish" 
+                                                   {{ in_array('Spanish', old('languages_spoken', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="lang_spanish">Spanish</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="lang_other" name="languages_spoken[]" value="Other" 
+                                                   {{ in_array('Other', old('languages_spoken', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="lang_other">Other</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+
+                        <!-- Professional Information -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">Professional Information</h5>
+                            
+                            <div class="mb-3">
+                                <label for="institution_hospital" class="form-label">Institution/Hospital *</label>
+                                <input type="text" class="form-control" id="institution_hospital" name="institution_hospital" 
+                                       value="{{ old('institution_hospital') }}" placeholder="Enter your institution or hospital name" required>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="position" class="form-label">Position *</label>
+                                    <input type="text" class="form-control" id="position" name="position" 
+                                           value="{{ old('position') }}" placeholder="e.g., Doctor, Nurse, Administrator" required>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="position_as_of_date" class="form-label">Position as of Date *</label>
+                                    <input type="date" class="form-control" id="position_as_of_date" name="position_as_of_date" 
+                                           value="{{ old('position_as_of_date') }}" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="specialty" class="form-label">Specialty *</label>
+                                <input type="text" class="form-control" id="specialty" name="specialty" 
+                                       value="{{ old('specialty') }}" placeholder="e.g., Cardiology, Pediatrics, Emergency Medicine" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="graduation_date" class="form-label">Graduation Date (if applicable)</label>
+                                <input type="date" class="form-control" id="graduation_date" name="graduation_date" 
+                                       value="{{ old('graduation_date') }}">
+                                <div class="form-text">Leave blank if not applicable</div>
+                            </div>
+                        </div>
+
+                        <!-- Session Booking Information -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">Session Booking</h5>
 
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Phone Number (Optional)</label>
@@ -110,8 +201,9 @@
                                 <textarea class="form-control" id="message" name="message" rows="4" 
                                           placeholder="Tell us about your goals or any specific topics you'd like to discuss...">{{ old('message') }}</textarea>
                             </div>
+                            </div>
 
-                            <div class="mb-4">
+                        <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
                                     <label class="form-check-label" for="terms">
@@ -121,83 +213,21 @@
                             </div>
 
                             <div class="d-grid">
-                                <button type="button" class="btn btn-primary btn-lg" id="download-agreement-btn">
-                                    <i class="fas fa-download me-2"></i>Download Agreement & Continue
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Step 2: Agreement Download Instructions -->
-                    <div id="step-2-content" style="display: none;">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-file-pdf text-danger" style="font-size: 48px;"></i>
-                            <h4 class="mt-3">Agreement Downloaded Successfully!</h4>
-                            <p class="text-muted">Please follow these steps:</p>
-                        </div>
-                        
-                        <div class="alert alert-info">
-                            <ol class="mb-0">
-                                <li><strong>Print</strong> the downloaded agreement</li>
-                                <li><strong>Sign</strong> the agreement manually</li>
-                                <li><strong>Scan</strong> or take a photo of the signed agreement</li>
-                                <li><strong>Convert</strong> to PDF format</li>
-                                <li>Click "Continue to Upload" when ready</li>
-                            </ol>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-outline-primary" id="download-again-btn">
-                                <i class="fas fa-download me-2"></i>Download Again
-                            </button>
-                            <button type="button" class="btn btn-primary" id="continue-upload-btn">
-                                <i class="fas fa-upload me-2"></i>Continue to Upload
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Register & Book Session
                             </button>
                         </div>
-                    </div>
+                    </form>
 
-                    <!-- Step 3: Upload Signed Agreement -->
-                    <div id="step-3-content" style="display: none;">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-upload text-primary" style="font-size: 48px;"></i>
-                            <h4 class="mt-3">Upload Your Signed Agreement</h4>
-                            <p class="text-muted">Please upload the signed PDF agreement to complete your booking</p>
-                        </div>
-
-                        <form method="POST" action="{{ route('booking.store') }}" enctype="multipart/form-data" id="final-booking-form">
-                            @csrf
-                            
-                            <!-- Hidden fields for form data -->
-                            <input type="hidden" name="full_name" id="hidden_full_name">
-                            <input type="hidden" name="email" id="hidden_email">
-                            <input type="hidden" name="phone" id="hidden_phone">
-                            <input type="hidden" name="preferred_date" id="hidden_preferred_date">
-                            <input type="hidden" name="preferred_time" id="hidden_preferred_time">
-                            <input type="hidden" name="message" id="hidden_message">
-                            <input type="hidden" name="terms" value="1">
-
-                            <div class="mb-4">
-                                <label for="signed_agreement" class="form-label">Signed Agreement (PDF) *</label>
-                                <input type="file" class="form-control" id="signed_agreement" name="signed_agreement" 
-                                       accept=".pdf" required>
-                                <div class="form-text">Please upload the signed agreement in PDF format (max 10MB)</div>
-                            </div>
-
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-outline-secondary" id="back-to-form-btn">
-                                    <i class="fas fa-arrow-left me-2"></i>Back to Form
-                                </button>
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-check me-2"></i>Complete Booking
-                                </button>
-                            </div>
-                        </form>
-                    </div>
 
                     <div class="text-center mt-4">
                         <p class="text-muted mb-0">
                             Already have an account? 
                             <a href="{{ route('client.login') }}" class="text-decoration-none">Login here</a>
+                        </p>
+                        <p class="text-muted mb-0 mt-2">
+                            New to the portal? 
+                            <a href="{{ route('register') }}" class="text-decoration-none">Register as a healthcare professional</a>
                         </p>
                     </div>
                 </div>
@@ -206,190 +236,61 @@
     </div>
 </div>
 
-<style>
-.step-indicator {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #6c757d;
-}
-
-.step-indicator.active {
-    color: #730623;
-}
-
-.step-number {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #e9ecef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.step-indicator.active .step-number {
-    background-color: #730623;
-    color: white;
-}
-
-.step-label {
-    font-size: 12px;
-    text-align: center;
-    font-weight: 500;
-}
-
-.step-line {
-    width: 60px;
-    height: 2px;
-    background-color: #e9ecef;
-    margin: 20px 0;
-}
-
-.step-indicator.active + .step-line {
-    background-color: #730623;
-}
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('booking-form');
-    const downloadBtn = document.getElementById('download-agreement-btn');
-    const downloadAgainBtn = document.getElementById('download-again-btn');
-    const continueUploadBtn = document.getElementById('continue-upload-btn');
-    const backToFormBtn = document.getElementById('back-to-form-btn');
+    // Age calculation based on date of birth
+    const dateOfBirthInput = document.getElementById('date_of_birth');
+    const ageInput = document.getElementById('age');
     
-    const step1Content = document.getElementById('step-1-content');
-    const step2Content = document.getElementById('step-2-content');
-    const step3Content = document.getElementById('step-3-content');
+    if (dateOfBirthInput && ageInput) {
+        dateOfBirthInput.addEventListener('change', function() {
+            const birthDate = new Date(this.value);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            if (age >= 18 && age <= 100) {
+                ageInput.value = age;
+            }
+        });
+    }
     
-    const step1Indicator = document.getElementById('step-1');
-    const step2Indicator = document.getElementById('step-2');
-    const step3Indicator = document.getElementById('step-3');
-
-    // Get CSRF token from meta tag
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    // Download agreement
-    downloadBtn.addEventListener('click', function() {
-        if (form.checkValidity()) {
-            // Store form data
-            const formData = new FormData(form);
+    // Form validation
+    const form = document.querySelector('form');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Language validation - ensure at least one language is selected
+            const checkedLanguages = document.querySelectorAll('input[name="languages_spoken[]"]:checked');
+            if (checkedLanguages.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one language you speak.');
+                return false;
+            }
             
-            // Download agreement
-            fetch('{{ route("booking.agreement.download") }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.blob();
-                }
-                throw new Error('Network response was not ok');
-            })
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'coaching_agreement.pdf';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-                
-                // Show step 2
-                showStep(2);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error downloading agreement. Please try again.');
-            });
-        } else {
-            form.reportValidity();
-        }
-    });
-
-    // Download again
-    downloadAgainBtn.addEventListener('click', function() {
-        if (form.checkValidity()) {
-            const formData = new FormData(form);
+            // Basic validation - let HTML5 validation handle most of it
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
             
-            fetch('{{ route("booking.agreement.download") }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
                 }
-            })
-            .then(response => response.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'coaching_agreement.pdf';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error downloading agreement. Please try again.');
             });
-        } else {
-            form.reportValidity();
-        }
-    });
-
-    // Continue to upload
-    continueUploadBtn.addEventListener('click', function() {
-        // Transfer form data to hidden fields
-        document.getElementById('hidden_full_name').value = document.getElementById('full_name').value;
-        document.getElementById('hidden_email').value = document.getElementById('email').value;
-        document.getElementById('hidden_phone').value = document.getElementById('phone').value;
-        document.getElementById('hidden_preferred_date').value = document.getElementById('preferred_date').value;
-        document.getElementById('hidden_preferred_time').value = document.getElementById('preferred_time').value;
-        document.getElementById('hidden_message').value = document.getElementById('message').value;
-        
-        showStep(3);
-    });
-
-    // Back to form
-    backToFormBtn.addEventListener('click', function() {
-        showStep(1);
-    });
-
-    function showStep(step) {
-        // Hide all content
-        step1Content.style.display = 'none';
-        step2Content.style.display = 'none';
-        step3Content.style.display = 'none';
-        
-        // Remove active class from all indicators
-        step1Indicator.classList.remove('active');
-        step2Indicator.classList.remove('active');
-        step3Indicator.classList.remove('active');
-        
-        // Show appropriate content and activate indicator
-        switch(step) {
-            case 1:
-                step1Content.style.display = 'block';
-                step1Indicator.classList.add('active');
-                break;
-            case 2:
-                step2Content.style.display = 'block';
-                step2Indicator.classList.add('active');
-                break;
-            case 3:
-                step3Content.style.display = 'block';
-                step3Indicator.classList.add('active');
-                break;
-        }
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+            }
+        });
     }
 });
 </script>
