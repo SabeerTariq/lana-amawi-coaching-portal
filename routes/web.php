@@ -59,6 +59,13 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     Route::post('/bookings/{booking}/accept', [ClientController::class, 'acceptSuggestedTime'])->name('bookings.accept');
     Route::post('/bookings/{booking}/reject', [ClientController::class, 'rejectSuggestedTime'])->name('bookings.reject');
     Route::post('/bookings/{booking}/modify', [ClientController::class, 'modifySuggestedTime'])->name('bookings.modify');
+    
+    // Program management
+    Route::get('/programs', [App\Http\Controllers\ProgramController::class, 'index'])->name('programs');
+    Route::get('/programs/{program}', [App\Http\Controllers\ProgramController::class, 'show'])->name('programs.show');
+    Route::post('/programs/select', [App\Http\Controllers\ProgramController::class, 'selectProgram'])->name('programs.select');
+    Route::get('/programs/agreement/{userProgram}/download', [App\Http\Controllers\ProgramController::class, 'downloadAgreement'])->name('programs.agreement.download');
+    Route::post('/programs/agreement/{userProgram}/upload', [App\Http\Controllers\ProgramController::class, 'uploadSignedAgreement'])->name('programs.agreement.upload');
 });
 
 // Admin routes (authenticated + admin middleware)
@@ -121,6 +128,28 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Client notes management
     Route::post('/clients/{client}/notes', [AdminController::class, 'addClientNote'])->name('clients.notes.add');
     Route::delete('/clients/notes/{note}', [AdminController::class, 'deleteClientNote'])->name('clients.notes.delete');
+    
+    // Program management
+    Route::get('/programs/applications', [App\Http\Controllers\Admin\ProgramController::class, 'applications'])->name('programs.applications');
+    Route::get('/programs/{program}/applications', [App\Http\Controllers\Admin\ProgramController::class, 'programApplications'])->name('programs.program-applications');
+    Route::post('/programs/{userProgram}/send-agreement', [App\Http\Controllers\Admin\ProgramController::class, 'sendAgreement'])->name('programs.send-agreement');
+    Route::get('/programs/{userProgram}/view-agreement', [App\Http\Controllers\Admin\ProgramController::class, 'viewAgreement'])->name('programs.view-agreement');
+    Route::post('/programs/{userProgram}/approve', [App\Http\Controllers\Admin\ProgramController::class, 'approveApplication'])->name('programs.approve');
+    Route::post('/programs/{userProgram}/request-payment', [App\Http\Controllers\Admin\ProgramController::class, 'requestPayment'])->name('programs.request-payment');
+    Route::post('/programs/{userProgram}/mark-payment-completed', [App\Http\Controllers\Admin\ProgramController::class, 'markPaymentCompleted'])->name('programs.mark-payment-completed');
+    Route::post('/programs/{userProgram}/activate', [App\Http\Controllers\Admin\ProgramController::class, 'activateProgram'])->name('programs.activate');
+    Route::post('/programs/{userProgram}/reject', [App\Http\Controllers\Admin\ProgramController::class, 'rejectApplication'])->name('programs.reject');
+    Route::post('/programs/{userProgram}/add-notes', [App\Http\Controllers\Admin\ProgramController::class, 'addNotes'])->name('programs.add-notes');
+    
+    // Program CRUD management
+    Route::resource('programs', App\Http\Controllers\Admin\ProgramController::class)->except(['show']);
+    Route::post('/programs/{program}/toggle-status', [App\Http\Controllers\Admin\ProgramController::class, 'toggleStatus'])->name('programs.toggle-status');
+    
+    // Subscription management
+    Route::resource('subscriptions', App\Http\Controllers\Admin\SubscriptionController::class);
+    Route::post('/subscriptions/{subscription}/toggle-status', [App\Http\Controllers\Admin\SubscriptionController::class, 'toggleStatus'])->name('subscriptions.toggle-status');
+    Route::post('/subscriptions/{subscription}/reset-monthly', [App\Http\Controllers\Admin\SubscriptionController::class, 'resetMonthlyCount'])->name('subscriptions.reset-monthly');
+    Route::post('/subscriptions/{subscription}/extend', [App\Http\Controllers\Admin\SubscriptionController::class, 'extend'])->name('subscriptions.extend');
     
     // Client profile
 });

@@ -101,6 +101,24 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the user's program selections
+     */
+    public function userPrograms()
+    {
+        return $this->hasMany(UserProgram::class);
+    }
+
+    /**
+     * Get the user's programs through user_programs
+     */
+    public function programs()
+    {
+        return $this->belongsToMany(Program::class, 'user_programs')
+                    ->withPivot(['status', 'admin_notes', 'agreement_path', 'signed_agreement_path', 'signed_agreement_name', 'agreement_sent_at', 'agreement_uploaded_at', 'approved_at', 'payment_requested_at', 'payment_completed_at', 'amount_paid', 'payment_reference'])
+                    ->withTimestamps();
+    }
+
+    /**
      * Check if user has uploaded a signed agreement.
      */
     public function hasSignedAgreement()

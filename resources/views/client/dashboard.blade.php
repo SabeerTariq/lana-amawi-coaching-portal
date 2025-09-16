@@ -52,7 +52,7 @@
                         <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
                         <h6 class="text-muted">No upcoming appointments</h6>
                         <p class="text-muted">Book your next session to continue your coaching journey.</p>
-                        <a href="{{ route('booking') }}" class="btn btn-primary">
+                        <a href="{{ route('client.appointments') }}" class="btn btn-primary">
                             <i class="fas fa-plus me-2"></i>Book Session
                         </a>
                     </div>

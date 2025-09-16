@@ -40,13 +40,15 @@
         
         .sidebar {
             background: #032a57;
-            min-height: 100vh;
+            height: 100vh;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             position: fixed;
             top: 0;
             left: 0;
             z-index: 1030;
             width: 16.666667%; /* col-md-2 equivalent */
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
         .sidebar .logo-section {
@@ -75,6 +77,30 @@
         .sidebar .nav-link.active {
             background-color: #730623;
             color: white;
+        }
+        
+        /* Custom scrollbar for sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Firefox scrollbar */
+        .sidebar {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
         }
         
         .main-content {
@@ -184,11 +210,12 @@
         <div class="row">
             <!-- Sidebar -->
             <div class="sidebar">
-                <div class="position-sticky d-flex flex-column" style="height: 100vh;">
-                    <div class="logo-section">
+                <div class="d-flex flex-column" style="height: 100vh;">
+                    <div class="logo-section flex-shrink-0">
                         <img src="{{ asset('images/logo.png') }}" alt="Lana Amawi Coaching">
                     </div>
-                    <ul class="nav flex-column flex-grow-1">
+                    <div class="flex-grow-1 overflow-auto">
+                        <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
                                href="{{ route('admin.dashboard') }}">
@@ -199,6 +226,24 @@
                             <a class="nav-link {{ request()->routeIs('admin.clients*') ? 'active' : '' }}" 
                                href="{{ route('admin.clients') }}">
                                 <i class="fas fa-users me-2"></i>Clients
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.programs.index') || request()->routeIs('admin.programs.create') || request()->routeIs('admin.programs.edit') ? 'active' : '' }}" 
+                               href="{{ route('admin.programs.index') }}">
+                                <i class="fas fa-graduation-cap me-2"></i>Programs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.programs.applications*') ? 'active' : '' }}" 
+                               href="{{ route('admin.programs.applications') }}">
+                                <i class="fas fa-file-alt me-2"></i>Program Applications
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.subscriptions*') ? 'active' : '' }}" 
+                               href="{{ route('admin.subscriptions.index') }}">
+                                <i class="fas fa-credit-card me-2"></i>Subscriptions
                             </a>
                         </li>
                         <li class="nav-item">
@@ -231,10 +276,11 @@
                                 <i class="fas fa-cog me-2"></i>Settings
                             </a>
                         </li>
-                    </ul>
+                        </ul>
+                    </div>
                     
                     <!-- Logout at bottom -->
-                    <div class="mt-auto pb-3">
+                    <div class="flex-shrink-0 pb-3 px-3">
                         @auth
                             <form method="POST" action="{{ route('logout') }}" class="d-inline">
                                 @csrf

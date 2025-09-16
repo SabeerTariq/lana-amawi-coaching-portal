@@ -715,9 +715,35 @@ body.popup-open {
                                     <td class="agreement-cell" data-label="Agreement">
                                         @php
                                             $user = \App\Models\User::where('email', $booking->email)->first();
+                                            $hasAgreement = false;
+                                            $agreementUrl = null;
+                                            
+                                            // Check for agreement in user_programs table first
+                                            if($user) {
+                                                $userProgram = \App\Models\UserProgram::where('user_id', $user->id)
+                                                    ->whereNotNull('signed_agreement_path')
+                                                    ->first();
+                                                
+                                                if($userProgram) {
+                                                    $hasAgreement = true;
+                                                    $agreementUrl = \Illuminate\Support\Facades\Storage::url($userProgram->signed_agreement_path);
+                                                } else {
+                                                    // Fallback to user table agreement
+                                                    if($user->hasSignedAgreement()) {
+                                                        $hasAgreement = true;
+                                                        $agreementUrl = $user->agreement_url;
+                                                    }
+                                                }
+                                            }
+                                            
+                                            // Also check if booking has its own agreement
+                                            if(!$hasAgreement && $booking->hasSignedAgreement()) {
+                                                $hasAgreement = true;
+                                                $agreementUrl = $booking->agreement_url;
+                                            }
                                         @endphp
-                                        @if($user && $user->hasSignedAgreement())
-                                            <a href="{{ $user->agreement_url }}" 
+                                        @if($hasAgreement)
+                                            <a href="{{ $agreementUrl }}" 
                                                target="_blank" 
                                                class="text-decoration-none"
                                                data-bs-toggle="tooltip" 

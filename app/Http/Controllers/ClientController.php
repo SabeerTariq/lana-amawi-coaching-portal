@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Appointment;
 use App\Models\Message;
 use App\Models\Booking;
+use App\Models\UserProgram;
 
 class ClientController extends Controller
 {
@@ -203,6 +204,16 @@ class ClientController extends Controller
         ]);
 
         $user = Auth::user();
+
+        // Check if user has any active programs
+        $activePrograms = $user->userPrograms()
+            ->where('status', UserProgram::STATUS_ACTIVE)
+            ->with('program')
+            ->get();
+
+        if ($activePrograms->isEmpty()) {
+            return redirect()->back()->with('error', 'You must have an approved and active program before booking sessions. Please select a program first.');
+        }
 
         try {
             $booking = Booking::create([

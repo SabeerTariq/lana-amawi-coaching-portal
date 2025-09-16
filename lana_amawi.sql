@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 14, 2025 at 05:14 AM
+-- Generation Time: Sep 16, 2025 at 09:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -39,18 +39,6 @@ CREATE TABLE `appointments` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `appointments`
---
-
-INSERT INTO `appointments` (`id`, `user_id`, `program`, `appointment_date`, `appointment_time`, `message`, `status`, `created_at`, `updated_at`) VALUES
-(25, 24, NULL, '2025-08-30', '13:00', NULL, 'completed', '2025-08-22 19:16:31', '2025-08-27 13:40:28'),
-(26, 25, NULL, '2025-08-26', '14:00', 'Ratione ad adipisici', 'completed', '2025-08-25 23:20:03', '2025-08-27 13:40:31'),
-(27, 26, NULL, '2025-08-26', '16:00', 'Quae non quos molest', 'confirmed', '2025-08-25 23:29:29', '2025-08-25 23:29:29'),
-(28, 28, NULL, '2025-08-27', '10:00', 'Eum magna consectetu', 'completed', '2025-08-27 13:23:20', '2025-08-27 13:40:46'),
-(29, 29, NULL, '2025-09-13', '13:00', 'Enim eiusmod impedit', 'completed', '2025-09-11 16:24:49', '2025-09-11 16:25:22'),
-(30, 27, NULL, '2025-08-27', '15:00', 'Voluptates porro hic', 'confirmed', '2025-09-13 22:10:47', '2025-09-13 22:10:47');
-
 -- --------------------------------------------------------
 
 --
@@ -76,15 +64,6 @@ CREATE TABLE `bookings` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `bookings`
---
-
-INSERT INTO `bookings` (`id`, `full_name`, `email`, `phone`, `program`, `preferred_date`, `preferred_time`, `message`, `admin_suggestion`, `client_response`, `response_date`, `status`, `signed_agreement_path`, `signed_agreement_name`, `agreement_uploaded_at`, `created_at`, `updated_at`) VALUES
-(16, 'Blair Merritt', 'sovu@mailinator.com', '+1 (296) 877-3438', NULL, '2025-09-14', '13:00', 'Sint sapiente qui te', NULL, NULL, NULL, 'pending', NULL, NULL, NULL, '2025-09-13 21:16:16', '2025-09-13 21:16:16'),
-(17, 'Halla Jackson', 'jotasez@mailinator.com', '+1 (218) 746-8664', NULL, '2025-09-14', '17:00', 'Laborum Obcaecati a', NULL, NULL, NULL, 'pending', NULL, NULL, NULL, '2025-09-13 21:29:03', '2025-09-13 21:29:03'),
-(18, 'Phoebe Stokes', 'zegavax@mailinator.com', '+1 (946) 518-7737', NULL, '2025-09-14', '15:00', 'Reiciendis quis fugi', NULL, NULL, NULL, 'pending', NULL, NULL, NULL, '2025-09-13 22:07:23', '2025-09-13 22:07:23');
 
 -- --------------------------------------------------------
 
@@ -124,14 +103,6 @@ CREATE TABLE `client_notes` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `client_notes`
---
-
-INSERT INTO `client_notes` (`id`, `user_id`, `admin_id`, `note`, `created_at`, `updated_at`) VALUES
-(1, 26, 14, 'Testing note', '2025-08-25 23:28:34', '2025-08-25 23:28:34'),
-(2, 26, 14, 'Another session', '2025-08-25 23:28:47', '2025-08-25 23:28:47');
 
 -- --------------------------------------------------------
 
@@ -204,13 +175,6 @@ CREATE TABLE `messages` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `messages`
---
-
-INSERT INTO `messages` (`id`, `user_id`, `message`, `attachment_path`, `attachment_name`, `attachment_type`, `attachment_size`, `sender_type`, `is_read`, `created_at`, `updated_at`) VALUES
-(6, 29, 'hi', NULL, NULL, NULL, NULL, 'admin', 0, '2025-09-11 16:26:00', '2025-09-11 16:26:00');
-
 -- --------------------------------------------------------
 
 --
@@ -247,7 +211,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (17, '2025_08_13_200000_add_agreement_fields_to_bookings_table', 10),
 (18, '2025_08_23_002943_add_agreement_fields_to_users_table', 11),
 (19, '2025_08_26_042306_create_client_notes_table', 12),
-(20, '2025_01_27_120000_add_professional_fields_to_users_table', 13);
+(20, '2025_01_27_120000_add_professional_fields_to_users_table', 13),
+(21, '2025_09_15_231507_create_programs_table', 14),
+(22, '2025_09_15_231511_create_user_programs_table', 14),
+(23, '2025_09_16_182730_create_subscriptions_table', 15),
+(24, '2025_09_16_182808_add_subscription_fields_to_programs_table', 15);
 
 -- --------------------------------------------------------
 
@@ -260,6 +228,38 @@ CREATE TABLE `password_reset_tokens` (
   `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `programs`
+--
+
+CREATE TABLE `programs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `duration_weeks` int(11) DEFAULT NULL,
+  `sessions_included` int(11) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `features` text DEFAULT NULL,
+  `subscription_type` varchar(255) DEFAULT NULL,
+  `monthly_price` decimal(10,2) DEFAULT NULL,
+  `monthly_sessions` int(11) DEFAULT NULL,
+  `booking_limit_per_month` int(11) NOT NULL DEFAULT 0,
+  `is_subscription_based` tinyint(1) NOT NULL DEFAULT 0,
+  `subscription_features` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`subscription_features`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `programs`
+--
+
+INSERT INTO `programs` (`id`, `name`, `description`, `price`, `duration_weeks`, `sessions_included`, `is_active`, `features`, `subscription_type`, `monthly_price`, `monthly_sessions`, `booking_limit_per_month`, `is_subscription_based`, `subscription_features`, `created_at`, `updated_at`) VALUES
+(4, 'Leadership Excellence Program', 'Advanced leadership program for healthcare professionals in management roles, focusing on team leadership, decision-making, and organizational effectiveness.', 499.00, 16, 10, 1, '[\"Leadership style assessment\",\"Team management strategies\",\"Conflict resolution skills\",\"Change management\",\"Strategic thinking development\",\"Communication excellence\",\"Performance management\",\"Organizational culture building\",\"Executive coaching techniques\",\"360-degree feedback analysis\"]', NULL, NULL, NULL, 0, 0, NULL, '2025-09-15 18:16:26', '2025-09-15 18:16:26');
 
 -- --------------------------------------------------------
 
@@ -281,8 +281,34 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('lB1JP61tPc20qHqprum7DMUUX84IjlknImAuS76L', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiYXVlZUd1aUlNZUxQWWVKd1Q5bE9aZkpISG40TndNRGdOc2RBd0xISCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9jbGllbnRzLzMyIjt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTQ7fQ==', 1757819506),
-('m4KkUTAFHshg1FRTYY3A9SbZT1Vu7y9tOXbmmEU5', 32, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoib1hrT29mVEJrRjhNSUp6VXB3ajhwNXp3cWZiTVlRaW1rUHZlYUpRSSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvcHJvZmlsZSI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjMyO30=', 1757819617);
+('JXYwBgdTNh7Quv8tNOOrKRH7h8KMYon4DS74Tide', 38, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiUzFjMFcwckJ3clhJVnd6M3lzMXFaVjVFMUVtSFV6bWhPdlNjWmxVQyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvcHJvZ3JhbXMiO31zOjE4OiJyZWdpc3RyYXRpb25fZW1haWwiO3M6MjA6ImhpcW9zQG1haWxpbmF0b3IuY29tIjtzOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aTozODt9', 1758049472),
+('LUDU5uhLpOCdj5YGgplXlwlgmp4qC027M8G5qhuQ', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiYXZNQ0tVbXZKYWlabG5VcGVEeld1QlJIUktReENSTm03R0hzazNrTCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wcm9ncmFtcy9hcHBsaWNhdGlvbnMiO31zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxNDt9', 1758049553);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subscriptions`
+--
+
+CREATE TABLE `subscriptions` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `program_id` bigint(20) UNSIGNED NOT NULL,
+  `subscription_type` varchar(255) NOT NULL,
+  `monthly_price` decimal(10,2) NOT NULL,
+  `monthly_sessions` int(11) NOT NULL,
+  `booking_limit_per_month` int(11) NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `starts_at` datetime NOT NULL,
+  `ends_at` datetime DEFAULT NULL,
+  `next_billing_date` datetime DEFAULT NULL,
+  `last_billing_date` datetime DEFAULT NULL,
+  `total_bookings_this_month` int(11) NOT NULL DEFAULT 0,
+  `subscription_features` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`subscription_features`)),
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -321,18 +347,43 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `phone`, `address`, `date_of_birth`, `gender`, `age`, `languages_spoken`, `institution_hospital`, `position`, `position_as_of_date`, `specialty`, `graduation_date`, `email_verified_at`, `password`, `is_admin`, `signed_agreement_path`, `signed_agreement_name`, `agreement_uploaded_at`, `remember_token`, `created_at`, `updated_at`) VALUES
-(14, 'Admin User', 'admin@example.com', '+1 (555) 000-0000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-08-07 15:03:40', '$2y$12$nV9CxLciXFYiNSIl9ehUGO5l8JcZ9Y/Ni.9bn9Ea3GLj0krv6qmn6', 1, NULL, NULL, NULL, 'YOY2pXfyMPqG2dw7z5OduSLfMuN7NiW1GwZWVNpuJnFtkQItSq5LQ78VChWy', '2025-08-07 15:03:40', '2025-09-13 21:31:06'),
+(14, 'Admin User', 'admin@example.com', '+1 (555) 000-0000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-08-07 15:03:40', '$2y$12$nV9CxLciXFYiNSIl9ehUGO5l8JcZ9Y/Ni.9bn9Ea3GLj0krv6qmn6', 1, NULL, NULL, NULL, 'Q8GdYBUIRhqJMq94UpSpLfu7XJUNqmQjEGsSNOv8ZTejcavF9VYniK0eFkVR', '2025-08-07 15:03:40', '2025-09-13 21:31:06'),
 (15, 'Demo User', 'demo@example.com', '+1 (555) 000-0000', '123 Medical Center Dr, Suite 200, New York, NY 10001', '1985-03-15', 'female', 39, '[\"English\",\"Spanish\"]', 'New York General Hospital', 'Cardiologist', '2020-01-15', 'Interventional Cardiology', '2010-06-15', '2025-08-07 15:03:40', '$2y$12$2xeDWAA2JBkMqBpbb47iF./aG2NhKqii/2LtskDP/fE1APX1511qa', 0, NULL, NULL, NULL, NULL, '2025-08-07 15:03:40', '2025-09-13 21:38:56'),
 (16, 'Test User', 'test@example.com', '+1 (555) 000-0000', '456 Healthcare Ave, Floor 5, Los Angeles, CA 90210', '1982-07-22', 'male', 42, '[\"English\",\"Chinese\",\"French\"]', 'Cedars-Sinai Medical Center', 'Emergency Medicine Physician', '2018-09-01', 'Emergency Medicine', '2008-05-20', '2025-08-07 15:03:41', '$2y$12$YCLznGXTvzWku2zqROdwFexXTqztB83EioioIm9DqxVzekFRePLly', 0, NULL, NULL, NULL, NULL, '2025-08-07 15:03:41', '2025-09-13 21:38:56'),
-(24, 'Te', 'testing1@gmail.com', '+1 (555) 000-0000', '789 Health Plaza, Unit 300, Chicago, IL 60601', '1988-11-10', 'female', 36, '[\"English\",\"Arabic\"]', 'Northwestern Memorial Hospital', 'Pediatrician', '2019-03-01', 'Pediatric Cardiology', '2012-05-15', NULL, '$2y$12$YKyp/OHId29xMU3Ay.MHSOEyQKip28Zy/vAgsv0T6fr.x1BpyjPY6', 0, NULL, NULL, NULL, NULL, '2025-08-22 19:07:54', '2025-09-13 21:38:56'),
-(25, 'Cheryl Henson', 'wapeny@mailinator.com', '+1 (555) 000-0000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$ppitOHOpeGmCWenWnSkAEudlNuK4ooDr5nKO9jdWnkK.F2Pns.SZi', 0, 'agreements/signed/bvS7FTqhQeyFYoLr6Il49OVT9fEKqzwBm8omahZW.pdf', 'coaching_agreement (1).pdf', '2025-08-25 23:17:45', NULL, '2025-08-25 23:17:45', '2025-09-13 21:31:06'),
-(26, 'Yoko Booth', 'mupec@mailinator.com', '+1 (555) 000-0000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$PZPd/iDWb0CjmXerSX8Q9OWHU6AWlSH9FOjDB4EZEBDsepToVhu6.', 0, 'agreements/signed/V1z0gVpUhSz4Nd77X63HjM0Hz737a7BTFBVc8E3C.pdf', 'coaching_agreement (1).pdf', '2025-08-25 23:21:02', NULL, '2025-08-25 23:21:02', '2025-09-13 21:31:06'),
-(27, 'Sybill Donovan', 'wawohe@mailinator.com', '+1 (555) 000-0000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$UOg12HDMqPOOYh4TgfEoBuf1qdVdk20oX3dU34FofylnfzUtGcXzG', 0, 'agreements/signed/y4UOnsgePnNiGDhmWKOBLoB13in9GoSXrLwHCg8B.pdf', 'coaching_agreement (7).pdf', '2025-08-27 12:53:00', NULL, '2025-08-27 12:53:00', '2025-09-13 21:31:06'),
-(28, 'Shea Hamilton', 'zonojiro@mailinator.com', '+1 (555) 000-0000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$yfmxmbGhMUiwitnkF82noukO7jofAMhAa7O/MQ/KOKL77ioMjQmaG', 0, 'agreements/signed/hSWihfgq4iQdfJasyG4zI7HGpv0LWS858Oa6DPku.pdf', 'coaching_agreement (8).pdf', '2025-08-27 12:56:15', NULL, '2025-08-27 12:56:15', '2025-09-13 21:31:06'),
-(29, 'Kelsie Burgess', 'wequvy@mailinator.com', '+1 (555) 000-0000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$CEBdnDhMMOpf5QnjmPrQa.UNE05Ld1fWiKqG8sVew6QcCFTw8NOb2', 0, 'agreements/signed/TRbobrXIjURj2URQcbaM1GjiA1NHOWvdCRoKQeLk.pdf', 'coaching_agreement (9).pdf', '2025-09-11 16:21:05', NULL, '2025-09-11 16:21:05', '2025-09-13 21:31:06'),
-(30, 'Blair Merritt', 'sovu@mailinator.com', '+1 (555) 000-0000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$QK2bt9NC2TXl7nAdlB9VPuuM2vrsX4Tnvg9isQkHxYyIHqAjo3fHu', 0, NULL, NULL, NULL, NULL, '2025-09-13 21:16:04', '2025-09-13 21:31:06'),
-(31, 'Halla Jackson', 'jotasez@mailinator.com', '+1 (555) 000-0000', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$JMPlR6.O/KQmIqF18MmBQu1acONh5binNPtABJymsYjB2g3/1pTQi', 0, NULL, NULL, NULL, NULL, '2025-09-13 21:28:56', '2025-09-13 21:31:06'),
-(32, 'Phoebe Stokes', 'zegavax@mailinator.com', NULL, 'Nesciunt unde molli', '1997-01-31', 'other', 83, '[\"Arabic\",\"French\",\"Other\"]', 'Hic dolor tempor mai', 'Doloremque est et am', '2022-06-13', 'Incidunt explicabo', '2006-10-23', NULL, '$2y$12$LhUA3wYGvNb2jX5sMMt3vOPIY6ZptHcIji1.U0amqVfQYps81S9D6', 0, NULL, NULL, NULL, NULL, '2025-09-13 22:07:19', '2025-09-13 22:07:19');
+(38, 'Lareina Love', 'hiqos@mailinator.com', '+1 (414) 201-6348', 'Nemo qui commodi pos', '2001-12-30', 'female', 42, '[\"English\",\"French\",\"Other\"]', 'Qui sed et sunt occa', 'Fugit distinctio F', '1991-07-18', 'Fugiat eligendi qui', '1970-01-17', NULL, '$2y$12$Hs//s07LotAOyZqr88rZNelVr3hNw1mxI0k8rZXuCNMDiu1s1JrQu', 0, NULL, NULL, NULL, NULL, '2025-09-16 13:22:07', '2025-09-16 13:22:07');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_programs`
+--
+
+CREATE TABLE `user_programs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `program_id` bigint(20) UNSIGNED NOT NULL,
+  `status` enum('pending','agreement_sent','agreement_uploaded','approved','payment_requested','payment_completed','active','rejected','cancelled') NOT NULL DEFAULT 'pending',
+  `admin_notes` text DEFAULT NULL,
+  `agreement_path` varchar(255) DEFAULT NULL,
+  `signed_agreement_path` varchar(255) DEFAULT NULL,
+  `signed_agreement_name` varchar(255) DEFAULT NULL,
+  `agreement_sent_at` timestamp NULL DEFAULT NULL,
+  `agreement_uploaded_at` timestamp NULL DEFAULT NULL,
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `payment_requested_at` timestamp NULL DEFAULT NULL,
+  `payment_completed_at` timestamp NULL DEFAULT NULL,
+  `amount_paid` decimal(10,2) DEFAULT NULL,
+  `payment_reference` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `user_programs`
+--
+
+INSERT INTO `user_programs` (`id`, `user_id`, `program_id`, `status`, `admin_notes`, `agreement_path`, `signed_agreement_path`, `signed_agreement_name`, `agreement_sent_at`, `agreement_uploaded_at`, `approved_at`, `payment_requested_at`, `payment_completed_at`, `amount_paid`, `payment_reference`, `created_at`, `updated_at`) VALUES
+(5, 38, 4, 'agreement_uploaded', NULL, 'agreements/agreement_5_1758049437.pdf', 'signed-agreements/signed_agreement_5_1758049471.pdf', 'program_agreement_leadership-excellence-program_lareina-love.pdf', '2025-09-16 14:03:58', '2025-09-16 14:04:31', NULL, NULL, NULL, NULL, NULL, '2025-09-16 14:03:46', '2025-09-16 14:04:31');
 
 --
 -- Indexes for dumped tables
@@ -411,6 +462,12 @@ ALTER TABLE `password_reset_tokens`
   ADD PRIMARY KEY (`email`);
 
 --
+-- Indexes for table `programs`
+--
+ALTER TABLE `programs`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `sessions`
 --
 ALTER TABLE `sessions`
@@ -419,11 +476,28 @@ ALTER TABLE `sessions`
   ADD KEY `sessions_last_activity_index` (`last_activity`);
 
 --
+-- Indexes for table `subscriptions`
+--
+ALTER TABLE `subscriptions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `subscriptions_user_id_is_active_index` (`user_id`,`is_active`),
+  ADD KEY `subscriptions_program_id_is_active_index` (`program_id`,`is_active`),
+  ADD KEY `subscriptions_next_billing_date_index` (`next_billing_date`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`);
+
+--
+-- Indexes for table `user_programs`
+--
+ALTER TABLE `user_programs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_programs_user_id_foreign` (`user_id`),
+  ADD KEY `user_programs_program_id_foreign` (`program_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -439,7 +513,7 @@ ALTER TABLE `appointments`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `client_notes`
@@ -469,13 +543,31 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `programs`
+--
+ALTER TABLE `programs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `subscriptions`
+--
+ALTER TABLE `subscriptions`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+
+--
+-- AUTO_INCREMENT for table `user_programs`
+--
+ALTER TABLE `user_programs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -499,6 +591,20 @@ ALTER TABLE `client_notes`
 --
 ALTER TABLE `messages`
   ADD CONSTRAINT `messages_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `subscriptions`
+--
+ALTER TABLE `subscriptions`
+  ADD CONSTRAINT `subscriptions_program_id_foreign` FOREIGN KEY (`program_id`) REFERENCES `programs` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `subscriptions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_programs`
+--
+ALTER TABLE `user_programs`
+  ADD CONSTRAINT `user_programs_program_id_foreign` FOREIGN KEY (`program_id`) REFERENCES `programs` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `user_programs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -72,9 +72,6 @@ class BookingController extends Controller
             'specialty' => 'required|string|max:255',
             'graduation_date' => 'nullable|date|before_or_equal:today',
             'phone' => 'nullable|string|max:20',
-            'preferred_date' => 'required|date|after_or_equal:today',
-            'preferred_time' => 'required|string',
-            'message' => 'nullable|string|max:1000',
             'terms' => 'required|accepted',
         ]);
 
@@ -85,7 +82,7 @@ class BookingController extends Controller
         }
 
         try {
-            \Log::info('Starting booking process for email: ' . $request->email);
+            \Log::info('Starting registration process for email: ' . $request->email);
             
             // Check if user already exists
             $user = User::where('email', $request->email)->first();
@@ -98,6 +95,7 @@ class BookingController extends Controller
                 $user = User::create([
                     'name' => $request->full_name,
                     'email' => $request->email,
+                    'phone' => $request->phone,
                     'address' => $request->address,
                     'date_of_birth' => $request->date_of_birth,
                     'gender' => $request->gender,
@@ -117,13 +115,14 @@ class BookingController extends Controller
                     Mail::to($user->email)->send(new ClientCredentials($user, $password));
                 } catch (\Exception $mailException) {
                     \Log::error('Mail sending failed: ' . $mailException->getMessage());
-                    // Continue with booking even if email fails
+                    // Continue with registration even if email fails
                 }
             } else {
                 // User already exists, update their professional information and generate new password
                 $newPassword = Str::random(8);
                 $user->update([
                     'name' => $request->full_name,
+                    'phone' => $request->phone,
                     'address' => $request->address,
                     'date_of_birth' => $request->date_of_birth,
                     'gender' => $request->gender,
@@ -142,40 +141,26 @@ class BookingController extends Controller
                     Mail::to($user->email)->send(new ClientCredentials($user, $newPassword));
                 } catch (\Exception $mailException) {
                     \Log::error('Mail sending failed for existing user: ' . $mailException->getMessage());
-                    // Continue with booking even if email fails
+                    // Continue with registration even if email fails
                 }
             }
 
-            $booking = Booking::create([
-                'full_name' => $request->full_name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'program' => null, // Program field removed from form
-                'preferred_date' => $request->preferred_date,
-                'preferred_time' => $request->preferred_time,
-                'message' => $request->message,
-                'status' => 'pending',
-            ]);
-
-            // Clear the pending booking session data
-            session()->forget('pending_booking');
-
-            \Log::info('Booking with signed agreement completed successfully for user: ' . $user->email);
+            \Log::info('User registration completed successfully for user: ' . $user->email);
             
             // Store email in session for pre-filling login form
-            session(['booking_email' => $user->email]);
+            session(['registration_email' => $user->email]);
             
             // Redirect to client login with success messages
             return redirect()->route('client.login')
-                ->with('success', 'Your professional registration and booking have been submitted successfully!')
+                ->with('success', 'Your professional registration has been completed successfully!')
                 ->with('email_check', 'Please check your email for your portal login credentials.');
         } catch (\Exception $e) {
             // Log the error for debugging
-            \Log::error('Booking submission error: ' . $e->getMessage());
+            \Log::error('Registration submission error: ' . $e->getMessage());
             \Log::error('Error trace: ' . $e->getTraceAsString());
             
             return redirect()->back()
-                ->withErrors(['error' => 'An error occurred while submitting your booking. Please try again. Error: ' . $e->getMessage()])
+                ->withErrors(['error' => 'An error occurred while submitting your registration. Please try again. Error: ' . $e->getMessage()])
                 ->withInput();
         }
     }

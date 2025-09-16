@@ -21,9 +21,18 @@
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">My Appointments</h1>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookNewSessionModal">
-        <i class="fas fa-plus me-2"></i>Book New Session
-    </button>
+    @php
+        $activePrograms = Auth::user()->userPrograms()->where('status', \App\Models\UserProgram::STATUS_ACTIVE)->count();
+    @endphp
+    @if($activePrograms > 0)
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookNewSessionModal">
+            <i class="fas fa-plus me-2"></i>Book New Session
+        </button>
+    @else
+        <a href="{{ route('client.programs') }}" class="btn btn-primary">
+            <i class="fas fa-graduation-cap me-2"></i>Select Program First
+        </a>
+    @endif
 </div>
 
 <!-- Tabs -->

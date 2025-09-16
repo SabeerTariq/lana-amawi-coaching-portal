@@ -182,6 +182,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('client.programs*') ? 'active' : '' }}" 
+                               href="{{ route('client.programs') }}">
+                                <i class="fas fa-graduation-cap me-2"></i>Programs
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('client.appointments') ? 'active' : '' }}" 
                                href="{{ route('client.appointments') }}">
                                 <i class="fas fa-calendar-alt me-2"></i>Appointments
