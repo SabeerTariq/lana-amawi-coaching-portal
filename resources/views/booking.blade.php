@@ -57,6 +57,12 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       value="{{ old('phone') }}" placeholder="Enter your phone number" required>
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="address" class="form-label">Address *</label>
                                 <textarea class="form-control" id="address" name="address" rows="2" 
                                           placeholder="Enter your full address" required>{{ old('address') }}</textarea>
@@ -106,12 +112,32 @@
                                                    {{ in_array('French', old('languages_spoken', [])) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="lang_french">French</label>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="lang_spanish" name="languages_spoken[]" value="Spanish" 
                                                    {{ in_array('Spanish', old('languages_spoken', [])) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="lang_spanish">Spanish</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="lang_mandarin" name="languages_spoken[]" value="Mandarin Chinese" 
+                                                   {{ in_array('Mandarin Chinese', old('languages_spoken', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="lang_mandarin">Mandarin Chinese</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="lang_german" name="languages_spoken[]" value="German" 
+                                                   {{ in_array('German', old('languages_spoken', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="lang_german">German</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="lang_japanese" name="languages_spoken[]" value="Japanese" 
+                                                   {{ in_array('Japanese', old('languages_spoken', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="lang_japanese">Japanese</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="lang_vietnamese" name="languages_spoken[]" value="Vietnamese" 
+                                                   {{ in_array('Vietnamese', old('languages_spoken', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="lang_vietnamese">Vietnamese</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="lang_other" name="languages_spoken[]" value="Other" 
@@ -154,6 +180,12 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="education_institution" class="form-label">Education Institution *</label>
+                                <input type="text" class="form-control" id="education_institution" name="education_institution" 
+                                       value="{{ old('education_institution') }}" placeholder="e.g., Harvard Medical School, Johns Hopkins University" required>
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="graduation_date" class="form-label">Graduation Date (if applicable)</label>
                                 <input type="date" class="form-control" id="graduation_date" name="graduation_date" 
                                        value="{{ old('graduation_date') }}">
@@ -161,16 +193,6 @@
                             </div>
                         </div>
 
-                        <!-- Contact Information -->
-                        <div class="mb-4">
-                            <h5 class="text-primary mb-3">Contact</h5>
-
-                            <div class="mb-3">
-                                <label for="phone" class="form-label">Phone Number (Optional)</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" 
-                                       value="{{ old('phone') }}">
-                            </div>
-                        </div>
 
                         <div class="mb-3">
                                 <div class="form-check">

@@ -65,13 +65,14 @@ class BookingController extends Controller
             'gender' => 'required|in:male,female,other,prefer_not_to_say',
             'age' => 'required|integer|min:18|max:100',
             'languages_spoken' => 'required|array|min:1',
-            'languages_spoken.*' => 'string|in:English,Arabic,French,Spanish,Other',
+            'languages_spoken.*' => 'string|in:English,Arabic,French,Spanish,Mandarin Chinese,German,Japanese,Vietnamese,Other',
             'institution_hospital' => 'required|string|max:255',
             'position' => 'required|string|max:255',
             'position_as_of_date' => 'required|date|before_or_equal:today',
             'specialty' => 'required|string|max:255',
+            'education_institution' => 'required|string|max:255',
             'graduation_date' => 'nullable|date|before_or_equal:today',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'required|string|max:20',
             'terms' => 'required|accepted',
         ]);
 
@@ -105,6 +106,7 @@ class BookingController extends Controller
                     'position' => $request->position,
                     'position_as_of_date' => $request->position_as_of_date,
                     'specialty' => $request->specialty,
+                    'education_institution' => $request->education_institution,
                     'graduation_date' => $request->graduation_date,
                     'password' => Hash::make($password),
                     'is_admin' => false,
@@ -132,6 +134,7 @@ class BookingController extends Controller
                     'position' => $request->position,
                     'position_as_of_date' => $request->position_as_of_date,
                     'specialty' => $request->specialty,
+                    'education_institution' => $request->education_institution,
                     'graduation_date' => $request->graduation_date,
                     'password' => Hash::make($newPassword)
                 ]);

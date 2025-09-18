@@ -425,10 +425,19 @@ class AdminController extends Controller
     public function convertBookingToAppointment(Booking $booking)
     {
         // Find user based on email
-            $user = User::where('email', $booking->email)->first();
+        $user = User::where('email', $booking->email)->first();
+        
+        if (!$user) {
+            return redirect()->back()->with('error', 'Cannot convert booking to appointment. User not found.');
+        }
+        
+        // Check if user has signed agreement (either general or program-based)
+        $hasGeneralAgreement = $user->hasSignedAgreement();
+        $hasProgramAgreement = $user->userPrograms()
+            ->whereNotNull('signed_agreement_path')
+            ->exists();
             
-        // Check if signed agreement is uploaded for the user
-        if (!$user || !$user->hasSignedAgreement()) {
+        if (!$hasGeneralAgreement && !$hasProgramAgreement) {
             return redirect()->back()->with('error', 'Cannot convert booking to appointment. The signed agreement has not been uploaded yet.');
         }
 
@@ -493,9 +502,20 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'This booking has not been accepted by the client yet.');
         }
 
-        // Check if signed agreement is uploaded for the user
-            $user = User::where('email', $booking->email)->first();
-        if (!$user || !$user->hasSignedAgreement()) {
+        // Find user based on email
+        $user = User::where('email', $booking->email)->first();
+        
+        if (!$user) {
+            return redirect()->back()->with('error', 'Cannot convert booking to appointment. User not found.');
+        }
+        
+        // Check if user has signed agreement (either general or program-based)
+        $hasGeneralAgreement = $user->hasSignedAgreement();
+        $hasProgramAgreement = $user->userPrograms()
+            ->whereNotNull('signed_agreement_path')
+            ->exists();
+            
+        if (!$hasGeneralAgreement && !$hasProgramAgreement) {
             return redirect()->back()->with('error', 'Cannot convert booking to appointment. The signed agreement has not been uploaded yet.');
         }
 

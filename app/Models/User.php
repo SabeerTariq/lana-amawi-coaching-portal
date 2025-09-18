@@ -31,6 +31,7 @@ class User extends Authenticatable
         'position',
         'position_as_of_date',
         'specialty',
+        'education_institution',
         'graduation_date',
         'password',
         'is_admin',
