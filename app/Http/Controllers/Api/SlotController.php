@@ -28,23 +28,38 @@ class SlotController extends Controller
         $date = $request->input('date');
         $type = $request->input('type');
 
-        // Check if the date is available for booking
-        if (!$this->bookingService->slotService->isDateAvailable($date)) {
+        try {
+            // Use the slot service directly
+            $slotService = app(\App\Services\EnhancedSlotAvailabilityService::class);
+            
+            // Check if the date is available for booking
+            if (!$slotService->isDateAvailable($date)) {
+                return response()->json([
+                    'slots' => [],
+                    'date' => $date,
+                    'type' => $type,
+                    'message' => 'No availability for this date'
+                ]);
+            }
+
+            // Get available slots for the specific booking type
+            $slots = $slotService->getAvailableSlots($date, $type);
+
+            return response()->json([
+                'slots' => $slots,
+                'date' => $date,
+                'type' => $type,
+                'message' => count($slots) > 0 ? 'Slots available' : 'No slots available for this session type'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('API getAvailableSlots error: ' . $e->getMessage());
             return response()->json([
                 'slots' => [],
-                'message' => 'No availability for this date'
-            ]);
+                'date' => $date,
+                'type' => $type,
+                'error' => 'Error retrieving slots: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Get available slots for the specific booking type (considering existing bookings)
-        $slots = $this->bookingService->getAvailableSlotsForBooking($date, $type);
-
-        return response()->json([
-            'slots' => $slots,
-            'date' => $date,
-            'type' => $type,
-            'message' => count($slots) > 0 ? 'Slots available' : 'No slots available for this session type'
-        ]);
     }
 
     /**

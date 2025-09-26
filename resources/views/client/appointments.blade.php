@@ -263,19 +263,21 @@
                                                    name="new_date" required min="{{ date('Y-m-d') }}">
                                         </div>
                                         <div class="mb-3">
-                                            <label for="new_time{{ $booking->id }}" class="form-label">Preferred Time *</label>
-                                            <select class="form-control" id="new_time{{ $booking->id }}" name="new_time" required>
-                                                <option value="">Select time</option>
-                                                <option value="09:00">9:00 AM</option>
-                                                <option value="10:00">10:00 AM</option>
-                                                <option value="11:00">11:00 AM</option>
-                                                <option value="12:00">12:00 PM</option>
-                                                <option value="13:00">1:00 PM</option>
-                                                <option value="14:00">2:00 PM</option>
-                                                <option value="15:00">3:00 PM</option>
-                                                <option value="16:00">4:00 PM</option>
-                                                <option value="17:00">5:00 PM</option>
+                                            <label for="new_booking_type{{ $booking->id }}" class="form-label">Session Type *</label>
+                                            <select class="form-control" id="new_booking_type{{ $booking->id }}" name="new_booking_type" required>
+                                                <option value="">Select session type</option>
+                                                <option value="in-office" {{ $booking->booking_type == 'in-office' ? 'selected' : '' }}>In-Office</option>
+                                                <option value="virtual" {{ $booking->booking_type == 'virtual' ? 'selected' : '' }}>Virtual</option>
                                             </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="new_time{{ $booking->id }}" class="form-label">Preferred Time *</label>
+                                            <select class="form-control" id="new_time{{ $booking->id }}" name="new_time" required disabled>
+                                                <option value="">Please select date and session type first</option>
+                                            </select>
+                                            <div class="form-text" id="modify-time-info{{ $booking->id }}">
+                                                Select a date and session type to see available time slots.
+                                            </div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="modification_reason{{ $booking->id }}" class="form-label">Reason for Change *</label>
@@ -443,18 +445,12 @@
                             </div>
                             <div class="mb-3">
                                 <label for="appointment_time{{ $appointment->id }}" class="form-label">New Time</label>
-                                <select class="form-control" id="appointment_time{{ $appointment->id }}" name="appointment_time" required>
-                                    <option value="">Select time</option>
-                                    <option value="09:00">9:00 AM</option>
-                                    <option value="10:00">10:00 AM</option>
-                                    <option value="11:00">11:00 AM</option>
-                                    <option value="12:00">12:00 PM</option>
-                                    <option value="13:00">1:00 PM</option>
-                                    <option value="14:00">2:00 PM</option>
-                                    <option value="15:00">3:00 PM</option>
-                                    <option value="16:00">4:00 PM</option>
-                                    <option value="17:00">5:00 PM</option>
+                                <select class="form-control" id="appointment_time{{ $appointment->id }}" name="appointment_time" required disabled>
+                                    <option value="">Please select date first</option>
                                 </select>
+                                <div class="form-text" id="reschedule-time-info{{ $appointment->id }}">
+                                    Select a date to see available time slots.
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -537,7 +533,7 @@
                             <label for="preferred_date" class="form-label">Preferred Date *</label>
                             <input type="date" class="form-control @error('preferred_date') is-invalid @enderror" 
                                    id="preferred_date" name="preferred_date" required min="{{ date('Y-m-d') }}" 
-                                   value="{{ old('preferred_date', date('Y-m-d', strtotime('+1 day'))) }}">
+                                   value="{{ old('preferred_date') }}">
                             @error('preferred_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -666,14 +662,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const preferredTime = document.getElementById('preferred_time');
     const timeSlotsInfo = document.getElementById('time-slots-info');
     
-    // Set default date to tomorrow when modal opens
+    
+    // Set default date to next available weekday when modal opens
     const bookModal = document.getElementById('bookNewSessionModal');
+    
     if (bookModal) {
         bookModal.addEventListener('show.bs.modal', function() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
+            // Find next available weekday (Monday-Friday)
+            const today = new Date();
+            let nextWeekday = new Date(today);
+            
+            // Skip weekends (Saturday = 6, Sunday = 0)
+            do {
+                nextWeekday.setDate(nextWeekday.getDate() + 1);
+            } while (nextWeekday.getDay() === 0 || nextWeekday.getDay() === 6);
+            
             if (preferredDate) {
-                preferredDate.value = tomorrow.toISOString().split('T')[0];
+                preferredDate.value = nextWeekday.toISOString().split('T')[0];
             }
             updateTimeSlots();
         });
@@ -691,6 +696,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const date = preferredDate?.value;
         const type = bookingType?.value;
         
+        
         if (!date || !type) {
             preferredTime.disabled = true;
             preferredTime.innerHTML = '<option value="">Please select date and session type first</option>';
@@ -700,8 +706,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Check if date is available
-        fetch(`/api/available-slots?date=${date}&type=${type}`)
-            .then(response => response.json())
+        fetch(`{{ url('/api/available-slots') }}?date=${date}&type=${type}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 preferredTime.disabled = false;
                 preferredTime.innerHTML = '<option value="">Select time</option>';
@@ -728,6 +746,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('slot-status').style.display = 'block';
                     document.getElementById('slot-available').style.display = 'none';
                     document.getElementById('slot-unavailable').style.display = 'block';
+                    
+                    // Show helpful message for weekends
+                    const selectedDate = new Date(date);
+                    const dayOfWeek = selectedDate.getDay();
+                    if (dayOfWeek === 0 || dayOfWeek === 6) {
+                        document.getElementById('slot-unavailable').innerHTML = 
+                            '<i class="fas fa-exclamation-triangle me-2"></i>No availability on weekends. Please select a weekday (Monday-Friday).';
+                    }
                 }
             })
             .catch(error => {
@@ -735,6 +761,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 preferredTime.disabled = true;
                 preferredTime.innerHTML = '<option value="">Error loading slots</option>';
                 timeSlotsInfo.textContent = 'Error loading available slots.';
+                
+                // Show error status
+                document.getElementById('slot-status').style.display = 'block';
+                document.getElementById('slot-available').style.display = 'none';
+                document.getElementById('slot-unavailable').style.display = 'block';
             });
     }
     
@@ -761,7 +792,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Check slot availability one more time before submission
-            fetch(`/api/check-slot`, {
+            fetch(`{{ url('/api/check-slot') }}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -791,6 +822,137 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize on page load if values are already set
     updateTimeSlots();
+    
+    // Handle modify modals - add event listeners for date and booking type changes
+    document.querySelectorAll('[id^="new_date"]').forEach(function(dateInput) {
+        const bookingId = dateInput.id.replace('new_date', '');
+        const timeSelect = document.getElementById('new_time' + bookingId);
+        const timeInfo = document.getElementById('modify-time-info' + bookingId);
+        const bookingTypeSelect = document.getElementById('new_booking_type' + bookingId);
+        
+        if (dateInput && timeSelect && timeInfo) {
+            dateInput.addEventListener('change', function() {
+                updateModifyTimeSlots(bookingId, dateInput.value, bookingTypeSelect?.value, timeSelect, timeInfo);
+            });
+        }
+        
+        if (bookingTypeSelect && timeSelect && timeInfo) {
+            bookingTypeSelect.addEventListener('change', function() {
+                updateModifyTimeSlots(bookingId, dateInput?.value, bookingTypeSelect.value, timeSelect, timeInfo);
+            });
+        }
+    });
+    
+    // Handle reschedule modals - add event listeners for date changes
+    document.querySelectorAll('[id^="appointment_date"]').forEach(function(dateInput) {
+        const appointmentId = dateInput.id.replace('appointment_date', '');
+        const timeSelect = document.getElementById('appointment_time' + appointmentId);
+        const timeInfo = document.getElementById('reschedule-time-info' + appointmentId);
+        
+        if (dateInput && timeSelect && timeInfo) {
+            dateInput.addEventListener('change', function() {
+                updateRescheduleTimeSlots(appointmentId, dateInput.value, timeSelect, timeInfo);
+            });
+        }
+    });
+    
+    function updateModifyTimeSlots(bookingId, date, bookingType, timeSelect, timeInfo) {
+        if (!date || !bookingType) {
+            timeSelect.disabled = true;
+            timeSelect.innerHTML = '<option value="">Please select date and session type first</option>';
+            timeInfo.textContent = 'Select a date and session type to see available time slots.';
+            return;
+        }
+        
+        fetch(`{{ url('/api/available-slots') }}?date=${date}&type=${bookingType}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            timeSelect.disabled = false;
+            timeSelect.innerHTML = '<option value="">Select time</option>';
+            
+            if (data.slots && data.slots.length > 0) {
+                data.slots.forEach(slot => {
+                    const option = document.createElement('option');
+                    option.value = slot;
+                    option.textContent = formatTime(slot);
+                    timeSelect.appendChild(option);
+                });
+                timeInfo.textContent = `Available slots: ${data.slots.length} time slots`;
+            } else {
+                timeSelect.innerHTML = '<option value="">No slots available for this date</option>';
+                timeInfo.textContent = 'No available slots for this date.';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching slots for modify modal:', error);
+            timeSelect.disabled = true;
+            timeSelect.innerHTML = '<option value="">Error loading slots</option>';
+            timeInfo.textContent = 'Error loading available slots.';
+        });
+    }
+    
+    function updateRescheduleTimeSlots(appointmentId, date, timeSelect, timeInfo) {
+        if (!date) {
+            timeSelect.disabled = true;
+            timeSelect.innerHTML = '<option value="">Please select date first</option>';
+            timeInfo.textContent = 'Select a date to see available time slots.';
+            return;
+        }
+        
+        // For reschedule, we'll assume virtual as default since we don't have booking type info
+        // In a real implementation, you might want to store the original booking type
+        const bookingType = 'virtual';
+        
+        fetch(`{{ url('/api/available-slots') }}?date=${date}&type=${bookingType}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            timeSelect.disabled = false;
+            timeSelect.innerHTML = '<option value="">Select time</option>';
+            
+            if (data.slots && data.slots.length > 0) {
+                data.slots.forEach(slot => {
+                    const option = document.createElement('option');
+                    option.value = slot;
+                    option.textContent = formatTime(slot);
+                    timeSelect.appendChild(option);
+                });
+                timeInfo.textContent = `Available slots: ${data.slots.length} time slots`;
+            } else {
+                timeSelect.innerHTML = '<option value="">No slots available for this date</option>';
+                timeInfo.textContent = 'No available slots for this date.';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching slots for reschedule modal:', error);
+            timeSelect.disabled = true;
+            timeSelect.innerHTML = '<option value="">Error loading slots</option>';
+            timeInfo.textContent = 'Error loading available slots.';
+        });
+    }
 });
 </script>
 @endpush

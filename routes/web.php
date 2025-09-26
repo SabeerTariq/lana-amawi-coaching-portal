@@ -204,6 +204,7 @@ Route::get('/test-booking', function() {
     }
 });
 
+
 // Test email route
 Route::get('/test-email', function() {
     try {

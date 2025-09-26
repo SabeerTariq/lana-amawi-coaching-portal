@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Appointment;
 use App\Models\Message;
 use App\Models\Booking;
+use App\Models\UserProgram;
 use App\Services\BookingAvailabilityService;
 
 class ClientController extends Controller
