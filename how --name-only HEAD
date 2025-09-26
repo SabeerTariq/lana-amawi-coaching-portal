@@ -1,0 +1,10 @@
+[33m4df8886[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Update welcome page and fix line endings
+[33mddd3ed3[m Fix program field requirement issue - make program nullable in appointments and bookings, update AdminController to handle null program values
+[33mb2c18d5[m Add logout buttons to client and admin portals - Redirect to login page
+[33mdcd5eb2[m Fix calendar JavaScript syntax error - Move event listeners inside DOMContentLoaded function
+[33m3ecef4d[m Fix program field validation error - Remove program field requirement from booking form
+[33m51ea26c[m Add database export (lana_amawi.sql) for easy local setup
+[33mdd7b1cd[m Clean up project: remove deployment files and focus on local development
+[33m19affd6[m Fix Docker build by moving Laravel setup to runtime startup script
+[33mf987db0[m Fix Railway deployment with simplified Nixpacks config and Dockerfile alternative
+[33mc84da45[m Add Railway.com deployment configuration
