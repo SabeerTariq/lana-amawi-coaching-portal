@@ -64,6 +64,7 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     Route::get('/programs', [App\Http\Controllers\ProgramController::class, 'index'])->name('programs');
     Route::get('/programs/{program}', [App\Http\Controllers\ProgramController::class, 'show'])->name('programs.show');
     Route::post('/programs/select', [App\Http\Controllers\ProgramController::class, 'selectProgram'])->name('programs.select');
+    Route::post('/programs/{userProgram}/cancel', [App\Http\Controllers\ProgramController::class, 'cancelProgram'])->name('programs.cancel');
     Route::get('/programs/agreement/{userProgram}/download', [App\Http\Controllers\ProgramController::class, 'downloadAgreement'])->name('programs.agreement.download');
     Route::post('/programs/agreement/{userProgram}/upload', [App\Http\Controllers\ProgramController::class, 'uploadSignedAgreement'])->name('programs.agreement.upload');
 });

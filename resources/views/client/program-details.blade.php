@@ -106,11 +106,38 @@
     </div>
 
     <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Ready to Get Started?</h5>
+        @php
+            $userProgram = Auth::user()->userPrograms()->where('program_id', $program->id)->first();
+            $isSelected = $userProgram !== null && $userProgram->status !== \App\Models\UserProgram::STATUS_CANCELLED;
+        @endphp
+        <div class="card {{ $isSelected ? 'border-success' : '' }}">
+            <div class="card-header {{ $isSelected ? 'bg-success text-white' : '' }}">
+                <h5 class="card-title mb-0">
+                    @if($isSelected)
+                        <i class="fas fa-check-circle me-2"></i>Program Status
+                    @else
+                        Ready to Get Started?
+                    @endif
+                </h5>
             </div>
             <div class="card-body">
+                @if($isSelected)
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <div>
+                            <strong>Current Status:</strong> {{ $userProgram->status_display_text }}
+                            @if($userProgram->status === \App\Models\UserProgram::STATUS_ACTIVE)
+                                <br><small class="text-success">You can now book sessions!</small>
+                            @elseif($userProgram->status === \App\Models\UserProgram::STATUS_PENDING)
+                                <br><small class="text-warning">Your application is under review.</small>
+                            @elseif($userProgram->status === \App\Models\UserProgram::STATUS_AGREEMENT_SENT)
+                                <br><small class="text-info">Please check your email for the agreement.</small>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @else
                 <div class="text-center mb-4">
                     <div class="h2 text-primary mb-2">{{ $program->formatted_price }}</div>
                     <p class="text-muted">One-time payment for complete program</p>
@@ -126,13 +153,77 @@
                         <li>Begin your coaching journey!</li>
                     </ol>
                 </div>
+                @endif
 
                 <form action="{{ route('client.programs.select') }}" method="POST">
                     @csrf
                     <input type="hidden" name="program_id" value="{{ $program->id }}">
-                    <button type="submit" class="btn btn-primary w-100 btn-lg">
-                        <i class="fas fa-rocket me-2"></i>Select This Program
-                    </button>
+                    
+                    @php
+                        $userProgram = Auth::user()->userPrograms()->where('program_id', $program->id)->first();
+                    @endphp
+                    
+                    @if($userProgram)
+                        @switch($userProgram->status)
+                            @case(\App\Models\UserProgram::STATUS_PENDING)
+                                <button type="button" class="btn btn-warning w-100 btn-lg" disabled>
+                                    <i class="fas fa-clock me-2"></i>Pending Review
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_AGREEMENT_SENT)
+                                <button type="button" class="btn btn-info w-100 btn-lg" disabled>
+                                    <i class="fas fa-file-contract me-2"></i>Agreement Sent
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_AGREEMENT_UPLOADED)
+                                <button type="button" class="btn btn-primary w-100 btn-lg" disabled>
+                                    <i class="fas fa-upload me-2"></i>Agreement Uploaded
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_APPROVED)
+                                <button type="button" class="btn btn-success w-100 btn-lg" disabled>
+                                    <i class="fas fa-check me-2"></i>Approved
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_PAYMENT_REQUESTED)
+                                <button type="button" class="btn btn-warning w-100 btn-lg" disabled>
+                                    <i class="fas fa-credit-card me-2"></i>Payment Requested
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_PAYMENT_COMPLETED)
+                                <button type="button" class="btn btn-success w-100 btn-lg" disabled>
+                                    <i class="fas fa-check-circle me-2"></i>Payment Completed
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_ACTIVE)
+                                <button type="button" class="btn btn-success w-100 btn-lg" disabled>
+                                    <i class="fas fa-star me-2"></i>Active Program
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_REJECTED)
+                                <button type="button" class="btn btn-danger w-100 btn-lg" disabled>
+                                    <i class="fas fa-times me-2"></i>Rejected
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_CANCELLED)
+                                <form action="{{ route('client.programs.select') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="program_id" value="{{ $program->id }}">
+                                    <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                        <i class="fas fa-rocket me-2"></i>Select This Program
+                                    </button>
+                                </form>
+                                @break
+                            @default
+                                <button type="button" class="btn btn-secondary w-100 btn-lg" disabled>
+                                    <i class="fas fa-question me-2"></i>{{ ucfirst($userProgram->status) }}
+                                </button>
+                        @endswitch
+                    @else
+                        <button type="submit" class="btn btn-primary w-100 btn-lg">
+                            <i class="fas fa-rocket me-2"></i>Select This Program
+                        </button>
+                    @endif
                 </form>
 
                 <div class="text-center mt-3">

@@ -35,21 +35,40 @@ class ProgramController extends Controller
         $user = Auth::user();
         $program = Program::findOrFail($request->program_id);
 
-        // Check if user already has this program
-        $existingProgram = $user->userPrograms()->where('program_id', $program->id)->first();
+        // Check if user already has this program (excluding cancelled programs)
+        $existingProgram = $user->userPrograms()
+            ->where('program_id', $program->id)
+            ->where('status', '!=', UserProgram::STATUS_CANCELLED)
+            ->first();
         
         if ($existingProgram) {
             return redirect()->back()->with('error', 'You have already selected this program.');
         }
 
-        // Create user program selection
-        UserProgram::create([
-            'user_id' => $user->id,
-            'program_id' => $program->id,
-            'status' => UserProgram::STATUS_PENDING,
-        ]);
+        // Check if user previously cancelled this program
+        $cancelledProgram = $user->userPrograms()
+            ->where('program_id', $program->id)
+            ->where('status', UserProgram::STATUS_CANCELLED)
+            ->first();
 
-        return redirect()->back()->with('success', 'Program selected successfully! Your application will be reviewed by our team.');
+        if ($cancelledProgram) {
+            // Reactivate the previously cancelled program
+            $cancelledProgram->update([
+                'status' => UserProgram::STATUS_PENDING,
+                'admin_notes' => $cancelledProgram->admin_notes . "\n\n[RE-SELECTED BY CLIENT] Program re-selected after cancellation - " . now()->format('Y-m-d H:i:s'),
+            ]);
+            
+            return redirect()->back()->with('success', 'Program re-selected successfully! Your application will be reviewed by our team.');
+        } else {
+            // Create new user program selection
+            UserProgram::create([
+                'user_id' => $user->id,
+                'program_id' => $program->id,
+                'status' => UserProgram::STATUS_PENDING,
+            ]);
+
+            return redirect()->back()->with('success', 'Program selected successfully! Your application will be reviewed by our team.');
+        }
     }
 
     /**
@@ -101,6 +120,34 @@ class ProgramController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Signed agreement uploaded successfully! We will review it and get back to you.');
+    }
+
+    /**
+     * Client cancels a selected program
+     */
+    public function cancelProgram(Request $request, UserProgram $userProgram)
+    {
+        // Verify the user owns this program selection
+        if ($userProgram->user_id !== Auth::id()) {
+            abort(403, 'Access denied.');
+        }
+
+        $request->validate([
+            'cancellation_reason' => 'required|string|max:500',
+        ]);
+
+        // Check if program can be cancelled
+        if (!$userProgram->canBeCancelled()) {
+            return redirect()->back()->with('error', 'This program cannot be cancelled.');
+        }
+
+        // Update program status to cancelled
+        $userProgram->update([
+            'status' => UserProgram::STATUS_CANCELLED,
+            'admin_notes' => $userProgram->admin_notes . "\n\n[CANCELLED BY CLIENT] Reason: " . $request->cancellation_reason . " - " . now()->format('Y-m-d H:i:s'),
+        ]);
+
+        return redirect()->back()->with('success', 'Program cancelled successfully. We\'re sorry to see you go!');
     }
 
     /**

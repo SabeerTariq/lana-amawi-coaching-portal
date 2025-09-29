@@ -131,13 +131,59 @@
 <!-- Available Programs -->
 <div class="row">
     @foreach($programs as $program)
+    @php
+        $userProgram = $userPrograms->where('program_id', $program->id)->first();
+        $isSelected = $userProgram !== null && $userProgram->status !== \App\Models\UserProgram::STATUS_CANCELLED;
+        $cardClass = $isSelected ? 'border-success' : '';
+        $cardHeaderClass = $isSelected ? 'bg-success text-white' : '';
+    @endphp
     <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">{{ $program->name }}</h5>
+        <div class="card h-100 {{ $cardClass }}">
+            <div class="card-header {{ $cardHeaderClass }}">
+                <h5 class="card-title mb-0">
+                    {{ $program->name }}
+                    @if($isSelected)
+                        <span class="badge bg-light text-success ms-2">
+                            <i class="fas fa-check-circle me-1"></i>Selected
+                        </span>
+                    @endif
+                </h5>
             </div>
             <div class="card-body">
                 <p class="text-muted">{{ $program->description }}</p>
+                
+                @if($isSelected)
+                <div class="alert alert-info mb-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <div class="flex-grow-1">
+                            <strong>Status:</strong> {{ $userProgram->status_display_text }}
+                            @if($userProgram->status === \App\Models\UserProgram::STATUS_ACTIVE)
+                                <br><small class="text-success">You can now book sessions!</small>
+                            @elseif($userProgram->status === \App\Models\UserProgram::STATUS_PENDING)
+                                <br><small class="text-warning">Your application is under review.</small>
+                            @elseif($userProgram->status === \App\Models\UserProgram::STATUS_AGREEMENT_SENT)
+                                <br><small class="text-info">Please check your email for the agreement.</small>
+                            @elseif($userProgram->status === \App\Models\UserProgram::STATUS_AGREEMENT_UPLOADED)
+                                <br><small class="text-primary">Waiting for approval.</small>
+                            @elseif($userProgram->status === \App\Models\UserProgram::STATUS_PAYMENT_REQUESTED)
+                                <br><small class="text-warning">Payment is required to activate your program.</small>
+                            @endif
+                        </div>
+                        @if($userProgram->status === \App\Models\UserProgram::STATUS_ACTIVE)
+                            <a href="{{ route('client.appointments') }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-calendar-plus me-1"></i>Book Session
+                            </a>
+                        @endif
+                        @if($userProgram->canBeCancelled())
+                            <button type="button" class="btn btn-outline-danger btn-sm ms-2" 
+                                    data-bs-toggle="modal" data-bs-target="#cancelProgramModal{{ $userProgram->id }}">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </button>
+                        @endif
+                    </div>
+                </div>
+                @endif
                 
                 <div class="mb-3">
                     <div class="row text-center">
@@ -176,13 +222,76 @@
                     <a href="{{ route('client.programs.show', $program) }}" class="btn btn-outline-primary">
                         <i class="fas fa-info-circle me-1"></i>View Details
                     </a>
-                    <form action="{{ route('client.programs.select') }}" method="POST" class="d-inline">
-                        @csrf
-                        <input type="hidden" name="program_id" value="{{ $program->id }}">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-plus me-1"></i>Select Program
-                        </button>
-                    </form>
+                    
+                    @php
+                        $userProgram = $userPrograms->where('program_id', $program->id)->first();
+                    @endphp
+                    
+                    @if($userProgram)
+                        @switch($userProgram->status)
+                            @case(\App\Models\UserProgram::STATUS_PENDING)
+                                <button class="btn btn-warning w-100" disabled>
+                                    <i class="fas fa-clock me-1"></i>Pending Review
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_AGREEMENT_SENT)
+                                <button class="btn btn-info w-100" disabled>
+                                    <i class="fas fa-file-contract me-1"></i>Agreement Sent
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_AGREEMENT_UPLOADED)
+                                <button class="btn btn-primary w-100" disabled>
+                                    <i class="fas fa-upload me-1"></i>Agreement Uploaded
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_APPROVED)
+                                <button class="btn btn-success w-100" disabled>
+                                    <i class="fas fa-check me-1"></i>Approved
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_PAYMENT_REQUESTED)
+                                <button class="btn btn-warning w-100" disabled>
+                                    <i class="fas fa-credit-card me-1"></i>Payment Requested
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_PAYMENT_COMPLETED)
+                                <button class="btn btn-success w-100" disabled>
+                                    <i class="fas fa-check-circle me-1"></i>Payment Completed
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_ACTIVE)
+                                <button class="btn btn-success w-100" disabled>
+                                    <i class="fas fa-star me-1"></i>Active Program
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_REJECTED)
+                                <button class="btn btn-danger w-100" disabled>
+                                    <i class="fas fa-times me-1"></i>Rejected
+                                </button>
+                                @break
+                            @case(\App\Models\UserProgram::STATUS_CANCELLED)
+                                <form action="{{ route('client.programs.select') }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <input type="hidden" name="program_id" value="{{ $program->id }}">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus me-1"></i>Select Program
+                                    </button>
+                                </form>
+                                @break
+                            @default
+                                <button class="btn btn-secondary w-100" disabled>
+                                    <i class="fas fa-question me-1"></i>{{ ucfirst($userProgram->status) }}
+                                </button>
+                        @endswitch
+                    @else
+                        <form action="{{ route('client.programs.select') }}" method="POST" class="d-inline">
+                            @csrf
+                            <input type="hidden" name="program_id" value="{{ $program->id }}">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-plus me-1"></i>Select Program
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>
@@ -365,5 +474,53 @@
     background: #dee2e6;
 }
 </style>
+
+<!-- Cancel Program Modals -->
+@foreach($userPrograms as $userProgram)
+@if($userProgram->canBeCancelled())
+<div class="modal fade" id="cancelProgramModal{{ $userProgram->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel Program</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('client.programs.cancel', $userProgram) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> Cancelling this program will stop all future sessions and you may lose access to program benefits.
+                    </div>
+                    
+                    <p>You are about to cancel: <strong>{{ $userProgram->program->name }}</strong></p>
+                    
+                    <div class="mb-3">
+                        <label for="cancellation_reason{{ $userProgram->id }}" class="form-label">Reason for Cancellation *</label>
+                        <textarea class="form-control" id="cancellation_reason{{ $userProgram->id }}" 
+                                  name="cancellation_reason" rows="4" required
+                                  placeholder="Please tell us why you're cancelling this program..."></textarea>
+                        <div class="form-text">This information helps us improve our services.</div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmCancellation{{ $userProgram->id }}" required>
+                        <label class="form-check-label" for="confirmCancellation{{ $userProgram->id }}">
+                            I understand that cancelling this program will stop all future sessions and I may lose access to program benefits.
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Program</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times me-2"></i>Cancel Program
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+@endforeach
 
 @endsection

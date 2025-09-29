@@ -96,6 +96,22 @@ class UserProgram extends Model
     }
 
     /**
+     * Check if program can be cancelled
+     */
+    public function canBeCancelled()
+    {
+        return !in_array($this->status, [self::STATUS_CANCELLED, self::STATUS_REJECTED]);
+    }
+
+    /**
+     * Check if program can be re-selected (only cancelled programs)
+     */
+    public function canBeReselected()
+    {
+        return $this->status === self::STATUS_CANCELLED;
+    }
+
+    /**
      * Get status badge color
      */
     public function getStatusBadgeColorAttribute()
