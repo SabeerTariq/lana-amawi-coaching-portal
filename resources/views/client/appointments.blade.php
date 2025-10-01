@@ -635,7 +635,7 @@
                             <div class="col-md-6">
                                 <small class="text-muted">
                                     <strong>Weekend:</strong><br>
-                                    Closed
+                                    By Appointments Only
                                 </small>
                             </div>
                         </div>
