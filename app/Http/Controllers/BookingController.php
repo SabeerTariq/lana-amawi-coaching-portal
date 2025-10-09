@@ -41,18 +41,17 @@ class BookingController extends Controller
             'pending_booking' => $request->all()
         ]);
 
-        // Generate agreement PDF
-        $pdf = PDF::loadView('agreements.coaching_agreement', [
-            'client_name' => $request->full_name,
-            'client_email' => $request->email,
-            'client_phone' => $request->phone,
-            'preferred_date' => $request->preferred_date,
-            'preferred_time' => $request->preferred_time,
-            'message' => $request->message,
-            'agreement_date' => now()->format('F j, Y'),
-        ]);
+        // Use the static PDF template instead of generating dynamic content
+        $templatePath = 'agreement-templates/life-coaching-contract.pdf';
+        $templateFullPath = storage_path('app/public/' . $templatePath);
+        
+        // Check if template exists
+        if (!file_exists($templateFullPath)) {
+            return response()->json(['error' => 'Agreement template not found.'], 404);
+        }
 
-        return $pdf->download('coaching_agreement_' . Str::slug($request->full_name) . '.pdf');
+        // Return the static PDF for download
+        return response()->download($templateFullPath, 'life_coaching_contract.pdf');
     }
 
     public function store(Request $request)

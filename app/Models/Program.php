@@ -13,7 +13,7 @@ class Program extends Model
         'name',
         'description',
         'price',
-        'duration_weeks',
+        'duration_months',
         'sessions_included',
         'is_active',
         'features',
@@ -79,8 +79,8 @@ class Program extends Model
      */
     public function getDurationTextAttribute()
     {
-        if ($this->duration_weeks) {
-            return $this->duration_weeks . ' week' . ($this->duration_weeks > 1 ? 's' : '');
+        if ($this->duration_months) {
+            return $this->duration_months . ' month' . ($this->duration_months > 1 ? 's' : '');
         }
         return null;
     }

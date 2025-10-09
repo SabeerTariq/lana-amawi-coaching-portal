@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Program Agreement - {{ $program->name }}</title>
+    <title>Life Coaching Contract - {{ $program->name }}</title>
     <style>
         body {
             font-family: 'Times New Roman', serif;
@@ -81,11 +81,17 @@
         .features-list li {
             margin: 5px 0;
         }
+        .terms-list {
+            margin: 10px 0;
+        }
+        .terms-list li {
+            margin: 8px 0;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>PROGRAM AGREEMENT</h1>
+        <h1>LIFE COACHING CONTRACT</h1>
         <p><strong>Lana Amawi Coaching Services</strong></p>
         <p>Professional Development Programs for Healthcare Professionals</p>
         <p>Agreement Date: {{ $agreement_date }}</p>
@@ -119,63 +125,70 @@
     </div>
 
     <div class="section">
-        <h2>1. PROGRAM TERMS</h2>
-        <p>This agreement covers the participation of {{ $user->name }} ("Client") in the {{ $program->name }} provided by Lana Amawi Coaching Services ("Coach"). The program includes {{ $program->sessions_included }} coaching sessions over a period of {{ $program->duration_weeks }} weeks.</p>
+        <h2>1. COACHING RELATIONSHIP</h2>
+        <p>This agreement establishes a professional coaching relationship between {{ $user->name }} ("Client") and Lana Amawi ("Coach") for the {{ $program->name }} program. The coaching relationship is designed to facilitate the creation and development of personal, professional, or business goals and to develop and carry out a strategy/plan for achieving those goals.</p>
     </div>
 
     <div class="section">
-        <h2>2. PAYMENT TERMS</h2>
-        <p>The total program fee is {{ $program->formatted_price }}. Payment is due upon program approval and before the first session. Payment can be made via bank transfer, credit card, or other agreed-upon methods.</p>
-    </div>
-
-    <div class="section">
-        <h2>3. PROGRAM STRUCTURE</h2>
-        <p>The program includes:</p>
-        <ul>
-            <li>{{ $program->sessions_included }} one-on-one coaching sessions</li>
+        <h2>2. PROGRAM STRUCTURE</h2>
+        <p>The {{ $program->name }} program includes:</p>
+        <ul class="terms-list">
+            <li>{{ $program->sessions_included }} one-on-one coaching sessions over {{ $program->duration_months }} months</li>
             <li>Personalized action plans and goal setting</li>
             <li>Email support between sessions</li>
             <li>Progress tracking and assessment</li>
             <li>Access to program resources and materials</li>
+            <li>Follow-up support as outlined in the program details</li>
         </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. PAYMENT TERMS</h2>
+        <p>The total program fee is {{ $program->formatted_price }}. Payment is due upon program approval and before the first session. Payment can be made via bank transfer, credit card, or other agreed-upon methods.</p>
+        <p>All fees are non-refundable once the program has commenced, except as outlined in the cancellation policy below.</p>
     </div>
 
     <div class="section">
         <h2>4. CLIENT RESPONSIBILITIES</h2>
         <p>The Client agrees to:</p>
-        <ul>
+        <ul class="terms-list">
             <li>Attend all scheduled sessions on time and prepared</li>
-            <li>Complete any agreed-upon assignments or exercises</li>
+            <li>Complete any agreed-upon assignments or exercises between sessions</li>
             <li>Communicate openly and honestly during sessions</li>
             <li>Provide 24-hour notice for session cancellations or rescheduling</li>
             <li>Take responsibility for implementing coaching insights and strategies</li>
             <li>Maintain confidentiality of program materials and discussions</li>
+            <li>Be committed to the coaching process and personal development</li>
+            <li>Provide feedback on the coaching process when requested</li>
         </ul>
     </div>
 
     <div class="section">
         <h2>5. COACH RESPONSIBILITIES</h2>
         <p>Lana Amawi agrees to:</p>
-        <ul>
+        <ul class="terms-list">
             <li>Provide professional coaching services in a safe and supportive environment</li>
             <li>Maintain confidentiality as outlined in the privacy policy</li>
             <li>Be punctual and prepared for all scheduled sessions</li>
             <li>Provide 24-hour notice for any session cancellations or rescheduling</li>
             <li>Maintain professional boundaries and ethical standards</li>
             <li>Provide program materials and resources as outlined</li>
+            <li>Support the client's growth and development goals</li>
+            <li>Maintain professional development and coaching credentials</li>
         </ul>
     </div>
 
     <div class="section">
         <h2>6. CONFIDENTIALITY</h2>
         <p>All information shared during program sessions is confidential, except where disclosure is required by law or where there is a risk of harm to the client or others. The coach will maintain the highest standards of confidentiality and privacy.</p>
+        <p>The coach may discuss general themes and learning outcomes (without identifying the client) for professional development purposes, but will never share specific personal information or details that could identify the client.</p>
     </div>
 
     <div class="section">
-        <h2>7. CANCELLATION POLICY</h2>
+        <h2>7. CANCELLATION AND RESCHEDULING POLICY</h2>
         <p>Both parties agree to provide at least 24 hours' notice for session cancellations or rescheduling. Late cancellations may result in session fees being charged. Emergency situations will be handled on a case-by-case basis.</p>
         <p>Program cancellation after commencement will be handled according to the following terms:</p>
-        <ul>
+        <ul class="terms-list">
             <li>Before first session: Full refund minus administrative fee</li>
             <li>After first session: Pro-rated refund based on sessions completed</li>
             <li>After 50% completion: No refund available</li>
@@ -183,19 +196,27 @@
     </div>
 
     <div class="section">
-        <h2>8. LIMITATIONS</h2>
+        <h2>8. LIMITATIONS AND DISCLAIMERS</h2>
         <p>Coaching is not a substitute for professional medical, psychological, or legal advice. If the client requires such services, they should seek appropriate professional help. The coach will refer clients to appropriate professionals when necessary.</p>
+        <p>The coach makes no guarantees about specific outcomes or results from the coaching process. The client's success depends on their commitment, effort, and implementation of strategies discussed during sessions.</p>
     </div>
 
     <div class="section">
-        <h2>9. AGREEMENT</h2>
-        <p>By signing this agreement, both parties acknowledge that they have read, understood, and agree to the terms and conditions outlined above.</p>
+        <h2>9. TERMINATION</h2>
+        <p>Either party may terminate this agreement at any time with written notice. The coach reserves the right to terminate the coaching relationship if the client's behavior is inappropriate, harmful, or violates the terms of this agreement.</p>
+        <p>Upon termination, any remaining sessions will be handled according to the cancellation policy outlined above.</p>
+    </div>
+
+    <div class="section">
+        <h2>10. AGREEMENT</h2>
+        <p>By signing this agreement, both parties acknowledge that they have read, understood, and agree to the terms and conditions outlined above. This agreement constitutes the entire understanding between the parties and supersedes all prior agreements.</p>
     </div>
 
     <div class="signature-section">
         <div style="float: left; width: 45%;">
             <p><strong>Client Signature:</strong></p>
             <div class="signature-line"></div>
+            <p><strong>Print Name:</strong> {{ $user->name }}</p>
             <p><strong>Date:</strong></p>
             <div class="signature-line"></div>
         </div>
@@ -203,6 +224,7 @@
         <div style="float: right; width: 45%;">
             <p><strong>Coach Signature:</strong></p>
             <div class="signature-line"></div>
+            <p><strong>Print Name:</strong> Lana Amawi</p>
             <p><strong>Date:</strong></p>
             <div class="signature-line"></div>
         </div>
@@ -214,6 +236,7 @@
         <p><strong>Lana Amawi Coaching Services</strong></p>
         <p>This agreement is valid for the {{ $program->name }} program</p>
         <p>For questions or concerns, please contact: {{ $user->email }}</p>
+        <p>Contract effective date: {{ $agreement_date }}</p>
     </div>
 </body>
 </html>

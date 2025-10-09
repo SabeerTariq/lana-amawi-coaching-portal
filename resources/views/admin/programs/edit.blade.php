@@ -68,9 +68,9 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label for="duration_weeks" class="form-label">Duration (weeks)</label>
-                                        <input type="number" class="form-control" id="duration_weeks" name="duration_weeks" 
-                                               value="{{ old('duration_weeks', $program->duration_weeks) }}" min="1">
+                                        <label for="duration_months" class="form-label">Duration (months)</label>
+                                        <input type="number" class="form-control" id="duration_months" name="duration_months" 
+                                               value="{{ old('duration_months', $program->duration_months) }}" min="1">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label for="sessions_included" class="form-label">Sessions Included</label>

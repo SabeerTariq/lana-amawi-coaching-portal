@@ -14,7 +14,7 @@ A comprehensive programs and subscription management system that allows administ
 - name (Program Name)
 - description (Program Description)
 - price (One-time Price)
-- duration_weeks (Program Duration)
+- duration_months (Program Duration)
 - sessions_included (Sessions in One-time Purchase)
 - is_active (Active Status)
 - features (JSON - Program Features)

@@ -18,7 +18,7 @@ class ProgramSeeder extends Seeder
                 'name' => 'Life Coaching Program',
                 'description' => 'Comprehensive life coaching program designed to help healthcare professionals achieve personal and professional goals, improve work-life balance, and enhance overall well-being.',
                 'price' => 299.00,
-                'duration_weeks' => 8,
+                'duration_months' => 2, // 8 weeks = ~2 months
                 'sessions_included' => 6,
                 'is_active' => true,
                 'features' => [
@@ -36,7 +36,7 @@ class ProgramSeeder extends Seeder
                 'name' => 'Career Development Program',
                 'description' => 'Specialized program focused on advancing healthcare careers, leadership development, and professional growth within the medical field.',
                 'price' => 399.00,
-                'duration_weeks' => 12,
+                'duration_months' => 3, // 12 weeks = ~3 months
                 'sessions_included' => 8,
                 'is_active' => true,
                 'features' => [
@@ -54,7 +54,7 @@ class ProgramSeeder extends Seeder
                 'name' => 'Wellness & Self-Care Program',
                 'description' => 'Holistic wellness program designed specifically for healthcare professionals to prevent burnout, manage stress, and maintain optimal health.',
                 'price' => 249.00,
-                'duration_weeks' => 6,
+                'duration_months' => 1.5, // 6 weeks = ~1.5 months
                 'sessions_included' => 4,
                 'is_active' => true,
                 'features' => [
@@ -72,7 +72,7 @@ class ProgramSeeder extends Seeder
                 'name' => 'Leadership Excellence Program',
                 'description' => 'Advanced leadership program for healthcare professionals in management roles, focusing on team leadership, decision-making, and organizational effectiveness.',
                 'price' => 499.00,
-                'duration_weeks' => 16,
+                'duration_months' => 4, // 16 weeks = ~4 months
                 'sessions_included' => 10,
                 'is_active' => true,
                 'features' => [

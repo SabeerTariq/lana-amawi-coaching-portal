@@ -81,15 +81,17 @@ class ProgramController extends Controller
             abort(403, 'Access denied.');
         }
 
-        // Generate agreement PDF
-        $pdf = Pdf::loadView('agreements.program_agreement', [
-            'userProgram' => $userProgram,
-            'user' => $userProgram->user,
-            'program' => $userProgram->program,
-            'agreement_date' => now()->format('F j, Y'),
-        ]);
+        // Use the static PDF template instead of generating dynamic content
+        $templatePath = 'agreement-templates/life-coaching-contract.pdf';
+        $templateFullPath = storage_path('app/public/' . $templatePath);
+        
+        // Check if template exists
+        if (!file_exists($templateFullPath)) {
+            abort(404, 'Agreement template not found.');
+        }
 
-        return $pdf->download('program_agreement_' . Str::slug($userProgram->program->name) . '_' . Str::slug($userProgram->user->name) . '.pdf');
+        // Return the static PDF for download
+        return response()->download($templateFullPath, 'life_coaching_contract.pdf');
     }
 
     /**

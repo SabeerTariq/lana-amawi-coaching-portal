@@ -28,20 +28,14 @@
                     </div>
                     <div class="col-md-3 text-center">
                         <div class="border rounded p-3">
-                            <div class="h3 text-success mb-1">{{ $program->duration_weeks }}</div>
-                            <small class="text-muted">Weeks Duration</small>
+                            <div class="h3 text-success mb-1">{{ $program->duration_months }}</div>
+                            <small class="text-muted">Months Duration</small>
                         </div>
                     </div>
                     <div class="col-md-3 text-center">
                         <div class="border rounded p-3">
                             <div class="h3 text-info mb-1">{{ $program->sessions_included }}</div>
                             <small class="text-muted">Sessions Included</small>
-                        </div>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <div class="border rounded p-3">
-                            <div class="h3 text-warning mb-1">{{ round($program->price / $program->sessions_included, 2) }}</div>
-                            <small class="text-muted">Per Session</small>
                         </div>
                     </div>
                 </div>
@@ -83,7 +77,7 @@
                         <div class="timeline-marker bg-info"></div>
                         <div class="timeline-content">
                             <h6>Regular Coaching Sessions</h6>
-                            <p class="text-muted">{{ $program->sessions_included }} one-on-one sessions over {{ $program->duration_weeks }} weeks, tailored to your specific needs and goals.</p>
+                            <p class="text-muted">{{ $program->sessions_included }} one-on-one sessions over {{ $program->duration_months }} months, tailored to your specific needs and goals.</p>
                         </div>
                     </div>
                     <div class="timeline-item">

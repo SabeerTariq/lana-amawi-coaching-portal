@@ -52,20 +52,23 @@ class ProgramController extends Controller
     /**
      * Send agreement to client
      */
-    public function sendAgreement(UserProgram $userProgram)
+public function sendAgreement(UserProgram $userProgram)
     {
-        // Generate agreement PDF
-        $pdf = Pdf::loadView('agreements.program_agreement', [
-            'userProgram' => $userProgram,
-            'user' => $userProgram->user,
-            'program' => $userProgram->program,
-            'agreement_date' => now()->format('F j, Y'),
-        ]);
+        // Use the static PDF template instead of generating dynamic content
+        $templatePath = 'agreement-templates/life-coaching-contract.pdf';
+        $templateFullPath = storage_path('app/public/' . $templatePath);
+        
+        // Check if template exists
+        if (!file_exists($templateFullPath)) {
+            return redirect()->back()->with('error', 'Agreement template not found.');
+        }
 
-        // Store the agreement
+        // Copy the template to agreements folder with unique name
         $fileName = 'agreement_' . $userProgram->id . '_' . time() . '.pdf';
         $filePath = 'agreements/' . $fileName;
-        Storage::disk('public')->put($filePath, $pdf->output());
+        
+        // Copy the template file
+        Storage::disk('public')->copy($templatePath, $filePath);
 
         // Update user program
         $userProgram->update([
@@ -222,7 +225,7 @@ class ProgramController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'duration_weeks' => 'nullable|integer|min:1',
+            'duration_months' => 'nullable|integer|min:1',
             'sessions_included' => 'nullable|integer|min:1',
             'features' => 'nullable|array',
             'features.*' => 'string|max:255',
@@ -268,7 +271,7 @@ class ProgramController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'duration_weeks' => 'nullable|integer|min:1',
+            'duration_months' => 'nullable|integer|min:1',
             'sessions_included' => 'nullable|integer|min:1',
             'features' => 'nullable|array',
             'features.*' => 'string|max:255',

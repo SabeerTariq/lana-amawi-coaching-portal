@@ -195,8 +195,8 @@
                         </div>
                         <div class="col-4">
                             <div class="border rounded p-2">
-                                <div class="h5 mb-0 text-success">{{ $program->duration_weeks }}</div>
-                                <small class="text-muted">Weeks</small>
+                                <div class="h5 mb-0 text-success">{{ $program->duration_months }}</div>
+                                <small class="text-muted">Months</small>
                             </div>
                         </div>
                         <div class="col-4">
