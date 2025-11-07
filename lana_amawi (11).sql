@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 09, 2025 at 09:07 PM
+-- Generation Time: Nov 07, 2025 at 08:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -231,7 +231,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (27, '2025_09_25_235711_add_booking_type_to_appointments_table', 18),
 (28, '2025_09_26_185416_create_slot_schedules_table', 19),
 (29, '2025_09_26_185420_create_slot_exceptions_table', 19),
-(30, '2025_10_09_184454_rename_duration_weeks_to_duration_months_in_programs_table', 20);
+(30, '2025_10_09_184454_rename_duration_weeks_to_duration_months_in_programs_table', 20),
+(31, '2025_11_07_194117_merge_booking_limit_into_monthly_sessions', 21);
 
 -- --------------------------------------------------------
 
@@ -263,7 +264,6 @@ CREATE TABLE `programs` (
   `subscription_type` varchar(255) DEFAULT NULL,
   `monthly_price` decimal(10,2) DEFAULT NULL,
   `monthly_sessions` int(11) DEFAULT NULL,
-  `booking_limit_per_month` int(11) NOT NULL DEFAULT 0,
   `is_subscription_based` tinyint(1) NOT NULL DEFAULT 0,
   `subscription_features` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`subscription_features`)),
   `created_at` timestamp NULL DEFAULT NULL,
@@ -274,8 +274,12 @@ CREATE TABLE `programs` (
 -- Dumping data for table `programs`
 --
 
-INSERT INTO `programs` (`id`, `name`, `description`, `price`, `duration_months`, `sessions_included`, `is_active`, `features`, `subscription_type`, `monthly_price`, `monthly_sessions`, `booking_limit_per_month`, `is_subscription_based`, `subscription_features`, `created_at`, `updated_at`) VALUES
-(4, 'Life Coaching Program', 'This coaching program is designed to support high school, college, and graduate school students in achieving their academic, personal, and professional goals. The program provides personalized coaching to enhance study skills, time management, motivation, stress management and test taking. Students receive guidance on navigating educational challenges, setting clear goals, and building confidence to succeed in their academic journeys. With a focus on holistic development, the program empowers students to thrive academically while maintaining balance and well-being throughout their education.', 249.00, 1, 2, 1, '[\"360-degree feedback analysis\"]', 'student', 249.00, 2, 2, 1, '[\"2 Sessions Per Month\"]', '2025-09-15 18:16:26', '2025-10-09 14:05:35');
+INSERT INTO `programs` (`id`, `name`, `description`, `price`, `duration_months`, `sessions_included`, `is_active`, `features`, `subscription_type`, `monthly_price`, `monthly_sessions`, `is_subscription_based`, `subscription_features`, `created_at`, `updated_at`) VALUES
+(9, 'RELATIONSHIP PROGRAM', 'This coaching program is designed to support multicultural, multi-ethnic, and cross-cultural couples, marriages, and families globally. It offers a culturally sensitive and inclusive approach to strengthen communication, deepen understanding, and resolve conflicts unique to diverse backgrounds. The program empowers participants to navigate cultural differences with respect and empathy, fostering stronger, more resilient bonds within their relationships and families. Through personalized coaching, practical tools, and insightful guidance, couples and families learn to build connection, harmony, and lasting love across similar or different cultural boundaries.', 0.00, NULL, NULL, 1, '[\"2 Sessions Per Month\"]', 'relationship', 399.00, 2, 1, NULL, '2025-11-07 14:35:04', '2025-11-07 14:35:04'),
+(10, 'STUDENT COACHING PROGRAM', 'This coaching program is designed to support high school, college, and graduate school students in achieving their academic, personal, and professional goals. The program provides personalized coaching to enhance study skills, time management, motivation, stress management, and test taking. Students receive guidance on navigating educational challenges, setting clear goals, and building confidence to succeed in their academic journeys. With a focus on holistic development, the program empowers students to thrive academically while maintaining balance and well-being throughout their education.', 0.00, NULL, NULL, 1, '[\"2 Sessions Per Month\",\"Text Support\"]', 'student', 249.00, 2, 1, NULL, '2025-11-07 14:44:27', '2025-11-07 14:44:27'),
+(11, 'RESIDENT & FELLOW PROGRAM', 'This coaching program supports residents and fellows in medicine and dentistry as they navigate the demanding stages of advanced training. The program provides individualized and confidential coaching to address academic development, clinical performance, work-life balance, wellness, and professional identity formation. Through regular sessions, participants gain actionable feedback, set clear goals, and develop personalized strategies for resilience, communication, and career advancement. Coaches serve as allies and advocates throughout the residency and fellowship journey—helping trainees unlock potential, manage stress, and thrive in both their professional and personal lives.', 0.00, NULL, NULL, 1, '[\"2 Sessions Per Month\",\"Text Support\"]', 'resident', 299.00, 2, 1, NULL, '2025-11-07 14:45:13', '2025-11-07 14:45:13'),
+(12, 'MEDICAL PROFESSIONAL PROGRAM', 'This exclusive coaching program serves a select group of healthcare providers, offering personalized support through the unique challenges of clinical practice. Addressing issues such as managing difficult patients and families, coping with long shifts, balancing work-life demands, and strengthening family and partner relationships, this program ensures each provider receives tailored guidance and confidential support. As you remain on call for your patients, let this program be on call for you—providing expert help whenever you need it, restoring balance and resilience so you can thrive in your professional and personal life.', 0.00, NULL, NULL, 1, '[\"2 Sessions Per Month\",\"On-call Availability\",\"Text Support\"]', 'medical', 379.00, 2, 1, NULL, '2025-11-07 14:46:25', '2025-11-07 14:46:25'),
+(13, 'MEDICAL CONCIERGE PROGRAM', 'This exclusive coaching program serves a select group of healthcare providers, offering personalized support through the unique challenges of clinical practice. Addressing issues such as managing difficult patients and families, coping with long shifts, balancing work-life demands, and strengthening family and partner relationships, this program ensures each provider receives tailored guidance and confidential support. Enrollment is limited to preserve an intimate, high-impact experience. As you remain on call for your patients, let this program be on call for you—providing expert help whenever you need it, restoring balance and resilience so you can thrive in your professional and personal life.', 0.00, NULL, NULL, 1, '[\"3 Sessions Per Month\",\"On-call Availability\",\"Text Support\"]', 'concierge', 499.00, 3, 1, NULL, '2025-11-07 14:47:31', '2025-11-07 14:47:31');
 
 -- --------------------------------------------------------
 
@@ -297,12 +301,17 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('4YXrs8S4gcQMiYJL07h4DoUlD4N2LDlcoWEzVWvo', 15, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiNmo0bVhsZXc3Mld2b1RjT1Z0SVl6TFB0SGI1S2dlSXZHSE1Ya1FIQSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvYXBwb2ludG1lbnRzIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTU7fQ==', 1762545379),
 ('8P91xxblMzM3L6vBbcTtd7NOnLRMKjsBKJ67UzIL', 15, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiYTBpNUlRZ3RrR2tvMG1PdEFwb3EzYXVjQXFacTc5SHJHc3o2c2N1ZyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvYXBwb2ludG1lbnRzIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTU7fQ==', 1759347966),
-('bJ8XUss8T5QHoAFjKRGxOY95RUDycpLYmnqKvijs', 43, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoienpzNDJjUXI2QzNTZWtHU0hLTnptWWQ3SHV3VUhCYVVZZzNsQzFETSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvcHJvZ3JhbXMiO31zOjE4OiJyZWdpc3RyYXRpb25fZW1haWwiO3M6MTk6InNlc3lAbWFpbGluYXRvci5jb20iO3M6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjQzO30=', 1760036804),
+('bJ8XUss8T5QHoAFjKRGxOY95RUDycpLYmnqKvijs', 43, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoienpzNDJjUXI2QzNTZWtHU0hLTnptWWQ3SHV3VUhCYVVZZzNsQzFETSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvcHJvZ3JhbXMvNCI7fXM6MTg6InJlZ2lzdHJhdGlvbl9lbWFpbCI7czoxOToic2VzeUBtYWlsaW5hdG9yLmNvbSI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6NDM7fQ==', 1760038620),
 ('bLk6d2JznhQeLvv5rzKJbjqMhIxLk5YxZu7ROnRD', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiV1padDlrWEFUZGFCdU9penBnQ2xHT01WazBVc0hNaGlwemd1OGVCRiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NTk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wcm9ncmFtcy9hcHBsaWNhdGlvbnM/cHJvZ3JhbT00Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTQ7fQ==', 1760036743),
+('ckHTg9x0lYpR1GIhgc3dFfBXbOqzM1do7rD9VZ2l', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoibWQzTTgyVWNiemRsQmpLclRjb1VldUNscnFhSlZIUlVoZVdjVGhzMyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wcm9ncmFtcyI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE0O30=', 1760550451),
 ('e7Cp2IjS3O7B4tirghfqJUQQ2k5ORhZo4GS0P9o5', 15, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiZ2FSTEl6aVJwdGlTSGRheXpZakJMY01XYkVQeGh0Zk4zQ25ZQ1JudCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvZGFzaGJvYXJkIjt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTU7fQ==', 1759182697),
+('GP6ehFltEmsp4ZsXXWNKZL0FaAVB5CeeW5PXTqOd', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiNXNvYUNxaTExWXFLUnNpYkFEYXlJMXBFZ1dIbXJKSDV2TE01d1BTaSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wcm9ncmFtcy9hcHBsaWNhdGlvbnMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxNDt9', 1762545327),
+('lDqxMAg379WeSwCPOI3foiVK5WtoYH8gOpXQd4QQ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicHN4QzdtNU43amQ1SHM0VlNwZ0lRNm1sZGxBZXFUSlpNdlJkZmRETSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQvYXBwb2ludG1lbnRzIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1760474278),
 ('QHsNPbFY4pJW0zRfT78KmdV0DhnbOiNlKWlsvppR', 14, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiUzE5T2NkWDB4TXNjYUNjTmM2RmJyeXc0dE9OblMwZmp1UFpRazRiaCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTQ7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wcm9ncmFtcy9hcHBsaWNhdGlvbnMiO319', 1759178932),
-('UnsZ1wbKyzBYml3bChasZLkiMS3Y6VQcifuH8hm9', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNW1ZSlF1aUFSZTl1TXdEOE51YXBqUFBQMkNmcjJFYXBXTFltN1JZdCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9ib29raW5ncyI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1759347947);
+('UnsZ1wbKyzBYml3bChasZLkiMS3Y6VQcifuH8hm9', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNW1ZSlF1aUFSZTl1TXdEOE51YXBqUFBQMkNmcjJFYXBXTFltN1JZdCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9ib29raW5ncyI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1759347947),
+('X6HX30Y8EqQcx9sbcReF9JE3XElTz60Finxj3TUR', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQnQyMXBUUnlwUGxPcmhSaWZIc0h5R3Noa0ZSR3B3MTlmd3llSzZDaSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NTI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9lbmhhbmNlZC1zbG90LW1hbmFnZW1lbnQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1760474280);
 
 -- --------------------------------------------------------
 
@@ -372,7 +381,6 @@ CREATE TABLE `subscriptions` (
   `subscription_type` varchar(255) NOT NULL,
   `monthly_price` decimal(10,2) NOT NULL,
   `monthly_sessions` int(11) NOT NULL,
-  `booking_limit_per_month` int(11) NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `starts_at` datetime NOT NULL,
   `ends_at` datetime DEFAULT NULL,
@@ -464,12 +472,7 @@ CREATE TABLE `user_programs` (
 --
 
 INSERT INTO `user_programs` (`id`, `user_id`, `program_id`, `status`, `admin_notes`, `agreement_path`, `signed_agreement_path`, `signed_agreement_name`, `agreement_sent_at`, `agreement_uploaded_at`, `approved_at`, `payment_requested_at`, `payment_completed_at`, `amount_paid`, `payment_reference`, `created_at`, `updated_at`) VALUES
-(5, 38, 4, 'active', NULL, 'agreements/agreement_5_1758049437.pdf', 'signed-agreements/signed_agreement_5_1758049471.pdf', 'program_agreement_leadership-excellence-program_lareina-love.pdf', '2025-09-16 14:03:58', '2025-09-16 14:04:31', '2025-09-16 14:19:43', '2025-09-16 14:19:52', '2025-09-16 14:20:08', 499.00, 'jhgjhg', '2025-09-16 14:03:46', '2025-09-16 14:20:12'),
-(6, 39, 4, 'active', NULL, 'agreements/agreement_6_1758238643.pdf', 'signed-agreements/signed_agreement_6_1758238691.pdf', 'program_agreement_leadership-excellence-program_brittany-sparks.pdf', '2025-09-18 18:37:25', '2025-09-18 18:38:11', '2025-09-18 18:38:32', '2025-09-18 18:38:58', '2025-09-18 18:39:34', 499.00, '432432', '2025-09-18 18:36:13', '2025-09-18 18:39:41'),
-(7, 15, 4, 'active', '\n\n[CANCELLED BY CLIENT] Reason: Not wanted - 2025-09-29 20:46:39\n\n[RE-SELECTED BY CLIENT] Program re-selected after cancellation - 2025-09-29 20:46:42', 'agreements/agreement_7_1759178868.pdf', 'signed-agreements/signed_agreement_7_1759178896.pdf', 'program_agreement_career-development-program_kennan-frederick (1).pdf', '2025-09-29 15:47:50', '2025-09-29 15:48:16', '2025-09-29 15:48:36', '2025-09-29 15:48:39', '2025-09-29 15:48:48', 499.00, '123', '2025-09-26 13:22:05', '2025-09-29 15:48:52'),
-(8, 41, 4, 'cancelled', '\n\n[CANCELLED BY CLIENT] Reason: I want a different program. - 2025-09-29 20:32:20\n\n[RE-SELECTED BY CLIENT] Program re-selected after cancellation - 2025-09-29 20:41:02\n\n[CANCELLED BY CLIENT] Reason: No Reason - 2025-09-29 20:41:36\n\n[RE-SELECTED BY CLIENT] Program re-selected after cancellation - 2025-09-29 20:42:38\n\n[CANCELLED BY CLIENT] Reason: I want a different program - 2025-09-29 20:44:11', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-09-29 15:27:31', '2025-09-29 15:44:11'),
-(9, 42, 4, 'agreement_sent', '\n\n[CANCELLED BY CLIENT] Reason: I dont need it - 2025-10-09 18:20:33\n\n[RE-SELECTED BY CLIENT] Program re-selected after cancellation - 2025-10-09 18:20:38', 'agreements/agreement_9_1760034049.pdf', NULL, NULL, '2025-10-09 13:20:49', NULL, NULL, NULL, NULL, NULL, NULL, '2025-10-09 13:12:00', '2025-10-09 13:20:49'),
-(10, 43, 4, 'agreement_uploaded', NULL, 'agreements/agreement_10_1760034641.pdf', 'signed-agreements/signed_agreement_10_1760036791.pdf', 'life_coaching_contract (1).pdf', '2025-10-09 13:30:41', '2025-10-09 14:06:31', NULL, NULL, NULL, NULL, NULL, '2025-10-09 13:30:27', '2025-10-09 14:06:31');
+(11, 15, 9, 'active', NULL, 'agreements/agreement_11_1762545155.pdf', 'signed-agreements/signed_agreement_11_1762545196.pdf', 'life_coaching_contract (3).pdf', '2025-11-07 14:52:35', '2025-11-07 14:53:16', '2025-11-07 14:53:43', '2025-11-07 14:55:07', '2025-11-07 14:55:20', 399.00, '123', '2025-11-07 14:52:12', '2025-11-07 14:55:27');
 
 --
 -- Indexes for dumped tables
@@ -643,13 +646,13 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `programs`
 --
 ALTER TABLE `programs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `slot_exceptions`
@@ -679,7 +682,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_programs`
 --
 ALTER TABLE `user_programs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables

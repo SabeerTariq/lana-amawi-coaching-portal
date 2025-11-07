@@ -58,26 +58,6 @@
                                     <textarea class="form-control" id="description" name="description" rows="4" required>{{ old('description', $program->description) }}</textarea>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label for="price" class="form-label">One-time Price *</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">$</span>
-                                            <input type="number" class="form-control" id="price" name="price" 
-                                                   value="{{ old('price', $program->price) }}" step="0.01" min="0" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="duration_months" class="form-label">Duration (months)</label>
-                                        <input type="number" class="form-control" id="duration_months" name="duration_months" 
-                                               value="{{ old('duration_months', $program->duration_months) }}" min="1">
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="sessions_included" class="form-label">Sessions Included</label>
-                                        <input type="number" class="form-control" id="sessions_included" name="sessions_included" 
-                                               value="{{ old('sessions_included', $program->sessions_included) }}" min="1">
-                                    </div>
-                                </div>
 
                                 <div class="mb-3">
                                     <label for="features" class="form-label">Program Features</label>
@@ -116,70 +96,25 @@
                     <div class="col-lg-4">
                         <div class="card shadow">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Subscription Settings</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Monthly Subscription Settings</h6>
                             </div>
                             <div class="card-body">
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="is_subscription_based" 
-                                           name="is_subscription_based" value="1" 
-                                           {{ old('is_subscription_based', $program->is_subscription_based) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_subscription_based">
-                                        Enable Subscription Model
-                                    </label>
+                                <input type="hidden" name="is_subscription_based" value="1">
+                                
+                                <div class="mb-3">
+                                    <label for="monthly_price" class="form-label">Monthly Price *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="monthly_price" name="monthly_price" 
+                                               value="{{ old('monthly_price', $program->monthly_price) }}" step="0.01" min="0" required>
+                                    </div>
                                 </div>
 
-                                <div id="subscription-fields" style="display: {{ old('is_subscription_based', $program->is_subscription_based) ? 'block' : 'none' }};">
-                                    <div class="mb-3">
-                                        <label for="monthly_price" class="form-label">Monthly Price</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">$</span>
-                                            <input type="number" class="form-control" id="monthly_price" name="monthly_price" 
-                                                   value="{{ old('monthly_price', $program->monthly_price) }}" step="0.01" min="0">
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="monthly_sessions" class="form-label">Monthly Sessions</label>
-                                        <input type="number" class="form-control" id="monthly_sessions" name="monthly_sessions" 
-                                               value="{{ old('monthly_sessions', $program->monthly_sessions) }}" min="1">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="booking_limit_per_month" class="form-label">Booking Limit per Month</label>
-                                        <input type="number" class="form-control" id="booking_limit_per_month" name="booking_limit_per_month" 
-                                               value="{{ old('booking_limit_per_month', $program->booking_limit_per_month) }}" min="1">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="subscription_features" class="form-label">Subscription Features</label>
-                                        <div id="subscription-features-container">
-                                            @php
-                                                $subscriptionFeatures = old('subscription_features', $program->subscription_features ?? []);
-                                            @endphp
-                                            @if(count($subscriptionFeatures) > 0)
-                                                @foreach($subscriptionFeatures as $index => $feature)
-                                                    <div class="input-group mb-2 subscription-feature-input">
-                                                        <input type="text" class="form-control" name="subscription_features[]" 
-                                                               value="{{ $feature }}" placeholder="Enter subscription feature">
-                                                        <button type="button" class="btn btn-outline-danger remove-subscription-feature">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                @endforeach
-                                            @else
-                                                <div class="input-group mb-2 subscription-feature-input">
-                                                    <input type="text" class="form-control" name="subscription_features[]" 
-                                                           placeholder="Enter subscription feature">
-                                                    <button type="button" class="btn btn-outline-danger remove-subscription-feature">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <button type="button" class="btn btn-outline-primary btn-sm" id="add-subscription-feature">
-                                            <i class="fas fa-plus me-1"></i>Add Feature
-                                        </button>
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="monthly_sessions" class="form-label">Sessions per Month *</label>
+                                    <input type="number" class="form-control" id="monthly_sessions" name="monthly_sessions" 
+                                           value="{{ old('monthly_sessions', $program->monthly_sessions) }}" min="1" required>
+                                    <small class="form-text text-muted">Number of sessions/bookings included in monthly subscription</small>
                                 </div>
 
                                 <div class="form-check mb-3">
@@ -212,17 +147,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const subscriptionCheckbox = document.getElementById('is_subscription_based');
-    const subscriptionFields = document.getElementById('subscription-fields');
-
-    // Toggle subscription fields
-    subscriptionCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            subscriptionFields.style.display = 'block';
-        } else {
-            subscriptionFields.style.display = 'none';
-        }
-    });
 
     // Add feature functionality
     document.getElementById('add-feature').addEventListener('click', function() {
@@ -245,26 +169,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add subscription feature functionality
-    document.getElementById('add-subscription-feature').addEventListener('click', function() {
-        const container = document.getElementById('subscription-features-container');
-        const newFeature = document.createElement('div');
-        newFeature.className = 'input-group mb-2 subscription-feature-input';
-        newFeature.innerHTML = `
-            <input type="text" class="form-control" name="subscription_features[]" placeholder="Enter subscription feature">
-            <button type="button" class="btn btn-outline-danger remove-subscription-feature">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
-        container.appendChild(newFeature);
-    });
-
-    // Remove subscription feature functionality
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-subscription-feature') || e.target.parentElement.classList.contains('remove-subscription-feature')) {
-            e.target.closest('.subscription-feature-input').remove();
-        }
-    });
 });
 </script>
 @endsection

@@ -43,15 +43,15 @@
                     @foreach($userPrograms as $userProgram)
                     <div class="col-md-6 col-lg-4 mb-3">
                         <div class="card h-100">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">{{ $userProgram->program->name }}</h6>
-                                <span class="badge bg-{{ $userProgram->status_badge_color }}">
+                            <div class="card-header program-card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 text-white">{{ $userProgram->program->name }}</h6>
+                                <span class="badge bg-light text-{{ $userProgram->status_badge_color }}">
                                     {{ $userProgram->status_display_text }}
                                 </span>
                             </div>
                             <div class="card-body">
                                 <p class="text-muted small">{{ Str::limit($userProgram->program->description, 100) }}</p>
-                                <p class="mb-2"><strong>Price:</strong> {{ $userProgram->program->formatted_price }}</p>
+                                <p class="mb-2"><strong>Monthly Price:</strong> ${{ number_format($userProgram->program->monthly_price ?? 0, 2) }}/mo</p>
                                 
                                 <!-- Progress Indicator -->
                                 <div class="mb-3">
@@ -135,12 +135,11 @@
         $userProgram = $userPrograms->where('program_id', $program->id)->first();
         $isSelected = $userProgram !== null && $userProgram->status !== \App\Models\UserProgram::STATUS_CANCELLED;
         $cardClass = $isSelected ? 'border-success' : '';
-        $cardHeaderClass = $isSelected ? 'bg-success text-white' : '';
     @endphp
     <div class="col-md-6 col-lg-4 mb-4">
         <div class="card h-100 {{ $cardClass }}">
-            <div class="card-header {{ $cardHeaderClass }}">
-                <h5 class="card-title mb-0">
+            <div class="card-header program-card-header">
+                <h5 class="card-title mb-0 text-center">
                     {{ $program->name }}
                     @if($isSelected)
                         <span class="badge bg-light text-success ms-2">
@@ -187,22 +186,16 @@
                 
                 <div class="mb-3">
                     <div class="row text-center">
-                        <div class="col-4">
+                        <div class="col-6">
                             <div class="border rounded p-2">
-                                <div class="h5 mb-0 text-primary">{{ $program->formatted_price }}</div>
-                                <small class="text-muted">Total Price</small>
+                                <div class="h5 mb-0 text-primary">${{ number_format($program->monthly_price ?? 0, 2) }}</div>
+                                <small class="text-muted">Per Month</small>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-6">
                             <div class="border rounded p-2">
-                                <div class="h5 mb-0 text-success">{{ $program->duration_months }}</div>
-                                <small class="text-muted">Months</small>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="border rounded p-2">
-                                <div class="h5 mb-0 text-info">{{ $program->sessions_included }}</div>
-                                <small class="text-muted">Sessions</small>
+                                <div class="h5 mb-0 text-success">{{ $program->monthly_sessions ?? 0 }}</div>
+                                <small class="text-muted">Sessions/Month</small>
                             </div>
                         </div>
                     </div>
@@ -522,5 +515,35 @@
 </div>
 @endif
 @endforeach
+
+<style>
+.program-card-header {
+    background-color: #730623 !important;
+    color: white !important;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    padding: 1.5rem 1rem;
+}
+
+.program-card-header:not(.d-flex) {
+    justify-content: center;
+}
+
+.program-card-header .card-title {
+    color: white !important;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+    flex: 1;
+}
+
+.program-card-header h6 {
+    color: white !important;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+}
+</style>
 
 @endsection

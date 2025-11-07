@@ -80,17 +80,11 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="monthly_sessions" class="form-label">Monthly Sessions *</label>
-                                        <input type="number" class="form-control" id="monthly_sessions" name="monthly_sessions" 
-                                               value="{{ old('monthly_sessions') }}" min="1" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="booking_limit_per_month" class="form-label">Booking Limit per Month *</label>
-                                        <input type="number" class="form-control" id="booking_limit_per_month" name="booking_limit_per_month" 
-                                               value="{{ old('booking_limit_per_month') }}" min="1" required>
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="monthly_sessions" class="form-label">Monthly Sessions *</label>
+                                    <input type="number" class="form-control" id="monthly_sessions" name="monthly_sessions" 
+                                           value="{{ old('monthly_sessions') }}" min="1" required>
+                                    <small class="form-text text-muted">Number of sessions/bookings included in monthly subscription</small>
                                 </div>
 
                                 <div class="row">
@@ -198,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="mt-2">
                     <small class="text-muted">Booking Limit:</small><br>
-                    <strong>${program.booking_limit_per_month} per month</strong>
+                    <strong>${program.monthly_sessions} sessions per month</strong>
                 </div>
                 ${program.subscription_features && program.subscription_features.length > 0 ? `
                     <div class="mt-2">
@@ -213,7 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Auto-fill form fields
             document.getElementById('monthly_price').value = program.monthly_price;
             document.getElementById('monthly_sessions').value = program.monthly_sessions;
-            document.getElementById('booking_limit_per_month').value = program.booking_limit_per_month;
         } else {
             programInfo.innerHTML = '<p class="text-muted">Select a program to view details</p>';
         }

@@ -66,9 +66,8 @@
         <div class="program-info">
             <h3>Program Details</h3>
             <p><strong>Program:</strong> {{ $userProgram->program->name }}</p>
-            <p><strong>Duration:</strong> {{ $userProgram->program->duration_text }}</p>
-            <p><strong>Sessions Included:</strong> {{ $userProgram->program->sessions_text }}</p>
-            <p><strong>Investment:</strong> {{ $userProgram->program->formatted_price }}</p>
+            <p><strong>Monthly Subscription:</strong> ${{ number_format($userProgram->program->monthly_price ?? 0, 2) }}/month</p>
+            <p><strong>Sessions Per Month:</strong> {{ $userProgram->program->monthly_sessions ?? 0 }}</p>
         </div>
         
         <h3>Next Steps:</h3>

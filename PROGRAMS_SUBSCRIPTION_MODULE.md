@@ -20,8 +20,7 @@ A comprehensive programs and subscription management system that allows administ
 - features (JSON - Program Features)
 - subscription_type (Student/Resident/Medical/Concierge/Relationship)
 - monthly_price (Monthly Subscription Price)
-- monthly_sessions (Sessions per Month)
-- booking_limit_per_month (Monthly Booking Limit)
+- monthly_sessions (Sessions/Bookings per Month)
 - is_subscription_based (Subscription Model Enabled)
 - subscription_features (JSON - Subscription Features)
 - created_at, updated_at
@@ -34,8 +33,7 @@ A comprehensive programs and subscription management system that allows administ
 - program_id (Foreign Key to Programs)
 - subscription_type (Type of Subscription)
 - monthly_price (Monthly Cost)
-- monthly_sessions (Sessions per Month)
-- booking_limit_per_month (Booking Limit)
+- monthly_sessions (Sessions/Bookings per Month)
 - is_active (Active Status)
 - starts_at (Subscription Start Date)
 - ends_at (Subscription End Date - Optional)
@@ -99,7 +97,6 @@ protected $fillable = [
     'subscription_type',
     'monthly_price',
     'monthly_sessions',
-    'booking_limit_per_month',
     'is_subscription_based',
     'subscription_features',
 ];

@@ -39,9 +39,8 @@
                                     <tr>
                                         <th>Name</th>
                                         <th>Type</th>
-                                        <th>Price</th>
                                         <th>Monthly Price</th>
-                                        <th>Sessions</th>
+                                        <th>Sessions/Bookings per Month</th>
                                         <th>Applications</th>
                                         <th>Subscriptions</th>
                                         <th>Status</th>
@@ -54,24 +53,14 @@
                                             <td>
                                                 <div>
                                                     <strong>{{ $program->name }}</strong>
-                                                    @if($program->is_subscription_based)
-                                                        <span class="badge bg-info ms-2">Subscription</span>
-                                                    @endif
                                                 </div>
                                                 <small class="text-muted">{{ Str::limit($program->description, 50) }}</small>
                                             </td>
                                             <td>
                                                 @if($program->subscription_type)
-                                                    <span class="badge bg-secondary">{{ $program->subscription_type }}</span>
+                                                    <span class="badge bg-secondary">{{ ucfirst($program->subscription_type) }}</span>
                                                 @else
-                                                    <span class="text-muted">One-time</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($program->price)
-                                                    <span class="fw-bold text-success">${{ number_format($program->price, 2) }}</span>
-                                                @else
-                                                    <span class="text-muted">N/A</span>
+                                                    <span class="badge bg-info">General</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -83,11 +72,8 @@
                                             </td>
                                             <td>
                                                 <div>
-                                                    @if($program->sessions_included)
-                                                        <span class="badge bg-light text-dark">{{ $program->sessions_included }} sessions</span>
-                                                    @endif
                                                     @if($program->monthly_sessions)
-                                                        <br><small class="text-muted">{{ $program->monthly_sessions }}/month</small>
+                                                        <span class="badge bg-info">{{ $program->monthly_sessions }} sessions/month</span>
                                                     @endif
                                                 </div>
                                             </td>

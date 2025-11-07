@@ -224,21 +224,28 @@ public function sendAgreement(UserProgram $userProgram)
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'duration_months' => 'nullable|integer|min:1',
-            'sessions_included' => 'nullable|integer|min:1',
+            'subscription_type' => 'nullable|string|max:255',
+            'monthly_price' => 'required|numeric|min:0',
+            'monthly_sessions' => 'required|integer|min:1',
             'features' => 'nullable|array',
             'features.*' => 'string|max:255',
-            'subscription_type' => 'nullable|string|max:255',
-            'monthly_price' => 'nullable|numeric|min:0',
-            'monthly_sessions' => 'nullable|integer|min:1',
-            'booking_limit_per_month' => 'nullable|integer|min:0',
-            'is_subscription_based' => 'boolean',
-            'subscription_features' => 'nullable|array',
-            'subscription_features.*' => 'string|max:255',
         ]);
 
-        $program = Program::create($request->all());
+        // Prepare data with proper checkbox handling
+        $data = $request->all();
+        $data['is_subscription_based'] = 1; // Always subscription-based
+        $data['is_active'] = $request->has('is_active') ? 1 : 1; // Default to active if not specified
+        $data['price'] = 0; // Set price to 0 since we only use monthly subscriptions
+
+        // Filter out empty feature strings
+        if (isset($data['features']) && is_array($data['features'])) {
+            $data['features'] = array_filter($data['features'], function($feature) {
+                return !empty(trim($feature));
+            });
+            $data['features'] = array_values($data['features']); // Re-index array
+        }
+
+        $program = Program::create($data);
 
         return redirect()->route('admin.programs.index')
             ->with('success', 'Program created successfully!');
@@ -270,21 +277,28 @@ public function sendAgreement(UserProgram $userProgram)
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'duration_months' => 'nullable|integer|min:1',
-            'sessions_included' => 'nullable|integer|min:1',
+            'subscription_type' => 'nullable|string|max:255',
+            'monthly_price' => 'required|numeric|min:0',
+            'monthly_sessions' => 'required|integer|min:1',
             'features' => 'nullable|array',
             'features.*' => 'string|max:255',
-            'subscription_type' => 'nullable|string|max:255',
-            'monthly_price' => 'nullable|numeric|min:0',
-            'monthly_sessions' => 'nullable|integer|min:1',
-            'booking_limit_per_month' => 'nullable|integer|min:0',
-            'is_subscription_based' => 'boolean',
-            'subscription_features' => 'nullable|array',
-            'subscription_features.*' => 'string|max:255',
         ]);
 
-        $program->update($request->all());
+        // Prepare data with proper checkbox handling
+        $data = $request->all();
+        $data['is_subscription_based'] = 1; // Always subscription-based
+        $data['is_active'] = $request->has('is_active') ? 1 : 0;
+        $data['price'] = 0; // Set price to 0 since we only use monthly subscriptions
+
+        // Filter out empty feature strings
+        if (isset($data['features']) && is_array($data['features'])) {
+            $data['features'] = array_filter($data['features'], function($feature) {
+                return !empty(trim($feature));
+            });
+            $data['features'] = array_values($data['features']); // Re-index array
+        }
+
+        $program->update($data);
 
         return redirect()->route('admin.programs.index')
             ->with('success', 'Program updated successfully!');

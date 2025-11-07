@@ -112,9 +112,8 @@
     <div class="program-info">
         <h3>Selected Program: {{ $program->name }}</h3>
         <p><strong>Description:</strong> {{ $program->description }}</p>
-        <p><strong>Duration:</strong> {{ $program->duration_text }}</p>
-        <p><strong>Sessions Included:</strong> {{ $program->sessions_text }}</p>
-        <p><strong>Program Fee:</strong> {{ $program->formatted_price }}</p>
+        <p><strong>Monthly Subscription:</strong> ${{ number_format($program->monthly_price ?? 0, 2) }}/month</p>
+        <p><strong>Sessions Per Month:</strong> {{ $program->monthly_sessions ?? 0 }}</p>
         
         <h4>Program Features:</h4>
         <ul class="features-list">
@@ -133,19 +132,19 @@
         <h2>2. PROGRAM STRUCTURE</h2>
         <p>The {{ $program->name }} program includes:</p>
         <ul class="terms-list">
-            <li>{{ $program->sessions_included }} one-on-one coaching sessions over {{ $program->duration_months }} months</li>
+            <li>{{ $program->monthly_sessions ?? 0 }} one-on-one coaching sessions per month</li>
             <li>Personalized action plans and goal setting</li>
             <li>Email support between sessions</li>
             <li>Progress tracking and assessment</li>
             <li>Access to program resources and materials</li>
-            <li>Follow-up support as outlined in the program details</li>
+            <li>Ongoing support as outlined in the program details</li>
         </ul>
     </div>
 
     <div class="section">
         <h2>3. PAYMENT TERMS</h2>
-        <p>The total program fee is {{ $program->formatted_price }}. Payment is due upon program approval and before the first session. Payment can be made via bank transfer, credit card, or other agreed-upon methods.</p>
-        <p>All fees are non-refundable once the program has commenced, except as outlined in the cancellation policy below.</p>
+        <p>The monthly subscription fee is ${{ number_format($program->monthly_price ?? 0, 2) }}/month. Payment is due monthly upon program approval and before the first session of each month. Payment can be made via bank transfer, credit card, or other agreed-upon methods.</p>
+        <p>All fees are non-refundable once the program has commenced, except as outlined in the cancellation policy below. The subscription will continue on a monthly basis until cancelled by either party.</p>
     </div>
 
     <div class="section">

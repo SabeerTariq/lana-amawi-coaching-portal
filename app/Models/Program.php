@@ -20,7 +20,6 @@ class Program extends Model
         'subscription_type',
         'monthly_price',
         'monthly_sessions',
-        'booking_limit_per_month',
         'is_subscription_based',
         'subscription_features',
     ];
@@ -67,7 +66,7 @@ class Program extends Model
     }
 
     /**
-     * Get formatted price
+     * Get formatted price (legacy - kept for backward compatibility)
      */
     public function getFormattedPriceAttribute()
     {
@@ -75,7 +74,15 @@ class Program extends Model
     }
 
     /**
-     * Get program duration text
+     * Get formatted monthly price
+     */
+    public function getFormattedMonthlyPriceAttribute()
+    {
+        return '$' . number_format($this->monthly_price ?? 0, 2);
+    }
+
+    /**
+     * Get program duration text (legacy - kept for backward compatibility)
      */
     public function getDurationTextAttribute()
     {
@@ -86,7 +93,7 @@ class Program extends Model
     }
 
     /**
-     * Get sessions text
+     * Get sessions text (legacy - kept for backward compatibility)
      */
     public function getSessionsTextAttribute()
     {

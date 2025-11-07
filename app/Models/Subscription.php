@@ -16,7 +16,6 @@ class Subscription extends Model
         'subscription_type',
         'monthly_price',
         'monthly_sessions',
-        'booking_limit_per_month',
         'is_active',
         'starts_at',
         'ends_at',
@@ -82,7 +81,7 @@ class Subscription extends Model
      */
     public function hasReachedBookingLimit()
     {
-        return $this->currentMonthBookings()->count() >= $this->booking_limit_per_month;
+        return $this->currentMonthBookings()->count() >= $this->monthly_sessions;
     }
 
     /**
@@ -91,7 +90,7 @@ class Subscription extends Model
     public function getRemainingBookingsAttribute()
     {
         $used = $this->currentMonthBookings()->count();
-        return max(0, $this->booking_limit_per_month - $used);
+        return max(0, $this->monthly_sessions - $used);
     }
 
     /**

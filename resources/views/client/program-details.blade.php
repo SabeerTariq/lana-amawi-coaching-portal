@@ -20,22 +20,16 @@
                 <p class="lead">{{ $program->description }}</p>
                 
                 <div class="row mb-4">
-                    <div class="col-md-3 text-center">
+                    <div class="col-md-6 text-center">
                         <div class="border rounded p-3">
-                            <div class="h3 text-primary mb-1">{{ $program->formatted_price }}</div>
-                            <small class="text-muted">Total Investment</small>
+                            <div class="h3 text-primary mb-1">${{ number_format($program->monthly_price ?? 0, 2) }}</div>
+                            <small class="text-muted">Monthly Subscription</small>
                         </div>
                     </div>
-                    <div class="col-md-3 text-center">
+                    <div class="col-md-6 text-center">
                         <div class="border rounded p-3">
-                            <div class="h3 text-success mb-1">{{ $program->duration_months }}</div>
-                            <small class="text-muted">Months Duration</small>
-                        </div>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <div class="border rounded p-3">
-                            <div class="h3 text-info mb-1">{{ $program->sessions_included }}</div>
-                            <small class="text-muted">Sessions Included</small>
+                            <div class="h3 text-success mb-1">{{ $program->monthly_sessions ?? 0 }}</div>
+                            <small class="text-muted">Sessions Per Month</small>
                         </div>
                     </div>
                 </div>
@@ -60,43 +54,6 @@
             </div>
         </div>
 
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Program Structure</h5>
-            </div>
-            <div class="card-body">
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-primary"></div>
-                        <div class="timeline-content">
-                            <h6>Initial Assessment & Goal Setting</h6>
-                            <p class="text-muted">We'll start with a comprehensive assessment to understand your current situation and define clear, achievable goals.</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-info"></div>
-                        <div class="timeline-content">
-                            <h6>Regular Coaching Sessions</h6>
-                            <p class="text-muted">{{ $program->sessions_included }} one-on-one sessions over {{ $program->duration_months }} months, tailored to your specific needs and goals.</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-success"></div>
-                        <div class="timeline-content">
-                            <h6>Ongoing Support & Accountability</h6>
-                            <p class="text-muted">Email support between sessions, progress tracking, and continuous guidance to ensure you stay on track.</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-warning"></div>
-                        <div class="timeline-content">
-                            <h6>Final Review & Next Steps</h6>
-                            <p class="text-muted">Comprehensive review of your progress and development of a plan for continued growth beyond the program.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="col-lg-4">
@@ -133,8 +90,13 @@
                 </div>
                 @else
                 <div class="text-center mb-4">
-                    <div class="h2 text-primary mb-2">{{ $program->formatted_price }}</div>
-                    <p class="text-muted">One-time payment for complete program</p>
+                    <div class="h2 text-primary mb-2">${{ number_format($program->monthly_price ?? 0, 2) }}/mo</div>
+                    <p class="text-muted">Monthly subscription</p>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-check me-1"></i>{{ $program->monthly_sessions ?? 0 }} sessions/month
+                        </small>
+                    </div>
                 </div>
 
                 <div class="mb-4">
@@ -243,50 +205,4 @@
     </div>
 </div>
 
-<style>
-.timeline {
-    position: relative;
-    padding-left: 30px;
-}
-
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 15px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #dee2e6;
-}
-
-.timeline-item {
-    position: relative;
-    margin-bottom: 30px;
-}
-
-.timeline-marker {
-    position: absolute;
-    left: -22px;
-    top: 5px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 3px #dee2e6;
-}
-
-.timeline-content {
-    padding-left: 20px;
-}
-
-.timeline-content h6 {
-    margin-bottom: 5px;
-    color: #333;
-}
-
-.timeline-content p {
-    margin-bottom: 0;
-    font-size: 0.9rem;
-}
-</style>
 @endsection

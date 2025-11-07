@@ -147,9 +147,8 @@
                             <div class="mb-3">
                                 <strong>Program Details:</strong>
                                 <ul class="list-unstyled small mb-0">
-                                    <li>Duration: {{ $application->program->duration_text }}</li>
-                                    <li>Sessions: {{ $application->program->sessions_included }}</li>
-                                    <li>Price: {{ $application->program->formatted_price }}</li>
+                                    <li>Monthly Price: ${{ number_format($application->program->monthly_price ?? 0, 2) }}/mo</li>
+                                    <li>Sessions/Month: {{ $application->program->monthly_sessions ?? 0 }}</li>
                                 </ul>
                             </div>
                             

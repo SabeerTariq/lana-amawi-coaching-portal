@@ -73,14 +73,13 @@
                                             </td>
                                             <td>
                                                 <div>
-                                                    <span class="badge bg-light text-dark">{{ $subscription->monthly_sessions }}/month</span>
-                                                    <br><small class="text-muted">Limit: {{ $subscription->booking_limit_per_month }}</small>
+                                                    <span class="badge bg-light text-dark">{{ $subscription->monthly_sessions }} sessions/month</span>
                                                 </div>
                                             </td>
                                             <td>
                                                 @php
                                                     $used = $subscription->currentMonthBookings()->count();
-                                                    $limit = $subscription->booking_limit_per_month;
+                                                    $limit = $subscription->monthly_sessions;
                                                     $percentage = $limit > 0 ? ($used / $limit) * 100 : 0;
                                                 @endphp
                                                 <div class="d-flex align-items-center">
