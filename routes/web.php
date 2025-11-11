@@ -67,6 +67,9 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     Route::post('/programs/{userProgram}/cancel', [App\Http\Controllers\ProgramController::class, 'cancelProgram'])->name('programs.cancel');
     Route::get('/programs/agreement/{userProgram}/download', [App\Http\Controllers\ProgramController::class, 'downloadAgreement'])->name('programs.agreement.download');
     Route::post('/programs/agreement/{userProgram}/upload', [App\Http\Controllers\ProgramController::class, 'uploadSignedAgreement'])->name('programs.agreement.upload');
+    Route::get('/programs/{userProgram}/payment-selection', [App\Http\Controllers\ProgramController::class, 'paymentSelection'])->name('programs.payment-selection');
+    Route::get('/programs/{userProgram}/checkout', [App\Http\Controllers\ProgramController::class, 'checkout'])->name('programs.checkout');
+    Route::post('/programs/{userProgram}/checkout', [App\Http\Controllers\ProgramController::class, 'checkoutSubmit'])->name('programs.checkout.submit');
 });
 
 // Admin routes (authenticated + admin middleware)
@@ -161,6 +164,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/programs/{userProgram}/approve', [App\Http\Controllers\Admin\ProgramController::class, 'approveApplication'])->name('programs.approve');
     Route::post('/programs/{userProgram}/request-payment', [App\Http\Controllers\Admin\ProgramController::class, 'requestPayment'])->name('programs.request-payment');
     Route::post('/programs/{userProgram}/mark-payment-completed', [App\Http\Controllers\Admin\ProgramController::class, 'markPaymentCompleted'])->name('programs.mark-payment-completed');
+    Route::post('/programs/{userProgram}/mark-additional-session-payment', [App\Http\Controllers\Admin\ProgramController::class, 'markAdditionalSessionPayment'])->name('programs.mark-additional-session-payment');
     Route::post('/programs/{userProgram}/activate', [App\Http\Controllers\Admin\ProgramController::class, 'activateProgram'])->name('programs.activate');
     Route::post('/programs/{userProgram}/reject', [App\Http\Controllers\Admin\ProgramController::class, 'rejectApplication'])->name('programs.reject');
     Route::post('/programs/{userProgram}/add-notes', [App\Http\Controllers\Admin\ProgramController::class, 'addNotes'])->name('programs.add-notes');

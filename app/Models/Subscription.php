@@ -137,4 +137,25 @@ class Subscription extends Model
         
         return 'active';
     }
+
+    /**
+     * Get formatted subscription type display name
+     */
+    public function getFormattedSubscriptionTypeAttribute()
+    {
+        if (!$this->subscription_type) {
+            return 'General';
+        }
+
+        return match($this->subscription_type) {
+            'life_coaching' => 'Life Coaching',
+            'student' => 'Student',
+            'professional' => 'Professional',
+            'relationship' => 'Relationship',
+            'resident' => 'Resident',
+            'fellow' => 'Fellow',
+            'concierge' => 'Concierge',
+            default => ucfirst(str_replace('_', ' ', $this->subscription_type))
+        };
+    }
 }

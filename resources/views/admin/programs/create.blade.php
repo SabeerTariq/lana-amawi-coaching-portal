@@ -24,7 +24,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('admin.programs.store') }}" method="POST">
+            <form action="{{ route('admin.programs.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <div class="col-lg-8">
@@ -43,11 +43,13 @@
                                         <label for="subscription_type" class="form-label">Subscription Type</label>
                                         <select class="form-select" id="subscription_type" name="subscription_type">
                                             <option value="">Select Type</option>
+                                            <option value="life_coaching" {{ old('subscription_type') == 'life_coaching' ? 'selected' : '' }}>Life Coaching</option>
                                             <option value="student" {{ old('subscription_type') == 'student' ? 'selected' : '' }}>Student</option>
-                                            <option value="resident" {{ old('subscription_type') == 'resident' ? 'selected' : '' }}>Resident/Fellow</option>
-                                            <option value="medical" {{ old('subscription_type') == 'medical' ? 'selected' : '' }}>Medical</option>
-                                            <option value="concierge" {{ old('subscription_type') == 'concierge' ? 'selected' : '' }}>Medical Concierge</option>
+                                            <option value="professional" {{ old('subscription_type') == 'professional' ? 'selected' : '' }}>Professional</option>
                                             <option value="relationship" {{ old('subscription_type') == 'relationship' ? 'selected' : '' }}>Relationship</option>
+                                            <option value="resident" {{ old('subscription_type') == 'resident' ? 'selected' : '' }}>Resident</option>
+                                            <option value="fellow" {{ old('subscription_type') == 'fellow' ? 'selected' : '' }}>Fellow</option>
+                                            <option value="concierge" {{ old('subscription_type') == 'concierge' ? 'selected' : '' }}>Concierge</option>
                                         </select>
                                     </div>
                                 </div>
@@ -92,17 +94,43 @@
                     <div class="col-lg-4">
                         <div class="card shadow">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Monthly Subscription Settings</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">3-Month Contract Settings</h6>
                             </div>
                             <div class="card-body">
                                 <input type="hidden" name="is_subscription_based" value="1">
-                                
+                                                                
                                 <div class="mb-3">
                                     <label for="monthly_price" class="form-label">Monthly Price *</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="number" class="form-control" id="monthly_price" name="monthly_price" 
-                                               value="{{ old('monthly_price') }}" step="0.01" min="0" required>
+                                               value="{{ old('monthly_price') }}" step="0.01" min="0" required
+                                               oninput="updatePaymentOptions()">
+                                    </div>
+                                    <small class="form-text text-muted">This is the monthly subscription price</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="one_time_payment_amount" class="form-label">One-Time Payment Amount (3 months)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="one_time_payment_amount" name="one_time_payment_amount" 
+                                               value="{{ old('one_time_payment_amount') }}" step="0.01" min="0">
+                                    </div>
+                                    <small class="form-text text-muted">Custom amount for one-time payment covering all 3 months (optional)</small>
+                                </div>
+                                
+                                <div class="mb-3 p-3 bg-light rounded">
+                                    <strong>Payment Options Preview:</strong>
+                                    <div class="mt-2">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Monthly (3 payments):</span>
+                                            <strong id="monthly-preview">$0.00/month</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>One-Time (3 months):</span>
+                                            <strong class="text-success" id="onetime-preview">$0.00</strong>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -113,6 +141,16 @@
                                     <small class="form-text text-muted">Number of sessions/bookings included in monthly subscription</small>
                                 </div>
 
+                                <div class="mb-3">
+                                    <label for="additional_booking_charge" class="form-label">Additional Booking Charge (60-min sessions)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="additional_booking_charge" name="additional_booking_charge" 
+                                               value="{{ old('additional_booking_charge') }}" step="0.01" min="0">
+                                    </div>
+                                    <small class="form-text text-muted">Charge for additional 60-minute sessions beyond monthly limit</small>
+                                </div>
+
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" id="is_active" 
                                            name="is_active" value="1" 
@@ -120,6 +158,22 @@
                                     <label class="form-check-label" for="is_active">
                                         Active Program
                                     </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow mt-3">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Agreement Template</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="agreement_template" class="form-label">Program Agreement PDF</label>
+                                    <input type="file" class="form-control" id="agreement_template" name="agreement_template" 
+                                           accept=".pdf">
+                                    <small class="form-text text-muted">
+                                        Upload a PDF agreement template specific to this program. If not provided, default template will be used.
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -165,6 +219,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Initialize payment options preview
+    updatePaymentOptions();
+});
+
+// Update payment options preview
+function updatePaymentOptions() {
+    const monthlyPrice = parseFloat(document.getElementById('monthly_price').value) || 0;
+    const oneTimeAmount = parseFloat(document.getElementById('one_time_payment_amount').value) || 0;
+    
+    document.getElementById('monthly-preview').textContent = '$' + monthlyPrice.toFixed(2) + '/month';
+    document.getElementById('onetime-preview').textContent = oneTimeAmount > 0 ? '$' + oneTimeAmount.toFixed(2) : 'Not set';
+}
+
+// Update one-time preview when one-time amount changes
+document.addEventListener('DOMContentLoaded', function() {
+    const oneTimeInput = document.getElementById('one_time_payment_amount');
+    if (oneTimeInput) {
+        oneTimeInput.addEventListener('input', updatePaymentOptions);
+    }
 });
 </script>
 @endsection

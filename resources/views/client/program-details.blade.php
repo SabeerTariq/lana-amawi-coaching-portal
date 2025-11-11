@@ -19,33 +19,45 @@
             <div class="card-body">
                 <p class="lead">{{ $program->description }}</p>
                 
-                <div class="row mb-4">
-                    <div class="col-md-6 text-center">
-                        <div class="border rounded p-3">
-                            <div class="h3 text-primary mb-1">${{ number_format($program->monthly_price ?? 0, 2) }}</div>
-                            <small class="text-muted">Monthly Subscription</small>
+                <!-- Pricing Section -->
+                <div class="row mb-4 g-3">
+                    <div class="col-md-{{ $program->one_time_payment_amount ? '4' : '6' }} text-center">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <div class="h3 text-primary mb-2 fw-bold">${{ number_format($program->monthly_price ?? 0, 0) }}</div>
+                            <small class="text-muted d-block">Monthly Subscription</small>
                         </div>
                     </div>
-                    <div class="col-md-6 text-center">
-                        <div class="border rounded p-3">
-                            <div class="h3 text-success mb-1">{{ $program->monthly_sessions ?? 0 }}</div>
-                            <small class="text-muted">Sessions Per Month</small>
+                    @if($program->one_time_payment_amount)
+                    <div class="col-md-4 text-center">
+                        <div class="border rounded p-3 border-success bg-light h-100">
+                            <div class="h3 text-success mb-2 fw-bold">${{ number_format($program->one_time_payment_amount, 0) }}</div>
+                            <small class="text-muted d-block">One-Time (3 months)</small>
+                        </div>
+                    </div>
+                    @endif
+                    <div class="col-md-{{ $program->one_time_payment_amount ? '4' : '6' }} text-center">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <div class="h3 text-info mb-2 fw-bold">{{ $program->monthly_sessions ?? 0 }}</div>
+                            <small class="text-muted d-block">Sessions Per Month</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        @if($program->features && count($program->features) > 0)
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="card-title mb-0">What's Included</h5>
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-star text-warning me-2"></i>What's Included
+                </h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     @foreach($program->features as $feature)
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-2">
                         <div class="d-flex align-items-start">
-                            <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                            <i class="fas fa-check-circle text-success me-2 mt-1"></i>
                             <span>{{ $feature }}</span>
                         </div>
                     </div>
@@ -53,6 +65,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
     </div>
 
@@ -90,8 +103,14 @@
                 </div>
                 @else
                 <div class="text-center mb-4">
-                    <div class="h2 text-primary mb-2">${{ number_format($program->monthly_price ?? 0, 2) }}/mo</div>
-                    <p class="text-muted">Monthly subscription</p>
+                    <div class="h2 text-primary mb-2 fw-bold">${{ number_format($program->monthly_price ?? 0, 0) }}/mo</div>
+                    <p class="text-muted mb-2">Monthly subscription</p>
+                    @if($program->one_time_payment_amount)
+                    <div class="mb-2">
+                        <div class="h4 text-success fw-bold">${{ number_format($program->one_time_payment_amount, 0) }}</div>
+                        <small class="text-muted">One-Time (3 months)</small>
+                    </div>
+                    @endif
                     <div class="mt-2">
                         <small class="text-muted">
                             <i class="fas fa-calendar-check me-1"></i>{{ $program->monthly_sessions ?? 0 }} sessions/month
@@ -137,9 +156,9 @@
                                 </button>
                                 @break
                             @case(\App\Models\UserProgram::STATUS_APPROVED)
-                                <button type="button" class="btn btn-success w-100 btn-lg" disabled>
-                                    <i class="fas fa-check me-2"></i>Approved
-                                </button>
+                                <a href="{{ route('client.programs.payment-selection', $userProgram) }}" class="btn btn-success w-100 btn-lg">
+                                    <i class="fas fa-credit-card me-2"></i>Proceed to Payment
+                                </a>
                                 @break
                             @case(\App\Models\UserProgram::STATUS_PAYMENT_REQUESTED)
                                 <button type="button" class="btn btn-warning w-100 btn-lg" disabled>

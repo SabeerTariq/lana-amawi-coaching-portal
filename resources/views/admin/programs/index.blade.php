@@ -58,14 +58,25 @@
                                             </td>
                                             <td>
                                                 @if($program->subscription_type)
-                                                    <span class="badge bg-secondary">{{ ucfirst($program->subscription_type) }}</span>
+                                                    <span class="badge bg-secondary">{{ $program->formatted_subscription_type }}</span>
                                                 @else
                                                     <span class="badge bg-info">General</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($program->monthly_price)
-                                                    <span class="fw-bold text-primary">${{ number_format($program->monthly_price, 2) }}/mo</span>
+                                                    <div>
+                                                        <span class="fw-bold text-primary">${{ number_format($program->monthly_price, 2) }}/mo</span>
+                                                        <br>
+                                                        <small class="text-muted">
+                                                            One-time: 
+                                                            @if($program->one_time_payment_amount)
+                                                                ${{ number_format($program->one_time_payment_amount, 2) }}
+                                                            @else
+                                                                Not set
+                                                            @endif
+                                                        </small>
+                                                    </div>
                                                 @else
                                                     <span class="text-muted">N/A</span>
                                                 @endif

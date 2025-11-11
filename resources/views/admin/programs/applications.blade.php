@@ -54,8 +54,8 @@
                         </div>
                     </div>
                     
-                    @foreach(['pending', 'agreement_uploaded', 'approved', 'active', 'rejected'] as $status)
-                    <div class="col-md-2 col-6 mb-3">
+                    @foreach(['agreement_uploaded', 'approved', 'active', 'rejected'] as $status)
+                    <div class="col-md-3 col-6 mb-3">
                         <div class="border rounded p-3">
                             <div class="h4 mb-0 text-{{ $statusConfig[$status]['color'] ?? 'secondary' }}">
                                 {{ $statusCounts[$status] ?? 0 }}
@@ -74,26 +74,29 @@
 <ul class="nav nav-tabs mb-4" id="statusTabs" role="tablist">
     @php
         $statusConfig = [
-            'pending' => ['icon' => 'fa-clock', 'color' => 'warning', 'label' => 'Pending'],
-            'agreement_sent' => ['icon' => 'fa-paper-plane', 'color' => 'info', 'label' => 'Agreement Sent'],
             'agreement_uploaded' => ['icon' => 'fa-upload', 'color' => 'primary', 'label' => 'Agreement Uploaded'],
             'approved' => ['icon' => 'fa-check', 'color' => 'success', 'label' => 'Approved'],
-            'payment_requested' => ['icon' => 'fa-credit-card', 'color' => 'warning', 'label' => 'Payment Requested'],
-            'payment_completed' => ['icon' => 'fa-check-circle', 'color' => 'success', 'label' => 'Payment Completed'],
             'active' => ['icon' => 'fa-play', 'color' => 'success', 'label' => 'Active'],
             'rejected' => ['icon' => 'fa-times', 'color' => 'danger', 'label' => 'Rejected'],
             'cancelled' => ['icon' => 'fa-ban', 'color' => 'secondary', 'label' => 'Cancelled'],
         ];
         
-        $allStatuses = array_keys($statusConfig);
+        // Filter out pending and agreement_sent statuses - admin only sees uploaded agreements and beyond
         $availableStatuses = $applications->keys()->toArray();
+        $statusesToShow = [];
         
-        // Show all predefined statuses regardless of data
-        $statusesToShow = $allStatuses;
+        // Only show statuses from agreement_uploaded onwards
+        $visibleStatuses = ['agreement_uploaded', 'approved', 'active', 'rejected', 'cancelled'];
         
-        // Add any statuses that exist in data but not in config
+        foreach($visibleStatuses as $status) {
+            if (in_array($status, $availableStatuses) || isset($statusConfig[$status])) {
+                $statusesToShow[] = $status;
+            }
+        }
+        
+        // Add any other statuses that exist in data but not in config (for backward compatibility)
         foreach($availableStatuses as $status) {
-            if (!in_array($status, $allStatuses)) {
+            if (!in_array($status, $visibleStatuses) && !in_array($status, $statusesToShow)) {
                 $statusesToShow[] = $status;
                 $statusConfig[$status] = [
                     'icon' => 'fa-circle',
@@ -104,9 +107,13 @@
         }
     @endphp
     
+    @php
+        // Make agreement_uploaded the default active tab
+        $firstStatus = in_array('agreement_uploaded', $statusesToShow) ? 'agreement_uploaded' : ($statusesToShow[0] ?? null);
+    @endphp
     @foreach($statusesToShow as $index => $status)
     <li class="nav-item" role="presentation">
-        <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+        <button class="nav-link {{ $status === $firstStatus ? 'active' : '' }}" 
                 id="{{ $status }}-tab" 
                 data-bs-toggle="tab" 
                 data-bs-target="#{{ $status }}" 
@@ -123,8 +130,11 @@
 
 <!-- Tab Content -->
 <div class="tab-content" id="statusTabsContent">
+    @php
+        $firstStatus = in_array('agreement_uploaded', $statusesToShow) ? 'agreement_uploaded' : ($statusesToShow[0] ?? null);
+    @endphp
     @foreach($statusesToShow as $index => $status)
-    <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" id="{{ $status }}" role="tabpanel">
+    <div class="tab-pane fade {{ $status === $firstStatus ? 'show active' : '' }}" id="{{ $status }}" role="tabpanel">
         @if(isset($applications[$status]) && count($applications[$status]) > 0)
             <div class="row">
                 @foreach($applications[$status] as $application)
@@ -144,12 +154,33 @@
                                 <p class="text-muted small mb-0">{{ $application->user->position }}</p>
                             </div>
                             
+                            <!-- Program Pricing -->
                             <div class="mb-3">
-                                <strong>Program Details:</strong>
-                                <ul class="list-unstyled small mb-0">
-                                    <li>Monthly Price: ${{ number_format($application->program->monthly_price ?? 0, 2) }}/mo</li>
-                                    <li>Sessions/Month: {{ $application->program->monthly_sessions ?? 0 }}</li>
-                                </ul>
+                                <strong class="d-block mb-2">
+                                    <i class="fas fa-dollar-sign text-success me-1"></i>Pricing
+                                </strong>
+                                <div class="row g-2 text-center">
+                                    <div class="{{ $application->program->one_time_payment_amount ? 'col-4' : 'col-6' }}">
+                                        <div class="border rounded p-2 bg-light">
+                                            <div class="h6 mb-0 text-primary fw-bold">${{ number_format($application->program->monthly_price ?? 0, 0) }}</div>
+                                            <small class="text-muted d-block">Monthly</small>
+                                        </div>
+                                    </div>
+                                    @if($application->program->one_time_payment_amount)
+                                    <div class="col-4">
+                                        <div class="border rounded p-2 border-success bg-light">
+                                            <div class="h6 mb-0 text-success fw-bold">${{ number_format($application->program->one_time_payment_amount, 0) }}</div>
+                                            <small class="text-muted d-block">One-Time</small>
+                                        </div>
+                                    </div>
+                                    @endif
+                                    <div class="{{ $application->program->one_time_payment_amount ? 'col-4' : 'col-6' }}">
+                                        <div class="border rounded p-2 bg-light">
+                                            <div class="h6 mb-0 text-info fw-bold">{{ $application->program->monthly_sessions ?? 0 }}</div>
+                                            <small class="text-muted d-block">Sessions</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <!-- Progress Indicator -->
@@ -159,11 +190,9 @@
                                     @php
                                         $progressSteps = [
                                             'pending' => 0,
-                                            'agreement_sent' => 20,
-                                            'agreement_uploaded' => 40,
-                                            'approved' => 60,
-                                            'payment_requested' => 80,
-                                            'payment_completed' => 90,
+                                            'agreement_sent' => 25,
+                                            'agreement_uploaded' => 50,
+                                            'approved' => 75,
                                             'active' => 100
                                         ];
                                         $currentProgress = $progressSteps[$application->status] ?? 0;
@@ -187,21 +216,7 @@
                             @endif
                             
                             <div class="d-flex flex-wrap gap-1">
-                                @if($status === 'pending')
-                                    <form action="{{ route('admin.programs.send-agreement', $application) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-paper-plane me-1"></i>Send Agreement
-                                        </button>
-                                    </form>
-                                    <button type="button" class="btn btn-outline-danger btn-sm" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#rejectModal{{ $application->id }}">
-                                        <i class="fas fa-times me-1"></i>Reject
-                                    </button>
-                                @elseif($status === 'agreement_sent')
-                                    <span class="text-muted small">Waiting for client to upload signed agreement</span>
-                                @elseif($status === 'agreement_uploaded')
+                                @if($status === 'agreement_uploaded')
                                     <form action="{{ route('admin.programs.approve', $application) }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="btn btn-success btn-sm">
@@ -213,18 +228,7 @@
                                         <i class="fas fa-eye me-1"></i>View Agreement
                                     </a>
                                 @elseif($status === 'approved')
-                                    <form action="{{ route('admin.programs.request-payment', $application) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-warning btn-sm">
-                                            <i class="fas fa-credit-card me-1"></i>Request Payment
-                                        </button>
-                                    </form>
-                                @elseif($status === 'payment_requested')
-                                    <button type="button" class="btn btn-success btn-sm" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#paymentModal{{ $application->id }}">
-                                        <i class="fas fa-check me-1"></i>Mark Paid
-                                    </button>
+                                    <span class="text-muted small">Client will proceed to payment selection and checkout. Program will activate automatically after payment.</span>
                                 @elseif($status === 'payment_completed')
                                     <form action="{{ route('admin.programs.activate', $application) }}" method="POST" class="d-inline">
                                         @csrf
@@ -296,9 +300,66 @@
 @endif
 @endforeach
 
-<!-- Payment Modal -->
+<!-- Request Payment Modal -->
 @foreach($applications->flatten() as $application)
-@if($application->status === 'payment_requested')
+@if($application->status === 'approved')
+<div class="modal fade" id="requestPaymentModal{{ $application->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Payment - {{ $application->program->name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('admin.programs.request-payment', $application) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <strong>3-Month Contract</strong><br>
+                        Monthly Price: <strong>${{ number_format($application->program->monthly_price ?? 0, 2) }}</strong><br>
+                        @if($application->program->one_time_payment_amount)
+                            One-Time Amount: <strong>${{ number_format($application->program->one_time_payment_amount, 2) }}</strong>
+                        @else
+                            One-Time Amount: <strong>Not set</strong> (will use monthly × 3)
+                        @endif
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Payment Type *</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_type" id="payment_monthly{{ $application->id }}" 
+                                   value="monthly" checked onchange="updatePaymentAmount{{ $application->id }}()">
+                            <label class="form-check-label" for="payment_monthly{{ $application->id }}">
+                                <strong>Monthly Payments</strong> - 3 payments of ${{ number_format($application->program->monthly_price ?? 0, 2) }} each
+                            </label>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="radio" name="payment_type" id="payment_one_time{{ $application->id }}" 
+                                   value="one_time" onchange="updatePaymentAmount{{ $application->id }}()">
+                            <label class="form-check-label" for="payment_one_time{{ $application->id }}">
+                                <strong>One-Time Payment</strong> - 
+                                @if($application->program->one_time_payment_amount)
+                                    ${{ number_format($application->program->one_time_payment_amount, 2) }}
+                                @else
+                                    ${{ number_format(($application->program->monthly_price ?? 0) * 3, 2) }} (monthly × 3)
+                                @endif
+                                 for all 3 months
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Request Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+@endforeach
+
+<!-- Payment Modal (kept for backward compatibility if needed) -->
+@foreach($applications->flatten() as $application)
+@if(false && $application->status === 'payment_requested')
 <div class="modal fade" id="paymentModal{{ $application->id }}" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -309,14 +370,52 @@
             <form action="{{ route('admin.programs.mark-payment-completed', $application) }}" method="POST">
                 @csrf
                 <div class="modal-body">
+                    @php
+                        $paymentType = $application->payment_type ?? 'monthly';
+                        $monthlyPrice = $application->program->monthly_price ?? 0;
+                        $oneTimeAmount = $application->program->one_time_payment_amount ?? ($monthlyPrice * 3);
+                        $paymentsCompleted = $application->payments_completed ?? 0;
+                        $nextMonth = $paymentsCompleted + 1;
+                    @endphp
+                    
+                    <div class="alert alert-info mb-3">
+                        <strong>Contract Details:</strong><br>
+                        Payment Type: <strong>{{ ucfirst($paymentType) }}</strong><br>
+                        @if($paymentType === 'monthly')
+                            Payments Completed: {{ $paymentsCompleted }}/3<br>
+                            @if($nextMonth <= 3)
+                                This is payment for <strong>Month {{ $nextMonth }}</strong>
+                            @endif
+                        @else
+                            One-Time Payment: <strong>${{ number_format($oneTimeAmount, 2) }}</strong>
+                        @endif
+                    </div>
+                    
+                    <input type="hidden" name="payment_type" value="{{ $paymentType === 'one_time' ? 'contract_one_time' : 'contract_monthly' }}">
+                    @if($paymentType === 'monthly')
+                        <input type="hidden" name="month_number" value="{{ $nextMonth }}">
+                    @endif
+                    
                     <div class="mb-3">
-                        <label for="amount_paid" class="form-label">Amount Paid</label>
-                        <input type="number" class="form-control" id="amount_paid" name="amount_paid" 
-                               step="0.01" min="0" value="{{ $application->program->price }}" required>
+                        <label for="amount_paid{{ $application->id }}" class="form-label">Amount Paid *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="amount_paid{{ $application->id }}" name="amount_paid" 
+                                   step="0.01" min="0" 
+                                   value="{{ $paymentType === 'one_time' ? $oneTimeAmount : $monthlyPrice }}" 
+                                   required>
+                        </div>
+                        <small class="form-text text-muted">
+                            @if($paymentType === 'monthly')
+                                Expected: ${{ number_format($monthlyPrice, 2) }} (Month {{ $nextMonth }})
+                            @else
+                                Expected: ${{ number_format($oneTimeAmount, 2) }} (Full 3 months)
+                            @endif
+                        </small>
                     </div>
                     <div class="mb-3">
-                        <label for="payment_reference" class="form-label">Payment Reference</label>
-                        <input type="text" class="form-control" id="payment_reference" name="payment_reference" required>
+                        <label for="payment_reference{{ $application->id }}" class="form-label">Payment Reference *</label>
+                        <input type="text" class="form-control" id="payment_reference{{ $application->id }}" name="payment_reference" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -373,28 +472,10 @@
                         <h6 class="text-primary mb-3">Application Processing Steps:</h6>
                         <div class="timeline">
                             <div class="timeline-item">
-                                <div class="timeline-marker bg-warning"></div>
-                                <div class="timeline-content">
-                                    <h6>1. Pending Review</h6>
-                                    <p class="small text-muted">Client selects program → Review application → Send agreement or reject</p>
-                                    <span class="badge bg-warning">Action: Send Agreement or Reject</span>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-marker bg-info"></div>
-                                <div class="timeline-content">
-                                    <h6>2. Agreement Sent</h6>
-                                    <p class="small text-muted">Client downloads, signs, and uploads agreement</p>
-                                    <span class="badge bg-info">Monitor: Wait for client upload</span>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
                                 <div class="timeline-marker bg-primary"></div>
                                 <div class="timeline-content">
-                                    <h6>3. Agreement Uploaded</h6>
-                                    <p class="small text-muted">Review uploaded agreement → Approve or request changes</p>
+                                    <h6>1. Agreement Uploaded</h6>
+                                    <p class="small text-muted">Client selects program → Agreement auto-sent → Client uploads signed agreement</p>
                                     <span class="badge bg-primary">Action: View Agreement & Approve</span>
                                 </div>
                             </div>
@@ -402,35 +483,17 @@
                             <div class="timeline-item">
                                 <div class="timeline-marker bg-success"></div>
                                 <div class="timeline-content">
-                                    <h6>4. Approved</h6>
-                                    <p class="small text-muted">Application approved → Request payment from client</p>
-                                    <span class="badge bg-success">Action: Request Payment</span>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-marker bg-warning"></div>
-                                <div class="timeline-content">
-                                    <h6>5. Payment Requested</h6>
-                                    <p class="small text-muted">Client completes payment → Mark as paid</p>
-                                    <span class="badge bg-warning">Action: Mark Payment Complete</span>
+                                    <h6>2. Approved</h6>
+                                    <p class="small text-muted">Application approved → Client selects payment type (Monthly/One-Time) and completes checkout</p>
+                                    <span class="badge bg-success">Monitor: Client will proceed to payment</span>
                                 </div>
                             </div>
                             
                             <div class="timeline-item">
                                 <div class="timeline-marker bg-success"></div>
                                 <div class="timeline-content">
-                                    <h6>6. Payment Completed</h6>
-                                    <p class="small text-muted">Payment received → Activate program</p>
-                                    <span class="badge bg-success">Action: Activate Program</span>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-marker bg-success"></div>
-                                <div class="timeline-content">
-                                    <h6>7. Active</h6>
-                                    <p class="small text-muted">Program active → Client can book sessions</p>
+                                    <h6>3. Active</h6>
+                                    <p class="small text-muted">Client completes payment → Program activates automatically</p>
                                     <span class="badge bg-success">Monitor: Program in progress</span>
                                 </div>
                             </div>
@@ -442,16 +505,12 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <ul class="list-unstyled small">
-                                    <li><span class="badge bg-warning me-2">Pending</span> Send Agreement | Reject</li>
-                                    <li><span class="badge bg-info me-2">Agreement Sent</span> Monitor | Add Notes</li>
                                     <li><span class="badge bg-primary me-2">Agreement Uploaded</span> View | Approve</li>
-                                    <li><span class="badge bg-success me-2">Approved</span> Request Payment</li>
+                                    <li><span class="badge bg-success me-2">Approved</span> Client will proceed to payment</li>
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <ul class="list-unstyled small">
-                                    <li><span class="badge bg-warning me-2">Payment Requested</span> Mark Paid</li>
-                                    <li><span class="badge bg-success me-2">Payment Completed</span> Activate</li>
                                     <li><span class="badge bg-success me-2">Active</span> Monitor</li>
                                     <li><span class="badge bg-danger me-2">Rejected</span> View Details</li>
                                 </ul>

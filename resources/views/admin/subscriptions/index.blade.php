@@ -66,7 +66,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="badge bg-secondary">{{ ucfirst($subscription->subscription_type) }}</span>
+                                                <span class="badge bg-secondary">{{ $subscription->formatted_subscription_type }}</span>
                                             </td>
                                             <td>
                                                 <span class="fw-bold text-primary">{{ $subscription->formatted_monthly_price }}</span>

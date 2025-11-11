@@ -25,6 +25,14 @@ class UserProgram extends Model
         'payment_completed_at',
         'amount_paid',
         'payment_reference',
+        'contract_duration_months',
+        'payment_type',
+        'contract_start_date',
+        'contract_end_date',
+        'next_payment_date',
+        'total_payments_due',
+        'payments_completed',
+        'one_time_payment_amount',
     ];
 
     protected $casts = [
@@ -34,6 +42,10 @@ class UserProgram extends Model
         'payment_requested_at' => 'datetime',
         'payment_completed_at' => 'datetime',
         'amount_paid' => 'decimal:2',
+        'contract_start_date' => 'date',
+        'contract_end_date' => 'date',
+        'next_payment_date' => 'date',
+        'one_time_payment_amount' => 'decimal:2',
     ];
 
     // Status constants
@@ -61,6 +73,22 @@ class UserProgram extends Model
     public function program()
     {
         return $this->belongsTo(Program::class);
+    }
+
+    /**
+     * Get all payments for this user program
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Get completed payments
+     */
+    public function completedPayments()
+    {
+        return $this->hasMany(Payment::class)->where('status', Payment::STATUS_COMPLETED);
     }
 
     /**
@@ -177,5 +205,127 @@ class UserProgram extends Model
     public function getFormattedAmountPaidAttribute()
     {
         return $this->amount_paid ? '$' . number_format($this->amount_paid, 2) : null;
+    }
+
+    /**
+     * Payment type constants
+     */
+    const PAYMENT_TYPE_MONTHLY = 'monthly';
+    const PAYMENT_TYPE_ONE_TIME = 'one_time';
+
+    /**
+     * Initialize contract when program is activated
+     */
+    public function initializeContract($paymentType = self::PAYMENT_TYPE_MONTHLY)
+    {
+        $startDate = now();
+        $endDate = now()->addMonths($this->contract_duration_months ?? 3);
+        $oneTimeAmount = $this->program->one_time_payment_amount ?? ($this->program->monthly_price ?? 0) * ($this->contract_duration_months ?? 3);
+
+        $this->update([
+            'payment_type' => $paymentType,
+            'contract_start_date' => $startDate,
+            'contract_end_date' => $endDate,
+            'total_payments_due' => $this->contract_duration_months ?? 3,
+            'next_payment_date' => $paymentType === self::PAYMENT_TYPE_MONTHLY ? $startDate : null,
+            'one_time_payment_amount' => $paymentType === self::PAYMENT_TYPE_ONE_TIME ? $oneTimeAmount : null,
+        ]);
+    }
+
+    /**
+     * Check if contract is active
+     */
+    public function isContractActive()
+    {
+        if (!$this->contract_start_date || !$this->contract_end_date) {
+            return false;
+        }
+        return now()->between($this->contract_start_date, $this->contract_end_date);
+    }
+
+    /**
+     * Check if all contract payments are completed
+     */
+    public function areAllPaymentsCompleted()
+    {
+        return $this->payments_completed >= $this->total_payments_due;
+    }
+
+    /**
+     * Get remaining payments count
+     */
+    public function getRemainingPaymentsAttribute()
+    {
+        return max(0, $this->total_payments_due - $this->payments_completed);
+    }
+
+    /**
+     * Get total contract amount
+     */
+    public function getTotalContractAmountAttribute()
+    {
+        $monthlyPrice = $this->program->monthly_price ?? 0;
+        return $monthlyPrice * ($this->contract_duration_months ?? 3);
+    }
+
+    /**
+     * Get monthly payment amount
+     */
+    public function getMonthlyPaymentAmountAttribute()
+    {
+        return $this->program->monthly_price ?? 0;
+    }
+
+    /**
+     * Check if next payment is due
+     */
+    public function isNextPaymentDue()
+    {
+        if ($this->payment_type !== self::PAYMENT_TYPE_MONTHLY) {
+            return false;
+        }
+        return $this->next_payment_date && now()->greaterThanOrEqualTo($this->next_payment_date) && !$this->areAllPaymentsCompleted();
+    }
+
+    /**
+     * Get current month bookings count
+     */
+    public function getCurrentMonthBookingsCount()
+    {
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+        
+        return Appointment::where('user_id', $this->user_id)
+            ->where('program', $this->program->name ?? '')
+            ->whereBetween('appointment_date', [$startOfMonth, $endOfMonth])
+            ->where('status', '!=', 'cancelled')
+            ->count();
+    }
+
+    /**
+     * Check if user has reached monthly booking limit
+     */
+    public function hasReachedMonthlyLimit()
+    {
+        $monthlySessions = $this->program->monthly_sessions ?? 0;
+        return $this->getCurrentMonthBookingsCount() >= $monthlySessions;
+    }
+
+    /**
+     * Get remaining bookings for current month
+     */
+    public function getRemainingBookingsAttribute()
+    {
+        $monthlySessions = $this->program->monthly_sessions ?? 0;
+        $used = $this->getCurrentMonthBookingsCount();
+        return max(0, $monthlySessions - $used);
+    }
+
+    /**
+     * Get additional booking charge
+     */
+    public function getAdditionalBookingChargeAttribute()
+    {
+        return $this->program->additional_booking_charge ?? 0;
     }
 }

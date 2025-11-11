@@ -51,7 +51,31 @@
                             </div>
                             <div class="card-body">
                                 <p class="text-muted small">{{ Str::limit($userProgram->program->description, 100) }}</p>
-                                <p class="mb-2"><strong>Monthly Price:</strong> ${{ number_format($userProgram->program->monthly_price ?? 0, 2) }}/mo</p>
+                                <!-- Pricing Section -->
+                                <div class="mb-3">
+                                    <div class="row text-center g-2">
+                                        <div class="{{ $userProgram->program->one_time_payment_amount ? 'col-4' : 'col-6' }}">
+                                            <div class="border rounded p-2 bg-light">
+                                                <div class="h6 mb-0 text-primary fw-bold">${{ number_format($userProgram->program->monthly_price ?? 0, 0) }}</div>
+                                                <small class="text-muted d-block">Per Month</small>
+                                            </div>
+                                        </div>
+                                        @if($userProgram->program->one_time_payment_amount)
+                                        <div class="col-4">
+                                            <div class="border rounded p-2 border-success bg-light">
+                                                <div class="h6 mb-0 text-success fw-bold">${{ number_format($userProgram->program->one_time_payment_amount, 0) }}</div>
+                                                <small class="text-muted d-block">One-Time</small>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        <div class="{{ $userProgram->program->one_time_payment_amount ? 'col-4' : 'col-6' }}">
+                                            <div class="border rounded p-2 bg-light">
+                                                <div class="h6 mb-0 text-info fw-bold">{{ $userProgram->program->monthly_sessions ?? 0 }}</div>
+                                                <small class="text-muted d-block">Sessions</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 
                                 <!-- Progress Indicator -->
                                 <div class="mb-3">
@@ -61,11 +85,9 @@
                                             @php
                                                 $progressSteps = [
                                                     'pending' => 0,
-                                                    'agreement_sent' => 20,
-                                                    'agreement_uploaded' => 40,
-                                                    'approved' => 60,
-                                                    'payment_requested' => 80,
-                                                    'payment_completed' => 90,
+                                                    'agreement_sent' => 25,
+                                                    'agreement_uploaded' => 50,
+                                                    'approved' => 75,
                                                     'active' => 100
                                                 ];
                                                 $currentProgress = $progressSteps[$userProgram->status] ?? 0;
@@ -102,10 +124,13 @@
                                         Agreement uploaded. Waiting for admin approval.
                                     </div>
                                 @elseif($userProgram->status === \App\Models\UserProgram::STATUS_APPROVED)
-                                    <div class="alert alert-success small mb-0">
+                                    <div class="alert alert-success small mb-2">
                                         <i class="fas fa-check-circle me-1"></i>
-                                        Program approved! Payment will be requested soon.
+                                        Program approved! Please proceed to payment selection.
                                     </div>
+                                    <a href="{{ route('client.programs.payment-selection', $userProgram) }}" class="btn btn-success btn-sm w-100">
+                                        <i class="fas fa-credit-card me-1"></i>Select Payment Method
+                                    </a>
                                 @elseif($userProgram->status === \App\Models\UserProgram::STATUS_PAYMENT_REQUESTED)
                                     <div class="alert alert-warning small mb-0">
                                         <i class="fas fa-credit-card me-1"></i>
@@ -137,9 +162,9 @@
         $cardClass = $isSelected ? 'border-success' : '';
     @endphp
     <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100 {{ $cardClass }}">
+        <div class="card h-100 shadow-sm {{ $cardClass }}">
             <div class="card-header program-card-header">
-                <h5 class="card-title mb-0 text-center">
+                <h5 class="card-title mb-0 text-center fw-bold">
                     {{ $program->name }}
                     @if($isSelected)
                         <span class="badge bg-light text-success ms-2">
@@ -184,32 +209,52 @@
                 </div>
                 @endif
                 
+                <!-- Pricing Section -->
                 <div class="mb-3">
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <div class="border rounded p-2">
-                                <div class="h5 mb-0 text-primary">${{ number_format($program->monthly_price ?? 0, 2) }}</div>
-                                <small class="text-muted">Per Month</small>
+                    <div class="row text-center g-2">
+                        <div class="{{ $program->one_time_payment_amount ? 'col-4' : 'col-6' }}">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="h5 mb-0 text-primary fw-bold">${{ number_format($program->monthly_price ?? 0, 0) }}</div>
+                                <small class="text-muted d-block">Per Month</small>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="border rounded p-2">
-                                <div class="h5 mb-0 text-success">{{ $program->monthly_sessions ?? 0 }}</div>
-                                <small class="text-muted">Sessions/Month</small>
+                        @if($program->one_time_payment_amount)
+                        <div class="col-4">
+                            <div class="border rounded p-2 border-success bg-light">
+                                <div class="h5 mb-0 text-success fw-bold">${{ number_format($program->one_time_payment_amount, 0) }}</div>
+                                <small class="text-muted d-block">One-Time (3mo)</small>
+                            </div>
+                        </div>
+                        @endif
+                        <div class="{{ $program->one_time_payment_amount ? 'col-4' : 'col-6' }}">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="h5 mb-0 text-info fw-bold">{{ $program->monthly_sessions ?? 0 }}</div>
+                                <small class="text-muted d-block">Sessions/Month</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <h6>Program Features:</h6>
-                <ul class="list-unstyled small">
-                    @foreach(array_slice($program->features, 0, 4) as $feature)
-                    <li><i class="fas fa-check text-success me-2"></i>{{ $feature }}</li>
-                    @endforeach
-                    @if(count($program->features) > 4)
-                    <li class="text-muted">+ {{ count($program->features) - 4 }} more features</li>
-                    @endif
-                </ul>
+                <!-- Features Section -->
+                @if($program->features && count($program->features) > 0)
+                <div class="mb-3">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-star text-warning me-1"></i>Program Features
+                    </h6>
+                    <ul class="list-unstyled small mb-0">
+                        @foreach(array_slice($program->features, 0, 4) as $feature)
+                        <li class="mb-1">
+                            <i class="fas fa-check-circle text-success me-2"></i>{{ $feature }}
+                        </li>
+                        @endforeach
+                        @if(count($program->features) > 4)
+                        <li class="text-muted mt-1">
+                            <i class="fas fa-ellipsis-h me-2"></i>+ {{ count($program->features) - 4 }} more features
+                        </li>
+                        @endif
+                    </ul>
+                </div>
+                @endif
 
                 <div class="d-grid gap-2">
                     <a href="{{ route('client.programs.show', $program) }}" class="btn btn-outline-primary">
@@ -238,9 +283,9 @@
                                 </button>
                                 @break
                             @case(\App\Models\UserProgram::STATUS_APPROVED)
-                                <button class="btn btn-success w-100" disabled>
-                                    <i class="fas fa-check me-1"></i>Approved
-                                </button>
+                                <a href="{{ route('client.programs.payment-selection', $userProgram) }}" class="btn btn-success w-100">
+                                    <i class="fas fa-credit-card me-1"></i>Proceed to Payment
+                                </a>
                                 @break
                             @case(\App\Models\UserProgram::STATUS_PAYMENT_REQUESTED)
                                 <button class="btn btn-warning w-100" disabled>

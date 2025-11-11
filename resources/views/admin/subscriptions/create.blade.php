@@ -63,11 +63,13 @@
                                         <label for="subscription_type" class="form-label">Subscription Type *</label>
                                         <select class="form-select" id="subscription_type" name="subscription_type" required>
                                             <option value="">Select Type</option>
+                                            <option value="life_coaching" {{ old('subscription_type') == 'life_coaching' ? 'selected' : '' }}>Life Coaching</option>
                                             <option value="student" {{ old('subscription_type') == 'student' ? 'selected' : '' }}>Student</option>
-                                            <option value="resident" {{ old('subscription_type') == 'resident' ? 'selected' : '' }}>Resident/Fellow</option>
-                                            <option value="medical" {{ old('subscription_type') == 'medical' ? 'selected' : '' }}>Medical</option>
-                                            <option value="concierge" {{ old('subscription_type') == 'concierge' ? 'selected' : '' }}>Medical Concierge</option>
+                                            <option value="professional" {{ old('subscription_type') == 'professional' ? 'selected' : '' }}>Professional</option>
                                             <option value="relationship" {{ old('subscription_type') == 'relationship' ? 'selected' : '' }}>Relationship</option>
+                                            <option value="resident" {{ old('subscription_type') == 'resident' ? 'selected' : '' }}>Resident</option>
+                                            <option value="fellow" {{ old('subscription_type') == 'fellow' ? 'selected' : '' }}>Fellow</option>
+                                            <option value="concierge" {{ old('subscription_type') == 'concierge' ? 'selected' : '' }}>Concierge</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6 mb-3">

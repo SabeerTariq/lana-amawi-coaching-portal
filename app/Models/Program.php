@@ -22,11 +22,16 @@ class Program extends Model
         'monthly_sessions',
         'is_subscription_based',
         'subscription_features',
+        'additional_booking_charge',
+        'one_time_payment_amount',
+        'agreement_template_path',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'monthly_price' => 'decimal:2',
+        'additional_booking_charge' => 'decimal:2',
+        'one_time_payment_amount' => 'decimal:2',
         'is_active' => 'boolean',
         'is_subscription_based' => 'boolean',
         'features' => 'array',
@@ -101,5 +106,42 @@ class Program extends Model
             return $this->sessions_included . ' session' . ($this->sessions_included > 1 ? 's' : '') . ' included';
         }
         return null;
+    }
+
+    /**
+     * Get formatted additional booking charge
+     */
+    public function getFormattedAdditionalBookingChargeAttribute()
+    {
+        return $this->additional_booking_charge ? '$' . number_format($this->additional_booking_charge, 2) : '$0.00';
+    }
+
+    /**
+     * Get formatted one-time payment amount
+     */
+    public function getFormattedOneTimePaymentAmountAttribute()
+    {
+        return $this->one_time_payment_amount ? '$' . number_format($this->one_time_payment_amount, 2) : null;
+    }
+
+    /**
+     * Get formatted subscription type display name
+     */
+    public function getFormattedSubscriptionTypeAttribute()
+    {
+        if (!$this->subscription_type) {
+            return 'General';
+        }
+
+        return match($this->subscription_type) {
+            'life_coaching' => 'Life Coaching',
+            'student' => 'Student',
+            'professional' => 'Professional',
+            'relationship' => 'Relationship',
+            'resident' => 'Resident',
+            'fellow' => 'Fellow',
+            'concierge' => 'Concierge',
+            default => ucfirst(str_replace('_', ' ', $this->subscription_type))
+        };
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Program;
 use App\Models\UserProgram;
 use App\Models\User;
 use App\Models\Subscription;
+use App\Models\Payment;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
@@ -21,16 +22,20 @@ class ProgramController extends Controller
      */
     public function applications()
     {
+        // Only show applications from agreement_uploaded status onwards
+        // Admin doesn't need to see pending, agreement_sent, or payment_requested statuses
         $allApplications = UserProgram::with(['user', 'program'])
+            ->whereIn('status', [
+                UserProgram::STATUS_AGREEMENT_UPLOADED,
+                UserProgram::STATUS_APPROVED,
+                UserProgram::STATUS_ACTIVE,
+                UserProgram::STATUS_REJECTED,
+                UserProgram::STATUS_CANCELLED
+            ])
             ->orderBy('created_at', 'desc')
             ->get();
             
         $applications = $allApplications->groupBy('status');
-
-        // Debug: Log the grouped applications
-        \Log::info('All applications count:', ['count' => $allApplications->count()]);
-        \Log::info('Grouped applications keys:', $applications->keys()->toArray());
-        \Log::info('Grouped applications:', $applications->toArray());
 
         return view('admin.programs.applications', compact('applications'));
     }
@@ -54,13 +59,13 @@ class ProgramController extends Controller
      */
 public function sendAgreement(UserProgram $userProgram)
     {
-        // Use the static PDF template instead of generating dynamic content
-        $templatePath = 'agreement-templates/life-coaching-contract.pdf';
+        // Get program-specific agreement template or fallback to default
+        $templatePath = $userProgram->program->agreement_template_path ?? 'agreement-templates/life-coaching-contract.pdf';
         $templateFullPath = storage_path('app/public/' . $templatePath);
         
         // Check if template exists
         if (!file_exists($templateFullPath)) {
-            return redirect()->back()->with('error', 'Agreement template not found.');
+            return redirect()->back()->with('error', 'Agreement template not found for this program. Please upload an agreement template in program settings.');
         }
 
         // Copy the template to agreements folder with unique name
@@ -121,14 +126,25 @@ public function sendAgreement(UserProgram $userProgram)
     /**
      * Request payment
      */
-    public function requestPayment(UserProgram $userProgram)
+    public function requestPayment(Request $request, UserProgram $userProgram)
     {
+        $request->validate([
+            'payment_type' => 'required|in:monthly,one_time',
+        ]);
+
+        // Set default contract duration if not set
+        if (!$userProgram->contract_duration_months) {
+            $userProgram->update(['contract_duration_months' => 3]);
+        }
+
         $userProgram->update([
             'status' => UserProgram::STATUS_PAYMENT_REQUESTED,
             'payment_requested_at' => now(),
+            'payment_type' => $request->payment_type,
         ]);
 
-        return redirect()->back()->with('success', 'Payment requested for ' . $userProgram->user->name . '!');
+        $paymentTypeText = $request->payment_type === 'monthly' ? 'monthly payments' : 'one-time payment';
+        return redirect()->back()->with('success', 'Payment requested (' . $paymentTypeText . ') for ' . $userProgram->user->name . '!');
     }
 
     /**
@@ -139,14 +155,44 @@ public function sendAgreement(UserProgram $userProgram)
         $request->validate([
             'amount_paid' => 'required|numeric|min:0',
             'payment_reference' => 'required|string|max:255',
+            'payment_type' => 'nullable|in:contract_monthly,contract_one_time,additional_session',
+            'month_number' => 'nullable|integer|min:1|max:3',
         ]);
 
-        $userProgram->update([
-            'status' => UserProgram::STATUS_PAYMENT_COMPLETED,
+        $paymentType = $request->payment_type ?? ($userProgram->payment_type === 'one_time' ? Payment::TYPE_CONTRACT_ONE_TIME : Payment::TYPE_CONTRACT_MONTHLY);
+        $monthNumber = $request->month_number ?? ($userProgram->payments_completed + 1);
+
+        // Create payment record
+        $payment = Payment::create([
+            'user_program_id' => $userProgram->id,
+            'payment_type' => $paymentType,
+            'status' => Payment::STATUS_COMPLETED,
+            'amount' => $request->amount_paid,
+            'payment_reference' => $request->payment_reference,
+            'month_number' => $paymentType === Payment::TYPE_CONTRACT_MONTHLY ? $monthNumber : null,
+            'paid_at' => now(),
+        ]);
+
+        // Update user program
+        $updateData = [
             'payment_completed_at' => now(),
             'amount_paid' => $request->amount_paid,
             'payment_reference' => $request->payment_reference,
-        ]);
+            'payments_completed' => $userProgram->payments_completed + 1,
+        ];
+
+        // If monthly payment, update next payment date
+        if ($paymentType === Payment::TYPE_CONTRACT_MONTHLY && $userProgram->payment_type === UserProgram::PAYMENT_TYPE_MONTHLY) {
+            $updateData['next_payment_date'] = now()->addMonth();
+        }
+
+        // If one-time payment or all payments completed, mark as payment completed
+        if ($paymentType === Payment::TYPE_CONTRACT_ONE_TIME || 
+            ($userProgram->payments_completed + 1 >= $userProgram->total_payments_due)) {
+            $updateData['status'] = UserProgram::STATUS_PAYMENT_COMPLETED;
+        }
+
+        $userProgram->update($updateData);
 
         return redirect()->back()->with('success', 'Payment marked as completed for ' . $userProgram->user->name . '!');
     }
@@ -156,11 +202,42 @@ public function sendAgreement(UserProgram $userProgram)
      */
     public function activateProgram(UserProgram $userProgram)
     {
+        // Initialize contract if not already initialized
+        if (!$userProgram->contract_start_date) {
+            $paymentType = $userProgram->payment_type ?? UserProgram::PAYMENT_TYPE_MONTHLY;
+            $userProgram->initializeContract($paymentType);
+        }
+
         $userProgram->update([
             'status' => UserProgram::STATUS_ACTIVE,
         ]);
 
-        return redirect()->back()->with('success', 'Program activated for ' . $userProgram->user->name . '!');
+        return redirect()->back()->with('success', 'Program activated for ' . $userProgram->user->name . '! Contract initialized.');
+    }
+
+    /**
+     * Mark additional session payment as completed
+     */
+    public function markAdditionalSessionPayment(Request $request, UserProgram $userProgram)
+    {
+        $request->validate([
+            'appointment_id' => 'required|exists:appointments,id',
+            'amount_paid' => 'required|numeric|min:0',
+            'payment_reference' => 'required|string|max:255',
+        ]);
+
+        // Create payment record for additional session
+        Payment::create([
+            'user_program_id' => $userProgram->id,
+            'appointment_id' => $request->appointment_id,
+            'payment_type' => Payment::TYPE_ADDITIONAL_SESSION,
+            'status' => Payment::STATUS_COMPLETED,
+            'amount' => $request->amount_paid,
+            'payment_reference' => $request->payment_reference,
+            'paid_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Additional session payment marked as completed!');
     }
 
     /**
@@ -227,6 +304,9 @@ public function sendAgreement(UserProgram $userProgram)
             'subscription_type' => 'nullable|string|max:255',
             'monthly_price' => 'required|numeric|min:0',
             'monthly_sessions' => 'required|integer|min:1',
+            'additional_booking_charge' => 'nullable|numeric|min:0',
+            'one_time_payment_amount' => 'nullable|numeric|min:0',
+            'agreement_template' => 'nullable|file|mimes:pdf|max:10240', // 10MB max
             'features' => 'nullable|array',
             'features.*' => 'string|max:255',
         ]);
@@ -237,6 +317,14 @@ public function sendAgreement(UserProgram $userProgram)
         $data['is_active'] = $request->has('is_active') ? 1 : 1; // Default to active if not specified
         $data['price'] = 0; // Set price to 0 since we only use monthly subscriptions
 
+        // Handle agreement template upload
+        if ($request->hasFile('agreement_template')) {
+            $file = $request->file('agreement_template');
+            $fileName = 'agreement_' . Str::slug($request->name) . '_' . time() . '.pdf';
+            $filePath = $file->storeAs('agreement-templates', $fileName, 'public');
+            $data['agreement_template_path'] = $filePath;
+        }
+
         // Filter out empty feature strings
         if (isset($data['features']) && is_array($data['features'])) {
             $data['features'] = array_filter($data['features'], function($feature) {
@@ -244,6 +332,9 @@ public function sendAgreement(UserProgram $userProgram)
             });
             $data['features'] = array_values($data['features']); // Re-index array
         }
+
+        // Remove file from data array (not a database field)
+        unset($data['agreement_template']);
 
         $program = Program::create($data);
 
@@ -280,6 +371,9 @@ public function sendAgreement(UserProgram $userProgram)
             'subscription_type' => 'nullable|string|max:255',
             'monthly_price' => 'required|numeric|min:0',
             'monthly_sessions' => 'required|integer|min:1',
+            'additional_booking_charge' => 'nullable|numeric|min:0',
+            'one_time_payment_amount' => 'nullable|numeric|min:0',
+            'agreement_template' => 'nullable|file|mimes:pdf|max:10240', // 10MB max
             'features' => 'nullable|array',
             'features.*' => 'string|max:255',
         ]);
@@ -290,6 +384,19 @@ public function sendAgreement(UserProgram $userProgram)
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
         $data['price'] = 0; // Set price to 0 since we only use monthly subscriptions
 
+        // Handle agreement template upload
+        if ($request->hasFile('agreement_template')) {
+            // Delete old agreement if exists
+            if ($program->agreement_template_path && Storage::disk('public')->exists($program->agreement_template_path)) {
+                Storage::disk('public')->delete($program->agreement_template_path);
+            }
+            
+            $file = $request->file('agreement_template');
+            $fileName = 'agreement_' . Str::slug($request->name) . '_' . time() . '.pdf';
+            $filePath = $file->storeAs('agreement-templates', $fileName, 'public');
+            $data['agreement_template_path'] = $filePath;
+        }
+
         // Filter out empty feature strings
         if (isset($data['features']) && is_array($data['features'])) {
             $data['features'] = array_filter($data['features'], function($feature) {
@@ -297,6 +404,9 @@ public function sendAgreement(UserProgram $userProgram)
             });
             $data['features'] = array_values($data['features']); // Re-index array
         }
+
+        // Remove file from data array (not a database field)
+        unset($data['agreement_template']);
 
         $program->update($data);
 
