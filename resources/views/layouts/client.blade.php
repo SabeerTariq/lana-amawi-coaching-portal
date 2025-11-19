@@ -201,6 +201,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('client.subscriptions') ? 'active' : '' }}" 
+                               href="{{ route('client.subscriptions') }}">
+                                <i class="fas fa-credit-card me-2"></i>Subscriptions & Payments
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('client.profile') ? 'active' : '' }}" 
                                href="{{ route('client.profile') }}">
                                 <i class="fas fa-user-circle me-2"></i>Profile

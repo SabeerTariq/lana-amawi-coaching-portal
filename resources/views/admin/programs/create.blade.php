@@ -98,7 +98,7 @@
                             </div>
                             <div class="card-body">
                                 <input type="hidden" name="is_subscription_based" value="1">
-                                                                
+                                
                                 <div class="mb-3">
                                     <label for="monthly_price" class="form-label">Monthly Price *</label>
                                     <div class="input-group">

@@ -66,7 +66,7 @@
                                             <td>
                                                 @if($program->monthly_price)
                                                     <div>
-                                                        <span class="fw-bold text-primary">${{ number_format($program->monthly_price, 2) }}/mo</span>
+                                                    <span class="fw-bold text-primary">${{ number_format($program->monthly_price, 2) }}/mo</span>
                                                         <br>
                                                         <small class="text-muted">
                                                             One-time: 

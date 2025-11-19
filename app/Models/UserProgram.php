@@ -33,6 +33,9 @@ class UserProgram extends Model
         'total_payments_due',
         'payments_completed',
         'one_time_payment_amount',
+        'stripe_customer_id',
+        'stripe_subscription_id',
+        'stripe_price_id',
     ];
 
     protected $casts = [

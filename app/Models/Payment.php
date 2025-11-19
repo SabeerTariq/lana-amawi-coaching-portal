@@ -19,6 +19,9 @@ class Payment extends Model
         'notes',
         'month_number',
         'paid_at',
+        'stripe_payment_intent_id',
+        'stripe_charge_id',
+        'stripe_customer_id',
     ];
 
     protected $casts = [

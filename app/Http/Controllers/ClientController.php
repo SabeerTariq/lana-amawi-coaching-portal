@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\Message;
 use App\Models\Booking;
 use App\Models\UserProgram;
+use App\Models\Payment;
 use App\Services\BookingAvailabilityService;
 
 class ClientController extends Controller
@@ -335,5 +336,37 @@ class ClientController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'You have requested a modification to the suggested time. We will review your request and get back to you.');
+    }
+
+    /**
+     * Show client subscriptions and payments
+     */
+    public function subscriptions()
+    {
+        $user = Auth::user();
+        
+        // Get all user programs with their payments
+        $userPrograms = UserProgram::where('user_id', $user->id)
+            ->with(['program', 'payments' => function($query) {
+                $query->orderBy('created_at', 'desc');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Get all payments
+        $payments = Payment::whereHas('userProgram', function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->with('userProgram.program')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Calculate totals
+        $totalPaid = $payments->where('status', Payment::STATUS_COMPLETED)->sum('amount');
+        $activeSubscriptions = $userPrograms->where('status', UserProgram::STATUS_ACTIVE)
+            ->where('payment_type', UserProgram::PAYMENT_TYPE_MONTHLY)
+            ->count();
+        
+        return view('client.subscriptions', compact('userPrograms', 'payments', 'totalPaid', 'activeSubscriptions'));
     }
 } 

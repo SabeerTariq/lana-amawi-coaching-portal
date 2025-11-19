@@ -241,9 +241,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.subscriptions*') ? 'active' : '' }}" 
-                               href="{{ route('admin.subscriptions.index') }}">
-                                <i class="fas fa-credit-card me-2"></i>Subscriptions
+                            <a class="nav-link {{ request()->routeIs('admin.payments') ? 'active' : '' }}" 
+                               href="{{ route('admin.payments') }}">
+                                <i class="fas fa-money-bill-wave me-2"></i>Payments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.subscriptions-list') ? 'active' : '' }}" 
+                               href="{{ route('admin.subscriptions-list') }}">
+                                <i class="fas fa-users me-2"></i>Subscriptions & Programs
                             </a>
                         </li>
                         <li class="nav-item">

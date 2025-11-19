@@ -278,9 +278,27 @@ public function sendAgreement(UserProgram $userProgram)
      */
     public function index()
     {
-        $programs = Program::withCount(['userPrograms', 'subscriptions'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Get programs with correct counts
+        // Applications: All UserProgram records (excluding cancelled)
+        // Subscriptions: Active UserProgram records (status = 'active')
+        $programs = Program::withCount([
+            'userPrograms as applications_count' => function($query) {
+                $query->where('status', '!=', UserProgram::STATUS_CANCELLED);
+            },
+            'userPrograms as subscriptions_count' => function($query) {
+                $query->where('status', UserProgram::STATUS_ACTIVE);
+            }
+        ])
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        // Map the counts to match the view expectations
+        $programs->each(function($program) {
+            // Applications count (all non-cancelled user programs)
+            $program->user_programs_count = $program->applications_count ?? 0;
+            // Subscriptions count (active user programs)
+            $program->subscriptions_count = $program->subscriptions_count ?? 0;
+        });
 
         return view('admin.programs.index', compact('programs'));
     }
@@ -442,5 +460,64 @@ public function sendAgreement(UserProgram $userProgram)
         
         return redirect()->back()
             ->with('success', "Program {$status} successfully!");
+    }
+
+    /**
+     * Admin cancels a user program/subscription
+     */
+    public function cancelSubscription(Request $request, UserProgram $userProgram)
+    {
+        $request->validate([
+            'cancellation_reason' => 'nullable|string|max:500',
+        ]);
+
+        // Check if program can be cancelled
+        if (!$userProgram->canBeCancelled()) {
+            return redirect()->back()->with('error', 'This program cannot be cancelled.');
+        }
+
+        try {
+            // Cancel Stripe subscription if it's a monthly subscription
+            if ($userProgram->payment_type === UserProgram::PAYMENT_TYPE_MONTHLY && $userProgram->stripe_subscription_id) {
+                try {
+                    $stripeService = new \App\Services\StripeService();
+                    $stripeService->cancelSubscription($userProgram->stripe_subscription_id);
+                    
+                    \Log::info('Stripe subscription cancelled by admin', [
+                        'user_program_id' => $userProgram->id,
+                        'stripe_subscription_id' => $userProgram->stripe_subscription_id,
+                        'admin_id' => auth()->id(),
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to cancel Stripe subscription: ' . $e->getMessage(), [
+                        'user_program_id' => $userProgram->id,
+                        'stripe_subscription_id' => $userProgram->stripe_subscription_id,
+                    ]);
+                    // Continue with cancellation even if Stripe cancellation fails
+                }
+            }
+
+            // Update program status to cancelled
+            $adminNotes = $userProgram->admin_notes ?? '';
+            $adminNotes .= "\n\n[CANCELLED BY ADMIN]\n";
+            if ($request->cancellation_reason) {
+                $adminNotes .= "Reason: " . $request->cancellation_reason . "\n";
+            }
+            $adminNotes .= "Cancelled by: " . auth()->user()->name . " (ID: " . auth()->id() . ")\n";
+            $adminNotes .= "Cancelled at: " . now()->format('Y-m-d H:i:s') . "\n";
+            if ($userProgram->stripe_subscription_id) {
+                $adminNotes .= "Stripe Subscription ID: " . $userProgram->stripe_subscription_id;
+            }
+
+            $userProgram->update([
+                'status' => UserProgram::STATUS_CANCELLED,
+                'admin_notes' => $adminNotes,
+            ]);
+
+            return redirect()->back()->with('success', 'Subscription cancelled successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Admin subscription cancellation failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to cancel subscription. Please try again.');
+        }
     }
 }

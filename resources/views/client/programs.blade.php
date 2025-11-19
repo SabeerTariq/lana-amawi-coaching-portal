@@ -242,17 +242,17 @@
                         <i class="fas fa-star text-warning me-1"></i>Program Features
                     </h6>
                     <ul class="list-unstyled small mb-0">
-                        @foreach(array_slice($program->features, 0, 4) as $feature)
+                    @foreach(array_slice($program->features, 0, 4) as $feature)
                         <li class="mb-1">
                             <i class="fas fa-check-circle text-success me-2"></i>{{ $feature }}
                         </li>
-                        @endforeach
-                        @if(count($program->features) > 4)
+                    @endforeach
+                    @if(count($program->features) > 4)
                         <li class="text-muted mt-1">
                             <i class="fas fa-ellipsis-h me-2"></i>+ {{ count($program->features) - 4 }} more features
                         </li>
-                        @endif
-                    </ul>
+                    @endif
+                </ul>
                 </div>
                 @endif
 

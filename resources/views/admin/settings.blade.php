@@ -123,7 +123,7 @@
 
         <!-- Profile Settings -->
         <div class="col-lg-8">
-            <div class="card shadow">
+            <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Profile Settings</h6>
                 </div>
@@ -174,6 +174,146 @@
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-2"></i>Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Stripe Settings -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Stripe Configuration</h6>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('admin.settings.stripe') }}" method="POST">
+                        @csrf
+                        
+                        <div class="mb-3">
+                            <label for="stripe_key" class="form-label">Stripe Publishable Key</label>
+                            <input type="text" class="form-control" id="stripe_key" name="stripe_key" 
+                                   value="{{ old('stripe_key', $stripeSettings['stripe_key']) }}" 
+                                   placeholder="pk_test_...">
+                            <div class="form-text">Your Stripe publishable key (starts with pk_test_ or pk_live_)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="stripe_secret" class="form-label">Stripe Secret Key</label>
+                            <input type="password" class="form-control" id="stripe_secret" name="stripe_secret" 
+                                   value="{{ old('stripe_secret', $stripeSettings['stripe_secret']) }}" 
+                                   placeholder="sk_test_...">
+                            <div class="form-text">Your Stripe secret key (starts with sk_test_ or sk_live_)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="stripe_webhook_secret" class="form-label">Stripe Webhook Secret</label>
+                            <input type="password" class="form-control" id="stripe_webhook_secret" name="stripe_webhook_secret" 
+                                   value="{{ old('stripe_webhook_secret', $stripeSettings['stripe_webhook_secret']) }}" 
+                                   placeholder="whsec_...">
+                            <div class="form-text">Your Stripe webhook signing secret (starts with whsec_)</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Stripe Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SMTP Settings -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">SMTP Email Configuration</h6>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('admin.settings.smtp') }}" method="POST">
+                        @csrf
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mail_mailer" class="form-label">Mail Driver</label>
+                                    <select class="form-select" id="mail_mailer" name="mail_mailer" required>
+                                        <option value="smtp" {{ old('mail_mailer', $smtpSettings['mail_mailer']) == 'smtp' ? 'selected' : '' }}>SMTP</option>
+                                        <option value="mailgun" {{ old('mail_mailer', $smtpSettings['mail_mailer']) == 'mailgun' ? 'selected' : '' }}>Mailgun</option>
+                                        <option value="ses" {{ old('mail_mailer', $smtpSettings['mail_mailer']) == 'ses' ? 'selected' : '' }}>Amazon SES</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mail_host" class="form-label">SMTP Host</label>
+                                    <input type="text" class="form-control" id="mail_host" name="mail_host" 
+                                           value="{{ old('mail_host', $smtpSettings['mail_host']) }}" 
+                                           placeholder="smtp.mailtrap.io" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mail_port" class="form-label">SMTP Port</label>
+                                    <input type="number" class="form-control" id="mail_port" name="mail_port" 
+                                           value="{{ old('mail_port', $smtpSettings['mail_port']) }}" 
+                                           placeholder="2525" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mail_encryption" class="form-label">Encryption</label>
+                                    <select class="form-select" id="mail_encryption" name="mail_encryption">
+                                        <option value="">None</option>
+                                        <option value="tls" {{ old('mail_encryption', $smtpSettings['mail_encryption']) == 'tls' ? 'selected' : '' }}>TLS</option>
+                                        <option value="ssl" {{ old('mail_encryption', $smtpSettings['mail_encryption']) == 'ssl' ? 'selected' : '' }}>SSL</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mail_username" class="form-label">SMTP Username</label>
+                                    <input type="text" class="form-control" id="mail_username" name="mail_username" 
+                                           value="{{ old('mail_username', $smtpSettings['mail_username']) }}" 
+                                           placeholder="Your SMTP username">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mail_password" class="form-label">SMTP Password</label>
+                                    <input type="password" class="form-control" id="mail_password" name="mail_password" 
+                                           value="{{ old('mail_password', $smtpSettings['mail_password']) }}" 
+                                           placeholder="Your SMTP password">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mail_from_address" class="form-label">From Email Address</label>
+                                    <input type="email" class="form-control" id="mail_from_address" name="mail_from_address" 
+                                           value="{{ old('mail_from_address', $smtpSettings['mail_from_address']) }}" 
+                                           placeholder="noreply@example.com" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mail_from_name" class="form-label">From Name</label>
+                                    <input type="text" class="form-control" id="mail_from_name" name="mail_from_name" 
+                                           value="{{ old('mail_from_name', $smtpSettings['mail_from_name']) }}" 
+                                           placeholder="Your Company Name" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save SMTP Settings
                             </button>
                         </div>
                     </form>

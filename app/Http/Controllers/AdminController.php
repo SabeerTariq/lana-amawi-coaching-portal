@@ -11,6 +11,8 @@ use App\Models\Appointment;
 use App\Models\Message;
 use App\Models\Booking;
 use App\Models\ClientNote; // Added this import
+use App\Models\UserProgram;
+use App\Models\Payment;
 
 class AdminController extends Controller
 {
@@ -290,7 +292,26 @@ class AdminController extends Controller
     {
         $admin = Auth::user();
         
-        return view('admin.settings', compact('admin'));
+        // Get Stripe settings
+        $stripeSettings = [
+            'stripe_key' => \App\Models\Setting::get('stripe_key', config('services.stripe.key')),
+            'stripe_secret' => \App\Models\Setting::get('stripe_secret', config('services.stripe.secret')),
+            'stripe_webhook_secret' => \App\Models\Setting::get('stripe_webhook_secret', config('services.stripe.webhook_secret')),
+        ];
+        
+        // Get SMTP settings
+        $smtpSettings = [
+            'mail_mailer' => \App\Models\Setting::get('mail_mailer', config('mail.default')),
+            'mail_host' => \App\Models\Setting::get('mail_host', config('mail.mailers.smtp.host')),
+            'mail_port' => \App\Models\Setting::get('mail_port', config('mail.mailers.smtp.port')),
+            'mail_username' => \App\Models\Setting::get('mail_username', config('mail.mailers.smtp.username')),
+            'mail_password' => \App\Models\Setting::get('mail_password', config('mail.mailers.smtp.password')),
+            'mail_encryption' => \App\Models\Setting::get('mail_encryption', config('mail.mailers.smtp.encryption')),
+            'mail_from_address' => \App\Models\Setting::get('mail_from_address', config('mail.from.address')),
+            'mail_from_name' => \App\Models\Setting::get('mail_from_name', config('mail.from.name')),
+        ];
+        
+        return view('admin.settings', compact('admin', 'stripeSettings', 'smtpSettings'));
     }
 
     public function updateSettings(Request $request)
@@ -309,6 +330,52 @@ class AdminController extends Controller
         // You might want to store additional settings in a separate table
 
         return redirect()->back()->with('success', 'Settings updated successfully!');
+    }
+
+    /**
+     * Update Stripe settings
+     */
+    public function updateStripeSettings(Request $request)
+    {
+        $request->validate([
+            'stripe_key' => 'nullable|string|max:255',
+            'stripe_secret' => 'nullable|string|max:255',
+            'stripe_webhook_secret' => 'nullable|string|max:255',
+        ]);
+
+        \App\Models\Setting::set('stripe_key', $request->stripe_key, 'stripe');
+        \App\Models\Setting::set('stripe_secret', $request->stripe_secret, 'stripe');
+        \App\Models\Setting::set('stripe_webhook_secret', $request->stripe_webhook_secret, 'stripe');
+
+        return redirect()->back()->with('success', 'Stripe settings updated successfully!');
+    }
+
+    /**
+     * Update SMTP settings
+     */
+    public function updateSmtpSettings(Request $request)
+    {
+        $request->validate([
+            'mail_mailer' => 'required|string|max:50',
+            'mail_host' => 'required|string|max:255',
+            'mail_port' => 'required|integer|min:1|max:65535',
+            'mail_username' => 'nullable|string|max:255',
+            'mail_password' => 'nullable|string|max:255',
+            'mail_encryption' => 'nullable|string|in:tls,ssl',
+            'mail_from_address' => 'required|email|max:255',
+            'mail_from_name' => 'required|string|max:255',
+        ]);
+
+        \App\Models\Setting::set('mail_mailer', $request->mail_mailer, 'smtp');
+        \App\Models\Setting::set('mail_host', $request->mail_host, 'smtp');
+        \App\Models\Setting::set('mail_port', $request->mail_port, 'smtp');
+        \App\Models\Setting::set('mail_username', $request->mail_username, 'smtp');
+        \App\Models\Setting::set('mail_password', $request->mail_password, 'smtp');
+        \App\Models\Setting::set('mail_encryption', $request->mail_encryption, 'smtp');
+        \App\Models\Setting::set('mail_from_address', $request->mail_from_address, 'smtp');
+        \App\Models\Setting::set('mail_from_name', $request->mail_from_name, 'smtp');
+
+        return redirect()->back()->with('success', 'SMTP settings updated successfully!');
     }
 
     public function updateLogo(Request $request)
@@ -683,5 +750,80 @@ class AdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Show all payments and subscriptions
+     */
+    public function payments()
+    {
+        // Get all payments with related data
+        $payments = Payment::with(['userProgram.user', 'userProgram.program', 'appointment'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+        
+        // Get payment statistics
+        $totalRevenue = Payment::where('status', Payment::STATUS_COMPLETED)->sum('amount');
+        $pendingPayments = Payment::where('status', Payment::STATUS_PENDING)->count();
+        $completedPayments = Payment::where('status', Payment::STATUS_COMPLETED)->count();
+        $failedPayments = Payment::where('status', Payment::STATUS_FAILED)->count();
+        
+        // Get payment breakdown by type
+        $paymentsByType = [
+            'contract_monthly' => Payment::where('payment_type', Payment::TYPE_CONTRACT_MONTHLY)
+                ->where('status', Payment::STATUS_COMPLETED)
+                ->sum('amount'),
+            'contract_one_time' => Payment::where('payment_type', Payment::TYPE_CONTRACT_ONE_TIME)
+                ->where('status', Payment::STATUS_COMPLETED)
+                ->sum('amount'),
+            'additional_session' => Payment::where('payment_type', Payment::TYPE_ADDITIONAL_SESSION)
+                ->where('status', Payment::STATUS_COMPLETED)
+                ->sum('amount'),
+        ];
+        
+        return view('admin.payments', compact(
+            'payments',
+            'totalRevenue',
+            'pendingPayments',
+            'completedPayments',
+            'failedPayments',
+            'paymentsByType'
+        ));
+    }
+
+    /**
+     * Show all subscriptions (UserPrograms)
+     */
+    public function subscriptions()
+    {
+        // Get all user programs (subscriptions) with related data
+        $subscriptions = UserProgram::with(['user', 'program', 'payments'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+        
+        // Get subscription statistics
+        $activeSubscriptions = UserProgram::where('status', UserProgram::STATUS_ACTIVE)->count();
+        $monthlySubscriptions = UserProgram::where('payment_type', UserProgram::PAYMENT_TYPE_MONTHLY)
+            ->where('status', UserProgram::STATUS_ACTIVE)
+            ->count();
+        $oneTimeSubscriptions = UserProgram::where('payment_type', UserProgram::PAYMENT_TYPE_ONE_TIME)
+            ->where('status', UserProgram::STATUS_ACTIVE)
+            ->count();
+        
+        // Get subscriptions by status
+        $subscriptionsByStatus = [
+            'active' => UserProgram::where('status', UserProgram::STATUS_ACTIVE)->count(),
+            'approved' => UserProgram::where('status', UserProgram::STATUS_APPROVED)->count(),
+            'cancelled' => UserProgram::where('status', UserProgram::STATUS_CANCELLED)->count(),
+            'rejected' => UserProgram::where('status', UserProgram::STATUS_REJECTED)->count(),
+        ];
+        
+        return view('admin.subscriptions-list', compact(
+            'subscriptions',
+            'activeSubscriptions',
+            'monthlySubscriptions',
+            'oneTimeSubscriptions',
+            'subscriptionsByStatus'
+        ));
     }
 } 

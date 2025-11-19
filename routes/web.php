@@ -22,6 +22,9 @@ Route::get('/', [BookingController::class, 'index'])->name('booking');
 Route::post('/booking/agreement/download', [BookingController::class, 'downloadAgreement'])->name('booking.agreement.download');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
 
+// Stripe webhook (must be outside middleware)
+Route::post('/stripe/webhook', [App\Http\Controllers\StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
+
 // Authentication routes
 // Separate admin and client login routes
 Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
@@ -47,6 +50,7 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     Route::post('/messages/send', [ClientController::class, 'sendMessage'])->name('messages.send');
     Route::get('/messages/attachment/{message}', [ClientController::class, 'downloadAttachment'])->name('messages.attachment');
     Route::get('/profile', [ClientController::class, 'profile'])->name('profile');
+    Route::get('/subscriptions', [ClientController::class, 'subscriptions'])->name('subscriptions');
     
     // Appointment management
     Route::put('/appointments/{appointment}/reschedule', [ClientController::class, 'rescheduleAppointment'])->name('appointments.reschedule');
@@ -65,11 +69,14 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     Route::get('/programs/{program}', [App\Http\Controllers\ProgramController::class, 'show'])->name('programs.show');
     Route::post('/programs/select', [App\Http\Controllers\ProgramController::class, 'selectProgram'])->name('programs.select');
     Route::post('/programs/{userProgram}/cancel', [App\Http\Controllers\ProgramController::class, 'cancelProgram'])->name('programs.cancel');
+    Route::post('/subscriptions/{userProgram}/cancel', [App\Http\Controllers\ProgramController::class, 'cancelProgram'])->name('subscriptions.cancel');
     Route::get('/programs/agreement/{userProgram}/download', [App\Http\Controllers\ProgramController::class, 'downloadAgreement'])->name('programs.agreement.download');
     Route::post('/programs/agreement/{userProgram}/upload', [App\Http\Controllers\ProgramController::class, 'uploadSignedAgreement'])->name('programs.agreement.upload');
     Route::get('/programs/{userProgram}/payment-selection', [App\Http\Controllers\ProgramController::class, 'paymentSelection'])->name('programs.payment-selection');
     Route::get('/programs/{userProgram}/checkout', [App\Http\Controllers\ProgramController::class, 'checkout'])->name('programs.checkout');
+    Route::post('/programs/{userProgram}/checkout/create-payment-intent', [App\Http\Controllers\ProgramController::class, 'createPaymentIntent'])->name('programs.checkout.create-payment-intent');
     Route::post('/programs/{userProgram}/checkout', [App\Http\Controllers\ProgramController::class, 'checkoutSubmit'])->name('programs.checkout.submit');
+    Route::get('/programs/{userProgram}/checkout/success', [App\Http\Controllers\ProgramController::class, 'checkoutSuccess'])->name('programs.checkout.success');
 });
 
 // Admin routes (authenticated + admin middleware)
@@ -113,6 +120,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
     Route::post('/settings/logo', [AdminController::class, 'updateLogo'])->name('settings.logo');
+    Route::post('/settings/stripe', [AdminController::class, 'updateStripeSettings'])->name('settings.stripe');
+    Route::post('/settings/smtp', [AdminController::class, 'updateSmtpSettings'])->name('settings.smtp');
     
     // Appointment management
     Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
@@ -121,6 +130,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // Booking management
     Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
+    
+    // Payments and Subscriptions management
+    Route::get('/payments', [AdminController::class, 'payments'])->name('payments');
+    Route::get('/subscriptions-list', [AdminController::class, 'subscriptions'])->name('subscriptions-list');
     Route::post('/bookings/{booking}/convert', [AdminController::class, 'convertBookingToAppointment'])->name('bookings.convert');
     Route::post('/bookings/{booking}/suggest-time', [AdminController::class, 'suggestAlternativeTime'])->name('bookings.suggest-time');
     
@@ -168,6 +181,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/programs/{userProgram}/activate', [App\Http\Controllers\Admin\ProgramController::class, 'activateProgram'])->name('programs.activate');
     Route::post('/programs/{userProgram}/reject', [App\Http\Controllers\Admin\ProgramController::class, 'rejectApplication'])->name('programs.reject');
     Route::post('/programs/{userProgram}/add-notes', [App\Http\Controllers\Admin\ProgramController::class, 'addNotes'])->name('programs.add-notes');
+    Route::post('/subscriptions/{userProgram}/cancel', [App\Http\Controllers\Admin\ProgramController::class, 'cancelSubscription'])->name('subscriptions.cancel');
     
     // Program CRUD management
     Route::resource('programs', App\Http\Controllers\Admin\ProgramController::class)->except(['show']);
