@@ -65,13 +65,13 @@
         <div class="credentials-box">
             <strong>Email:</strong> {{ $user->email }}<br>
             <strong>Password:</strong> {{ $password }}<br>
-            <strong>Portal URL:</strong> <a href="{{ url('/login') }}">{{ url('/login') }}</a>
+            <strong>Portal URL:</strong> <a href="{{ url('/') }}">{{ url('/') }}</a>
         </div>
         
         <p><strong>Important:</strong> Please change your password after your first login for security purposes.</p>
         
         <div style="text-align: center;">
-            <a href="{{ url('/login') }}" class="login-button">Login to Your Portal</a>
+            <a href="{{ url('/') }}" class="login-button">Login to Your Portal</a>
         </div>
         
         <p>In your client portal, you can:</p>

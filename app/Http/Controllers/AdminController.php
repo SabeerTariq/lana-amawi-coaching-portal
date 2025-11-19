@@ -347,7 +347,11 @@ class AdminController extends Controller
         \App\Models\Setting::set('stripe_secret', $request->stripe_secret, 'stripe');
         \App\Models\Setting::set('stripe_webhook_secret', $request->stripe_webhook_secret, 'stripe');
 
-        return redirect()->back()->with('success', 'Stripe settings updated successfully!');
+        // Clear config cache to ensure new settings are loaded
+        \Artisan::call('config:clear');
+        \Cache::flush();
+
+        return redirect()->back()->with('success', 'Stripe settings updated successfully! Settings will take effect immediately.');
     }
 
     /**
@@ -375,7 +379,58 @@ class AdminController extends Controller
         \App\Models\Setting::set('mail_from_address', $request->mail_from_address, 'smtp');
         \App\Models\Setting::set('mail_from_name', $request->mail_from_name, 'smtp');
 
-        return redirect()->back()->with('success', 'SMTP settings updated successfully!');
+        // Clear config cache to ensure new settings are loaded
+        \Artisan::call('config:clear');
+        \Cache::flush();
+
+        // Reload mail configuration immediately
+        $this->reloadMailConfig();
+
+        return redirect()->back()->with('success', 'SMTP settings updated successfully! Settings will take effect immediately.');
+    }
+
+    /**
+     * Reload mail configuration from database
+     */
+    private function reloadMailConfig()
+    {
+        try {
+            $mailMailer = \App\Models\Setting::get('mail_mailer');
+            $mailHost = \App\Models\Setting::get('mail_host');
+            $mailPort = \App\Models\Setting::get('mail_port');
+            $mailUsername = \App\Models\Setting::get('mail_username');
+            $mailPassword = \App\Models\Setting::get('mail_password');
+            $mailEncryption = \App\Models\Setting::get('mail_encryption');
+            $mailFromAddress = \App\Models\Setting::get('mail_from_address');
+            $mailFromName = \App\Models\Setting::get('mail_from_name');
+
+            if ($mailMailer) {
+                \Config::set('mail.default', $mailMailer);
+            }
+            if ($mailHost) {
+                \Config::set('mail.mailers.smtp.host', $mailHost);
+            }
+            if ($mailPort) {
+                \Config::set('mail.mailers.smtp.port', $mailPort);
+            }
+            if ($mailUsername !== null) {
+                \Config::set('mail.mailers.smtp.username', $mailUsername);
+            }
+            if ($mailPassword !== null) {
+                \Config::set('mail.mailers.smtp.password', $mailPassword);
+            }
+            if ($mailEncryption !== null) {
+                \Config::set('mail.mailers.smtp.encryption', $mailEncryption);
+            }
+            if ($mailFromAddress) {
+                \Config::set('mail.from.address', $mailFromAddress);
+            }
+            if ($mailFromName) {
+                \Config::set('mail.from.name', $mailFromName);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to reload mail config: ' . $e->getMessage());
+        }
     }
 
     public function updateLogo(Request $request)

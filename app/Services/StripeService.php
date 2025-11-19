@@ -12,11 +12,53 @@ use Illuminate\Support\Facades\Log;
 
 class StripeService
 {
-    public function __construct()
+    /**
+     * Initialize Stripe with API key from database or config
+     * Always fetches fresh values to ensure latest settings are used
+     */
+    protected function initializeStripe()
     {
-        // Get Stripe secret from database settings, fallback to config
+        // Always get fresh values from database (not cached)
         $stripeSecret = \App\Models\Setting::get('stripe_secret', config('services.stripe.secret'));
         Stripe::setApiKey($stripeSecret);
+    }
+
+    public function __construct()
+    {
+        $this->initializeStripe();
+    }
+
+    /**
+     * Get current Stripe publishable key (always fresh from database)
+     */
+    public function getPublishableKey()
+    {
+        return \App\Models\Setting::get('stripe_key', config('services.stripe.key'));
+    }
+
+    /**
+     * Get current Stripe secret key (always fresh from database)
+     */
+    public function getSecretKey()
+    {
+        return \App\Models\Setting::get('stripe_secret', config('services.stripe.secret'));
+    }
+
+    /**
+     * Refresh Stripe API key (useful after settings update)
+     */
+    public function refreshApiKey()
+    {
+        $this->initializeStripe();
+    }
+
+    /**
+     * Ensure Stripe is initialized with latest API key before any operation
+     */
+    protected function ensureInitialized()
+    {
+        // Re-initialize to get latest API key from database
+        $this->initializeStripe();
     }
 
     /**
@@ -24,6 +66,7 @@ class StripeService
      */
     public function createCustomer($email, $name, $metadata = [])
     {
+        $this->ensureInitialized();
         try {
             return Customer::create([
                 'email' => $email,
@@ -41,6 +84,7 @@ class StripeService
      */
     public function createPaymentIntent($amount, $currency = 'usd', $customerId = null, $metadata = [], $description = null)
     {
+        $this->ensureInitialized();
         try {
             $params = [
                 'amount' => $amount * 100, // Convert to cents
@@ -71,6 +115,7 @@ class StripeService
      */
     public function createSubscription($customerId, $priceId, $metadata = [])
     {
+        $this->ensureInitialized();
         try {
             $subscription = Subscription::create([
                 'customer' => $customerId,
@@ -149,6 +194,7 @@ class StripeService
      */
     public function createPrice($productId, $amount, $currency = 'usd', $interval = 'month')
     {
+        $this->ensureInitialized();
         try {
             return \Stripe\Price::create([
                 'product' => $productId,
@@ -169,6 +215,7 @@ class StripeService
      */
     public function createProduct($name, $description = null, $metadata = [])
     {
+        $this->ensureInitialized();
         try {
             return \Stripe\Product::create([
                 'name' => $name,
@@ -186,6 +233,7 @@ class StripeService
      */
     public function retrievePaymentIntent($paymentIntentId, $expand = [])
     {
+        $this->ensureInitialized();
         try {
             $params = [];
             if (!empty($expand)) {
@@ -203,6 +251,7 @@ class StripeService
      */
     public function retrieveSubscription($subscriptionId)
     {
+        $this->ensureInitialized();
         try {
             return Subscription::retrieve($subscriptionId);
         } catch (ApiErrorException $e) {
@@ -216,6 +265,7 @@ class StripeService
      */
     public function cancelSubscription($subscriptionId)
     {
+        $this->ensureInitialized();
         try {
             $subscription = Subscription::retrieve($subscriptionId);
             return $subscription->cancel();
@@ -230,6 +280,7 @@ class StripeService
      */
     public function createSetupIntent($customerId, $metadata = [])
     {
+        $this->ensureInitialized();
         try {
             return \Stripe\SetupIntent::create([
                 'customer' => $customerId,
