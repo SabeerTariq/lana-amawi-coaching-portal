@@ -87,64 +87,43 @@ class BookingController extends Controller
             // Check if user already exists
             $user = User::where('email', $request->email)->first();
             
-            if (!$user) {
-                // Generate a random password
-                $password = Str::random(8);
-                
-                // Create new user with professional information
-                $user = User::create([
-                    'name' => $request->full_name,
-                    'email' => $request->email,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'date_of_birth' => $request->date_of_birth,
-                    'gender' => $request->gender,
-                    'age' => $request->age,
-                    'languages_spoken' => $request->languages_spoken,
-                    'institution_hospital' => $request->institution_hospital,
-                    'position' => $request->position,
-                    'position_as_of_date' => $request->position_as_of_date,
-                    'specialty' => $request->specialty,
-                    'education_institution' => $request->education_institution,
-                    'graduation_date' => $request->graduation_date,
-                    'password' => Hash::make($password),
-                    'is_admin' => false,
-                ]);
-                
-                // Send credentials email
-                try {
-                    Mail::to($user->email)->send(new ClientCredentials($user, $password));
-                } catch (\Exception $mailException) {
-                    \Log::error('Mail sending failed: ' . $mailException->getMessage());
-                    // Continue with registration even if email fails
-                }
-            } else {
-                // User already exists, update their professional information and generate new password
-                $newPassword = Str::random(8);
-                $user->update([
-                    'name' => $request->full_name,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'date_of_birth' => $request->date_of_birth,
-                    'gender' => $request->gender,
-                    'age' => $request->age,
-                    'languages_spoken' => $request->languages_spoken,
-                    'institution_hospital' => $request->institution_hospital,
-                    'position' => $request->position,
-                    'position_as_of_date' => $request->position_as_of_date,
-                    'specialty' => $request->specialty,
-                    'education_institution' => $request->education_institution,
-                    'graduation_date' => $request->graduation_date,
-                    'password' => Hash::make($newPassword)
-                ]);
-                
-                // Send new credentials email
-                try {
-                    Mail::to($user->email)->send(new ClientCredentials($user, $newPassword));
-                } catch (\Exception $mailException) {
-                    \Log::error('Mail sending failed for existing user: ' . $mailException->getMessage());
-                    // Continue with registration even if email fails
-                }
+            if ($user) {
+                // User already exists - return error message
+                \Log::info('Registration attempted with existing email: ' . $request->email);
+                return redirect()->back()
+                    ->withErrors(['email' => 'An account with this email address already exists. Please login instead.'])
+                    ->withInput();
+            }
+            
+            // Generate a random password
+            $password = Str::random(8);
+            
+            // Create new user with professional information
+            $user = User::create([
+                'name' => $request->full_name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'date_of_birth' => $request->date_of_birth,
+                'gender' => $request->gender,
+                'age' => $request->age,
+                'languages_spoken' => $request->languages_spoken,
+                'institution_hospital' => $request->institution_hospital,
+                'position' => $request->position,
+                'position_as_of_date' => $request->position_as_of_date,
+                'specialty' => $request->specialty,
+                'education_institution' => $request->education_institution,
+                'graduation_date' => $request->graduation_date,
+                'password' => Hash::make($password),
+                'is_admin' => false,
+            ]);
+            
+            // Send credentials email
+            try {
+                Mail::to($user->email)->send(new ClientCredentials($user, $password));
+            } catch (\Exception $mailException) {
+                \Log::error('Mail sending failed: ' . $mailException->getMessage());
+                // Continue with registration even if email fails
             }
 
             \Log::info('User registration completed successfully for user: ' . $user->email);

@@ -106,10 +106,10 @@
                                          <div class="text-center">
                          <p class="text-muted mb-2">
                              Don't have an account? 
-                             <a href="{{ route('register') }}" class="text-decoration-none">Sign up here</a>
+                             <a href="{{ route('booking') }}" class="text-decoration-none">Register here</a>
                          </p>
                          <a href="{{ route('booking') }}" class="btn btn-outline-secondary btn-sm">
-                             <i class="fas fa-arrow-left me-2"></i>Back to Form
+                             <i class="fas fa-arrow-left me-2"></i>Back to Registration Form
                          </a>
                      </div>
                 </div>

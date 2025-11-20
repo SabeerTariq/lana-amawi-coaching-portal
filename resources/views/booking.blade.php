@@ -31,6 +31,11 @@
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
+                            @if($errors->has('email'))
+                                <div class="mt-3">
+                                    <a href="{{ route('client.login') }}" class="btn btn-primary btn-sm">Go to Login Page</a>
+                                </div>
+                            @endif
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
