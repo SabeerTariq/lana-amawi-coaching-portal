@@ -225,11 +225,16 @@ class UserProgram extends Model
         $endDate = now()->addMonths($this->contract_duration_months ?? 3);
         $oneTimeAmount = $this->program->one_time_payment_amount ?? ($this->program->monthly_price ?? 0) * ($this->contract_duration_months ?? 3);
 
+        // For one-time payments, total_payments_due should be 1, not the contract duration
+        $totalPaymentsDue = $paymentType === self::PAYMENT_TYPE_ONE_TIME 
+            ? 1 
+            : ($this->contract_duration_months ?? 3);
+
         $this->update([
             'payment_type' => $paymentType,
             'contract_start_date' => $startDate,
             'contract_end_date' => $endDate,
-            'total_payments_due' => $this->contract_duration_months ?? 3,
+            'total_payments_due' => $totalPaymentsDue,
             'next_payment_date' => $paymentType === self::PAYMENT_TYPE_MONTHLY ? $startDate : null,
             'one_time_payment_amount' => $paymentType === self::PAYMENT_TYPE_ONE_TIME ? $oneTimeAmount : null,
         ]);

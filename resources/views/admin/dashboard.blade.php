@@ -6,10 +6,10 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Admin Dashboard</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group me-2">
+        <!-- <div class="btn-group me-2">
             <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
             <button type="button" class="btn btn-sm btn-outline-secondary">Print</button>
-        </div>
+        </div> -->
     </div>
 </div>
 
@@ -62,7 +62,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="flex-grow-1">
-                        <h4 class="mb-0 fs-4">{{ $totalRevenue ?? '$0' }}</h4>
+                        <h4 class="mb-0 fs-4">${{ number_format($totalRevenue ?? 0, 2) }}</h4>
                         <p class="mb-0 small">Total Revenue</p>
                     </div>
                     <i class="fas fa-dollar-sign fa-2x opacity-75 ms-2"></i>

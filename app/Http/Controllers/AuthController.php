@@ -110,7 +110,7 @@ class AuthController extends Controller
         return redirect()->route('booking');
     }
 
-    // Password Reset Methods
+    // Client Password Reset Methods
     public function showForgotPassword()
     {
         return view('auth.forgot-password');
@@ -158,7 +158,81 @@ class AuthController extends Controller
         );
 
         return $status === Password::PASSWORD_RESET
-                    ? redirect()->route('booking')->with('status', __($status))
+                    ? redirect()->route('client.login')->with('status', __($status))
+                    : back()->withErrors(['email' => [__($status)]]);
+    }
+
+    // Admin Password Reset Methods
+    public function showAdminForgotPassword()
+    {
+        return view('auth.admin-forgot-password');
+    }
+
+    public function sendAdminResetLink(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        // Check if the user exists and is an admin
+        $user = User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            return back()->withErrors(['email' => 'We could not find a user with that email address.']);
+        }
+
+        if (!$user->is_admin) {
+            return back()->withErrors(['email' => 'This email address is not associated with an admin account.']);
+        }
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+                    ? back()->with(['status' => __($status)])
+                    : back()->withErrors(['email' => __($status)]);
+    }
+
+    public function showAdminResetPassword(Request $request, $token)
+    {
+        return view('auth.admin-reset-password', ['token' => $token, 'email' => $request->email]);
+    }
+
+    public function resetAdminPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        // Check if the user exists and is an admin
+        $user = User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            return back()->withErrors(['email' => 'We could not find a user with that email address.']);
+        }
+
+        if (!$user->is_admin) {
+            return back()->withErrors(['email' => 'This email address is not associated with an admin account.']);
+        }
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+                    ? redirect()->route('admin.login')->with('status', __($status))
                     : back()->withErrors(['email' => [__($status)]]);
     }
 } 

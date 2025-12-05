@@ -223,6 +223,11 @@
                                             <i class="fas fa-check me-1"></i>Approve
                                         </button>
                                     </form>
+                                    <button type="button" class="btn btn-danger btn-sm" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#rejectModal{{ $application->id }}">
+                                        <i class="fas fa-times me-1"></i>Reject
+                                    </button>
                                     <a href="{{ route('admin.programs.view-agreement', $application) }}" 
                                        class="btn btn-outline-primary btn-sm" target="_blank">
                                         <i class="fas fa-eye me-1"></i>View Agreement
@@ -273,7 +278,7 @@
 
 <!-- Reject Modal -->
 @foreach($applications->flatten() as $application)
-@if($application->status === 'pending')
+@if(in_array($application->status, ['pending', 'agreement_uploaded']))
 <div class="modal fade" id="rejectModal{{ $application->id }}" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -284,14 +289,21 @@
             <form action="{{ route('admin.programs.reject', $application) }}" method="POST">
                 @csrf
                 <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> This action will reject the program application. The client will be notified and the status will be changed to "Rejected".
+                    </div>
                     <div class="mb-3">
-                        <label for="admin_notes" class="form-label">Reason for rejection</label>
-                        <textarea class="form-control" id="admin_notes" name="admin_notes" rows="3" required></textarea>
+                        <label for="admin_notes{{ $application->id }}" class="form-label">Reason for rejection <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="admin_notes{{ $application->id }}" name="admin_notes" rows="4" required placeholder="Please provide a reason for rejecting this application..."></textarea>
+                        <small class="form-text text-muted">This note will be visible to the admin and may be shared with the client.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Reject Application</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times me-1"></i>Reject Application
+                    </button>
                 </div>
             </form>
         </div>

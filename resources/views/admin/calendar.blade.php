@@ -12,13 +12,13 @@
             </button>
             <button class="btn btn-outline-success" id="addBookingBtn">
                 <i class="fas fa-calendar-plus me-2"></i>Add Booking
-            </button>
+            <!-- </button>
             <button class="btn btn-outline-secondary" onclick="exportCalendar()">
                 <i class="fas fa-download me-2"></i>Export
             </button>
             <button class="btn btn-outline-secondary" onclick="window.print()">
                 <i class="fas fa-print me-2"></i>Print
-            </button>
+            </button> -->
         </div>
     </div>
 

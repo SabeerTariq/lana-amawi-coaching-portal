@@ -23,7 +23,7 @@ class AdminController extends Controller
         $unreadMessages = Message::where('sender_type', 'client')
             ->where('is_read', false)
             ->count();
-        $totalRevenue = Appointment::where('status', 'completed')->count() * 100; // Assuming $100 per session
+        $totalRevenue = Payment::where('status', Payment::STATUS_COMPLETED)->sum('amount') ?? 0;
 
         $todayAppointments = Appointment::with('user')
             ->where('appointment_date', now()->toDateString())
@@ -813,7 +813,12 @@ class AdminController extends Controller
     public function payments()
     {
         // Get all payments with related data
-        $payments = Payment::with(['userProgram.user', 'userProgram.program', 'appointment'])
+        $payments = Payment::with([
+            'userProgram.user', 
+            'userProgram.program', 
+            'userProgram.payments',
+            'appointment'
+        ])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
         

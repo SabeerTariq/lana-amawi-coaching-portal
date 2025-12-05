@@ -33,11 +33,17 @@ Route::get('/client/login', [AuthController::class, 'showClientLogin'])->name('c
 Route::post('/client/login', [AuthController::class, 'clientLogin']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Password Reset Routes
+// Client Password Reset Routes
 Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
 Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+
+// Admin Password Reset Routes
+Route::get('/admin/forgot-password', [AuthController::class, 'showAdminForgotPassword'])->name('admin.password.request');
+Route::post('/admin/forgot-password', [AuthController::class, 'sendAdminResetLink'])->name('admin.password.email');
+Route::get('/admin/reset-password/{token}', [AuthController::class, 'showAdminResetPassword'])->name('admin.password.reset');
+Route::post('/admin/reset-password', [AuthController::class, 'resetAdminPassword'])->name('admin.password.update');
 
 // Client routes (authenticated)
 Route::middleware(['auth'])->prefix('client')->name('client.')->group(function () {

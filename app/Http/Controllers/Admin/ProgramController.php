@@ -249,9 +249,19 @@ public function sendAgreement(UserProgram $userProgram)
             'admin_notes' => 'required|string|max:1000',
         ]);
 
+        // Append rejection note to existing admin notes
+        $adminNotes = $userProgram->admin_notes ?? '';
+        if (!empty($adminNotes)) {
+            $adminNotes .= "\n\n";
+        }
+        $adminNotes .= "[REJECTED]\n";
+        $adminNotes .= "Reason: " . $request->admin_notes . "\n";
+        $adminNotes .= "Rejected by: " . auth()->user()->name . " (ID: " . auth()->id() . ")\n";
+        $adminNotes .= "Rejected at: " . now()->format('Y-m-d H:i:s');
+
         $userProgram->update([
             'status' => UserProgram::STATUS_REJECTED,
-            'admin_notes' => $request->admin_notes,
+            'admin_notes' => $adminNotes,
         ]);
 
         return redirect()->back()->with('success', 'Application rejected for ' . $userProgram->user->name . '.');
